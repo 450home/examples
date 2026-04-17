@@ -4,8 +4,10 @@
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node25` directory:
 
@@ -40,24 +42,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-node25-v8mp4
- ├────────── uuid: c3d4e5f6-a7b8-9012-cdef-123456789012
- ├───────── state: starting
- ├──────── domain: https://bright-star-k3m7pqnx.fra.unikraft.app
- ├───────── image: httpserver-node25@sha256:7b3e1f9d5a2c8e4b0f6d3a7c5e2b9f4d1a8c6e3b0f7d4a1c8e5b2f9d6a3c0
- ├──────── memory: 512 MiB
- ├─────── service: bright-star-k3m7pqnx
- ├── private fqdn: httpserver-node25-v8mp4.internal
- ├──── private ip: 172.16.3.6
- └────────── args: /usr/bin/node /usr/src/server.js
+ ├───────── name: httpserver-node25-v8mp4
+ ├───────── uuid: c3d4e5f6-a7b8-9012-cdef-123456789012
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://bright-star-k3m7pqnx.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-node25@sha256:7b3e1f9d5a2c8e4b0f6d3a7c5e2b9f4d1a8c6e3b0f7d4a1c8e5b2f9d6a3c0
+ ├─────── memory: 512 MiB
+ ├────── service: bright-star-k3m7pqnx
+ ├─ private fqdn: httpserver-node25-v8mp4.internal
+ └─── private ip: 10.0.3.6
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-node25-v8mp4
+uuid:         c3d4e5f6-a7b8-9012-cdef-123456789012
+state:        starting
+image:        <my-org>/httpserver-node25
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       8c6367b6-d913-4b24-fbc4-922cf124c8f8
+  name:       bright-star-k3m7pqnx
+  domains:
+  - fqdn:     bright-star-k3m7pqnx.fra.unikraft.app
+networks:
+- uuid:       229c5467-216f-79dd-e2f9-3307b196fad3
+  private-ip: 10.0.3.6
+  mac:        12:b0:25:ce:7f:75
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-node25-v8mp4` and the address is `https://bright-star-k3m7pqnx.fra.unikraft.app`.
@@ -79,15 +105,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                                   CREATED
+fra    httpserver-node25-v8mp4  running  <my-org>/httpserver-node25        512MiB  1      bright-star-k3m7pqnx.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                     FQDN                                   STATE    STATUS       IMAGE                                 MEMORY   VCPUS  ARGS                              BOOT TIME
-httpserver-node25-v8mp4  bright-star-k3m7pqnx.fra.unikraft.app  running  since 3mins  httpserver-node25@sha256:7b3e1f9d...  512 MiB  1      /usr/bin/node /usr/src/server.js  276.18 ms
+```ansi title="kraft"
+NAME                     FQDN                                   STATE    STATUS       IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-node25-v8mp4  bright-star-k3m7pqnx.fra.unikraft.app  running  since 3mins  oci://unikraft.io/<my-org>/httpserver-node25@sha256:...  512 MiB  1            276.18 ms
 ```
 
 When done, you can remove the instance:

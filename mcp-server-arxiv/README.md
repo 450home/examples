@@ -16,8 +16,10 @@ The server gives AI agents and assistants the ability to:
 
 To run this MCP server on Unikraft Cloud:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mcp-server-arxiv/` directory:
 
@@ -52,24 +54,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 2G --image <my-org>/mcp-server-
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 2G .
+kraft cloud deploy -p 443:8080/tls+http -M 2Gi .
 ```
 
 The output shows your instance details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├─────── name: mcp-server-arxiv-l7l24
- ├─────── uuid: 1a721bb8-4472-4149-9870-789b1df5f80a
- ├────── metro: https://api.fra.unikraft.cloud/v1
- ├────── state: starting
- ├───── domain: https://billowing-breeze-nuusy7l2.fra.unikraft.app
- ├────── image: mcp-server-arxiv@sha256:ea1e677ccc03628a3e7d57a4cd41118e3d2a631bcb2c34203bb9b175e7977f00
- ├───── memory: 2048 MiB
- ├──── service: billowing-breeze-nuusy7l2
- ├─ private ip: 10.0.1.149
- └─────── args: /usr/local/bin/python /src/server.py
+ ├───────── name: mcp-server-arxiv-l7l24
+ ├───────── uuid: 1a721bb8-4472-4149-9870-789b1df5f80a
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://billowing-breeze-nuusy7l2.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/mcp-server-arxiv@sha256:ea1e677ccc03628a3e7d57a4cd41118e3d2a631bcb2c34203bb9b175e7977f00
+ ├─────── memory: 2048 MiB
+ ├────── service: billowing-breeze-nuusy7l2
+ ├─ private fqdn: mcp-server-arxiv-l7l24.internal
+ └─── private ip: 10.0.1.149
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         mcp-server-arxiv-l7l24
+uuid:         1a721bb8-4472-4149-9870-789b1df5f80a
+state:        starting
+image:        <my-org>/mcp-server-arxiv
+resources:
+  memory:     2048MiB
+  vcpus:      1
+service:
+  uuid:       94b10356-3df8-b2fa-cd17-60ca8193c86c
+  name:       billowing-breeze-nuusy7l2
+  domains:
+  - fqdn:     billowing-breeze-nuusy7l2.fra.unikraft.app
+networks:
+- uuid:       e6754486-5398-bb06-420e-de23ed73da3f
+  private-ip: 10.0.1.149
+  mac:        12:b0:26:13:a0:89
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `mcp-server-arxiv-l7l24` and the service `billowing-breeze-nuusy7l2`.
@@ -98,15 +124,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                    STATE    IMAGE                      ARGS  MEMORY  VCPUS  FQDN                                    CREATED
+fra    mcp-server-arxiv-l7l24  standby  <my-org>/mcp-server-arxiv        2.0GiB  1      billowing-breeze-nuusy7l2.fra.unikraf…  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                    FQDN                                        STATE    STATUS   IMAGE                                                              MEMORY   VCPUS  ARGS                             BOOT TIME
-mcp-server-arxiv-l7l24  billowing-breeze-nuusy7l2.fra.unikraft.app  standby  standby  mcp-server-arxiv@sha256:ea1e677ccc03628a3e7d57a4cd41118e3d2a63...  2.0 GiB  1      /usr/bin/python3 /src/server.py  213.07 ms
+```ansi title="kraft"
+NAME                    FQDN                                        STATE    STATUS   IMAGE                                                   MEMORY   VCPUS  ARGS  BOOT TIME
+mcp-server-arxiv-l7l24  billowing-breeze-nuusy7l2.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/mcp-server-arxiv@sha256:...  2.0 GiB  1            213.07 ms
 ```
 
 When done, you can delete the instance with:
@@ -140,7 +171,7 @@ unikraft run --metro fra -v mcp-server-arxiv-data:/volume -p 443:8080/tls+http -
 or
 
 ```bash title="kraft"
-kraft cloud deploy -v mcp-server-arxiv-data:/volume -p 443:8080/tls+http -M 2G . --entrypoint "/usr/local/bin/python /src/server.py --storage-path /volume"
+kraft cloud deploy -v mcp-server-arxiv-data:/volume -p 443:8080/tls+http -M 2Gi . --entrypoint "/usr/local/bin/python /src/server.py --storage-path /volume"
 ```
 
 ## Available tools

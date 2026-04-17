@@ -1,9 +1,39 @@
-# Node18 Agar.io
+# Node Agar.io
 
-[Node.js](https://nodejs.org) is a free, open-source, cross-platform JavaScript runtime environment.
+[Agar.io](https://agar.io/) is a popular multiplayer game where players control a cell and aim to grow by consuming smaller cells while avoiding being consumed by larger ones.
+This guide deploys an implementation of the game using Node.js on Unikraft Cloud.
 
-To run Node.js on Unikraft Cloud, first install the CLI. Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
-Then clone this examples repository and `cd` into this directory, and invoke:
+To run this example, follow these steps:
+
+1. Install the CLI.
+   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
+
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/node18-agario/` directory:
+
+```bash
+git clone https://github.com/unikraft-cloud/examples
+cd examples/node18-agario/
+```
+
+Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
+
+```bash title="unikraft"
+unikraft login
+```
+
+or
+
+```bash title="kraft"
+# Set Unikraft Cloud access token
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
+export UKC_METRO=fra
+```
+
+When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/node18-agario:latest
@@ -13,8 +43,52 @@ unikraft run --metro fra -p 443:3000/tls+http -m 1G --image <my-org>/node18-agar
 or
 
 ```bash title="kraft"
-kraft cloud deploy --metro fra -p 443:3000/tls+http -M 1G .
+kraft cloud deploy --metro fra -p 443:3000/tls+http -M 1Gi .
 ```
+
+The output shows the instance address and other details:
+
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: node18-agario-5k2xp
+ ├───────── uuid: b3c4d5e6-f7a8-9b0c-1d2e-b3c4d5e6f7a8
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://dark-meadow-fj9tm6bq.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/node18-agario@sha256:0f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a
+ ├─────── memory: 1024 MiB
+ ├────── service: dark-meadow-fj9tm6bq
+ ├─ private fqdn: node18-agario-5k2xp.internal
+ └─── private ip: 10.0.3.5
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         node18-agario-5k2xp
+uuid:         b3c4d5e6-f7a8-9b0c-1d2e-b3c4d5e6f7a8
+state:        starting
+image:        <my-org>/node18-agario
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       c4d5e6f7-a8b9-0c1d-2e3f-c4d5e6f7a8b9
+  name:       dark-meadow-fj9tm6bq
+  domains:
+  - fqdn:     dark-meadow-fj9tm6bq.fra.unikraft.app
+networks:
+- uuid:       d5e6f7a8-b9c0-1d2e-3f4a-d5e6f7a8b9c0
+  private-ip: 10.0.3.5
+  mac:        12:b0:b1:8d:f0:ea
+timestamps:
+  created:    just now
+```
+
+In this case, the instance name is `node18-agario-5k2xp` and the address is `https://dark-meadow-fj9tm6bq.fra.unikraft.app`.
+They're different for each run.
 
 The command will deploy an `agar.io` alternative called `https://github.com/owenashurst/agar.io-clone`.
 
@@ -26,10 +100,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                 STATE    IMAGE                   ARGS  MEMORY   VCPUS  FQDN                                   CREATED
+fra    node18-agario-5k2xp  running  <my-org>/node18-agario        1024MiB  1      dark-meadow-fj9tm6bq.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
+```
+
+```ansi title="kraft"
+NAME                 FQDN                                   STATE    STATUS        IMAGE                                                MEMORY   VCPUS  ARGS  BOOT TIME
+node18-agario-5k2xp  dark-meadow-fj9tm6bq.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/node18-agario@sha256:...  1.0 GiB  1            78.95 ms
 ```
 
 When done, you can remove the instance:

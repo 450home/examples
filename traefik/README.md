@@ -1,11 +1,12 @@
 # Traefik
 
 This example uses the [`Traefik`](https://traefik.io/traefik/) cloud native app proxy.
+To run it, follow these steps:
 
-To run this example, follow these steps:
-
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/traefik/` directory:
 
@@ -40,25 +41,48 @@ unikraft run --metro fra -p 443:80/tls+http -p 8080:8080/tls -m 1G --image <my-o
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:80/tls+http -p 8080:8080/tls -M 1G .
+kraft cloud deploy -p 443:80/tls+http -p 8080:8080/tls -M 1Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: traefik-wqe7e
- ├────────── uuid: 69d25b0b-1813-4a3f-88e6-64abbc78b359
- ├───────── state: running
- ├─────────── url: https://holy-cherry-rye39b1x.fra.unikraft.app
- ├───────── image: traefik@sha256:f6dd913a81f6a057ceb9db7844222d7287b2a83f668cca88c73c2e85554cb526
- ├───── boot time: 53.66 ms
- ├──────── memory: 1024 MiB
- ├─────── service: holy-cherry-rye39b1x
- ├── private fqdn: traefik-wqe7e.internal
- ├──── private ip: 172.16.28.16
- └────────── args: /usr/bin/traefik -configFile /etc/traefik/default.toml
+ ├───────── name: traefik-wqe7e
+ ├───────── uuid: 69d25b0b-1813-4a3f-88e6-64abbc78b359
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://holy-cherry-rye39b1x.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/traefik@sha256:f6dd913a81f6a057ceb9db7844222d7287b2a83f668cca88c73c2e85554cb526
+ ├─────── memory: 1024 MiB
+ ├────── service: holy-cherry-rye39b1x
+ ├─ private fqdn: traefik-wqe7e.internal
+ └─── private ip: 10.0.28.16
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         traefik-wqe7e
+uuid:         69d25b0b-1813-4a3f-88e6-64abbc78b359
+state:        starting
+image:        <my-org>/traefik
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       ec7570da-5700-01b5-aaa1-0734498c11eb
+  name:       holy-cherry-rye39b1x
+  domains:
+  - fqdn:     holy-cherry-rye39b1x.fra.unikraft.app
+networks:
+- uuid:       b59f4362-dc72-7efe-477b-1efe227e1b08
+  private-ip: 10.0.28.16
+  mac:        12:b0:31:58:d7:d0
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `traefik-wqe7e` and the address is `https://holy-cherry-rye39b1x.fra.unikraft.app`.
@@ -86,15 +110,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME           STATE    IMAGE             ARGS  MEMORY   VCPUS  FQDN                                   CREATED
+fra    traefik-wqe7e  running  <my-org>/traefik        1024MiB  1      holy-cherry-rye39b1x.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME           FQDN                                   STATE    STATUS         IMAGE                        MEMORY    VCPUS  ARGS                                           BOOT TIME
-traefik-wqe7e  holy-cherry-rye39b1x.fra.unikraft.app  running  8 minutes ago  traefik@sha256:f6dd913a8...  1024 MiB  1      /usr/bin/traefik -configFile /etc/traefik/...  53661us
+```ansi title="kraft"
+NAME           FQDN                                   STATE    STATUS         IMAGE                                          MEMORY    VCPUS  ARGS  BOOT TIME
+traefik-wqe7e  holy-cherry-rye39b1x.fra.unikraft.app  running  8 minutes ago  oci://unikraft.io/<my-org>/traefik@sha256:...  1024 MiB  1            53.66 ms
 ```
 
 When done, you can remove the instance:

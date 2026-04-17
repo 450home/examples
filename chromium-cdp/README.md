@@ -4,8 +4,10 @@ This example uses Chromium, a headless browser exposing a [CDP (Chrome DevTools 
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/chromium-cdp/` directory:
 
@@ -26,6 +28,7 @@ or
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
 export UKC_METRO=fra
 ```
 
@@ -40,18 +43,43 @@ You can run the deploy script (which builds an erofs root filesystem and deploys
 
 The output shows the instance address and other details.
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├─────── name: chromium-cdp-d0l6y
- ├─────── uuid: debe81b0-8418-4e01-b795-b3546e0e5aac
- ├────── state: starting
- ├───── domain: https://spring-dream-p5wxwwl0.fra.unikraft.app
- ├────── image: chromium-cdp@sha256:9e22546a9234efbd586b3cc3ff2ab71d64b56e87b8af431a3dfffd4aff274cc3
- ├───── memory: 4096 MiB
- ├──── service: spring-dream-p5wxwwl0
- ├─ private ip: 10.0.4.141
- └─────── args: /usr/bin/wrapper.sh /usr/bin/node /app/proxy.js
+ ├───────── name: chromium-cdp-d0l6y
+ ├───────── uuid: debe81b0-8418-4e01-b795-b3546e0e5aac
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://spring-dream-p5wxwwl0.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/chromium-cdp@sha256:9e22546a9234efbd586b3cc3ff2ab71d64b56e87b8af431a3dfffd4aff274cc3
+ ├─────── memory: 4096 MiB
+ ├────── service: spring-dream-p5wxwwl0
+ ├─ private fqdn: chromium-cdp-d0l6y.internal
+ └─── private ip: 10.0.4.141
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         chromium-cdp-d0l6y
+uuid:         debe81b0-8418-4e01-b795-b3546e0e5aac
+state:        starting
+image:        <my-org>/chromium-cdp
+resources:
+  memory:     4096MiB
+  vcpus:      1
+service:
+  uuid:       516e239b-2ab1-9fb9-599d-fb891cc39edb
+  name:       spring-dream-p5wxwwl0
+  domains:
+  - fqdn:     spring-dream-p5wxwwl0.fra.unikraft.app
+networks:
+- uuid:       7d3633e4-7835-942c-7b32-5d392ba538d7
+  private-ip: 10.0.4.141
+  mac:        12:b0:7b:d3:eb:de
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `chromium-cdp-d0l6y` and the address is `https://spring-dream-p5wxwwl0.fra.unikraft.app`.
@@ -66,10 +94,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                STATE    IMAGE                  ARGS  MEMORY   VCPUS  FQDN                                    CREATED
+fra    chromium-cdp-d0l6y  running  <my-org>/chromium-cdp        4096MiB  1      spring-dream-p5wxwwl0.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
+```
+
+```ansi title="kraft"
+NAME                FQDN                                    STATE    STATUS        IMAGE                                               MEMORY  VCPUS  ARGS  BOOT TIME
+chromium-cdp-d0l6y  spring-dream-p5wxwwl0.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/chromium-cdp@sha256:...  4 GiB   1            350.51 ms
 ```
 
 When done, you can remove the instance:

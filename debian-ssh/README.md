@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a Debian app with SSH enabled.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/debian-ssh` directory:
 
@@ -39,24 +41,48 @@ unikraft run --metro fra -p 2222:2222/tls -m 1G -e PUBKEY="...." --image <my-org
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 2222:2222/tls -M 1G -e PUBKEY="...." .
+kraft cloud deploy -p 2222:2222/tls -M 1Gi -e PUBKEY="...." .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├─────── name: debian-ssh-2uwg5
- ├─────── uuid: b3d158c5-fb52-4685-a76b-2497973308dc
- ├────── metro: https://api.fra.unikraft.cloud/v1
- ├────── state: starting
- ├───── domain: nameless-cherry-sw2e9ul2.fra.unikraft.app
- ├────── image: debian-ssh@sha256:2442b4d5e078e7bc9ccd887fac65623511551592315d341a219f34a2c6628949
- ├───── memory: 1024 MiB
- ├──── service: nameless-cherry-sw2e9ul2
- ├─ private ip: 10.0.0.109
- └─────── args: /usr/bin/wrapper.sh
+ ├───────── name: debian-ssh-2uwg5
+ ├───────── uuid: b3d158c5-fb52-4685-a76b-2497973308dc
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://nameless-cherry-sw2e9ul2.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/debian-ssh@sha256:2442b4d5e078e7bc9ccd887fac65623511551592315d341a219f34a2c6628949
+ ├─────── memory: 1024 MiB
+ ├────── service: nameless-cherry-sw2e9ul2
+ ├─ private fqdn: debian-ssh-2uwg5.internal
+ └─── private ip: 10.0.0.109
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         debian-ssh-2uwg5
+uuid:         b3d158c5-fb52-4685-a76b-2497973308dc
+state:        starting
+image:        <my-org>/debian-ssh
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       5771bead-c045-52fa-1f89-5bc4f1cf3c38
+  name:       nameless-cherry-sw2e9ul2
+  domains:
+  - fqdn:     nameless-cherry-sw2e9ul2.fra.unikraft.app
+networks:
+- uuid:       9d76ad3f-2149-f0af-d77f-76daba253d33
+  private-ip: 10.0.0.109
+  mac:        12:b0:1d:bd:54:f6
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `debian-ssh-2uwg5` and the address is `nameless-cherry-sw2e9ul2.fra.unikraft.app`.
@@ -84,15 +110,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME              STATE    IMAGE                ARGS  MEMORY  VCPUS  FQDN                                    CREATED
+fra    debian-ssh-2uwg5  running  <my-org>/debian-ssh        1.0GiB  1      nameless-cherry-sw2e9ul2.fra.unikraft…  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME              FQDN                                       STATE    STATUS       IMAGE                      MEMORY   VCPUS  ARGS                 BOOT TIME
-debian-ssh-2uwg5  nameless-cherry-sw2e9ul2.fra.unikraft.app  running  since 5mins  debian-ssh@sha256:2442...  1.0 GiB  1      /usr/bin/wrapper.sh  217.26 ms
+```ansi title="kraft"
+NAME              FQDN                                       STATE    STATUS       IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
+debian-ssh-2uwg5  nameless-cherry-sw2e9ul2.fra.unikraft.app  running  since 5mins  oci://unikraft.io/<my-org>/debian-ssh@sha256:...  1.0 GiB  1            217.26 ms
 ```
 
 When done, you can remove the instance:

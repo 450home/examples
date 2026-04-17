@@ -2,16 +2,19 @@
 
 This app comes from [Prisma's REST API Example](https://github.com/prisma/prisma-examples/tree/latest/javascript/rest-express) and shows how to create a **REST API** using [Express](https://expressjs.com/) and [Prisma Client](https://www.prisma.io/docs/concepts/components/prisma-client) and deploy it onto Unikraft Cloud.
 It uses a SQLite database file with some initial [migration data](./prisma/migrations/20240208151224_init/).
-To run it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+To run this example, follow these steps:
+
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
-2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node18-prisma-rest-express/` directory:
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-prisma-expressjs4.19-node18/` directory:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-node18-prisma-rest-express/
+cd examples/httpserver-prisma-expressjs4.19-node18/
 ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
@@ -40,28 +43,51 @@ unikraft run --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 512M .
+kraft cloud deploy -p 443:3000/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-node18-prisma-hdof1
- ├────────── uuid: 066f55cb-bcbd-45e5-9f6b-b3866c3a3a4c
- ├───────── state: running
- ├─────────── url: https://funky-sun-4bf8v7g9.fra.unikraft.app
- ├───────── image: httpserver-node18-prisma@sha256:770d4af1d490daea11171c680eaf99e2a6017a262ba9fbf1ba8d708f5fc32bfe
- ├───── boot time: 37.94 ms
- ├──────── memory: 512 MiB
- ├─────── service: funky-sun-4bf8v7g9
- ├── private fqdn: httpserver-node18-prisma-hdof1.internal
- ├──── private ip: 172.16.28.2
- └────────── args: /usr/bin/node /usr/src/server.js
+ ├───────── name: httpserver-prisma-expressjs4.19-node18-hdof1
+ ├───────── uuid: 066f55cb-bcbd-45e5-9f6b-b3866c3a3a4c
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://funky-sun-4bf8v7g9.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-prisma-expressjs4.19-node18@sha256:770d4af1d490daea11171c680eaf99e2a6017a262ba9fbf1ba8d708f5fc32bfe
+ ├─────── memory: 512 MiB
+ ├────── service: funky-sun-4bf8v7g9
+ ├─ private fqdn: httpserver-prisma-expressjs4.19-node18-hdof1.internal
+ └─── private ip: 10.0.28.2
 ```
 
-In this case, the instance name is `httpserver-node18-prisma-hdof1` and the address is `https://funky-sun-4bf8v7g9.fra.unikraft.app`.
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-prisma-expressjs4.19-node18-hdof1
+uuid:         066f55cb-bcbd-45e5-9f6b-b3866c3a3a4c
+state:        starting
+image:        <my-org>/httpserver-prisma-expressjs4.19-node18
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       b7da8a3b-ca4d-979a-3ae9-9634bca98008
+  name:       funky-sun-4bf8v7g9
+  domains:
+  - fqdn:     funky-sun-4bf8v7g9.fra.unikraft.app
+networks:
+- uuid:       63d977e8-548c-f0af-cc97-39856660f612
+  private-ip: 10.0.28.2
+  mac:        12:b0:43:fb:5c:30
+timestamps:
+  created:    just now
+```
+
+In this case, the instance name is `httpserver-prisma-expressjs4.19-node18-hdof1` and the address is `https://funky-sun-4bf8v7g9.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to test the REST API, such as the `/users` endpoint:
@@ -82,27 +108,32 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                          STATE    IMAGE                                            ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    httpserver-prisma-expressjs4.19-node18-hdof1  running  <my-org>/httpserver-prisma-expressjs4.19-node18        512MiB  1      funky-sun-4bf8v7g9.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                            FQDN                                 STATE    STATUS        IMAGE                              MEMORY   VCPUS  ARGS                              BOOT TIME
-httpserver-node18-prisma-hdof1  funky-sun-4bf8v7g9.fra.unikraft.app  running  1 minute ago  httpserver-node18-prisma@sha25...  512 MiB  1      /usr/bin/node /usr/src/server.js  37935us
+```ansi title="kraft"
+NAME                                          FQDN                                 STATE    STATUS        IMAGE                                                                         MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-prisma-expressjs4.19-node18-hdof1  funky-sun-4bf8v7g9.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-prisma-expressjs4.19-node18@sha256:...  512 MiB  1            37.94 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-node18-prisma-hdof1
+unikraft instances delete httpserver-prisma-expressjs4.19-node18-hdof1
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-node18-prisma-hdof1
+kraft cloud instance remove httpserver-prisma-expressjs4.19-node18-hdof1
 ```
 
 ## Using the app

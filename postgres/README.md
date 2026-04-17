@@ -4,8 +4,10 @@ This guide shows you how to use [PostgreSQL](https://www.postgresql.org/), a pow
 
 To run it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/postgres/` directory:
 
@@ -40,24 +42,48 @@ unikraft run --metro fra -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=unikraft --
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 5432:5432/tls -M 1G -e POSTGRES_PASSWORD=unikraft .
+kraft cloud deploy -p 5432:5432/tls -M 1Gi -e POSTGRES_PASSWORD=unikraft .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: postgres-saan9
- ├────────── uuid: 3a1371f2-68c6-4187-84f8-c080f2b028ca
- ├───────── state: starting
- ├────────── fqdn: young-thunder-fbafrsxj.fra.unikraft.app
- ├───────── image: postgres@sha256:2476c0373d663d7604def7c35ffcb4ed4de8ab231309b4f20104b84f31570766
- ├──────── memory: 1024 MiB
- ├─────── service: young-thunder-fbafrsxj
- ├── private fqdn: postgres-saan9.internal
- ├──── private ip: 172.16.3.1
- └────────── args: wrapper.sh docker-entrypoint.sh postgres -c shared_preload_libraries='pg_ukc_scaletozero'
+ ├───────── name: postgres-saan9
+ ├───────── uuid: 3a1371f2-68c6-4187-84f8-c080f2b028ca
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://young-thunder-fbafrsxj.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/postgres@sha256:2476c0373d663d7604def7c35ffcb4ed4de8ab231309b4f20104b84f31570766
+ ├─────── memory: 1024 MiB
+ ├────── service: young-thunder-fbafrsxj
+ ├─ private fqdn: postgres-saan9.internal
+ └─── private ip: 10.0.3.1
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         postgres-saan9
+uuid:         3a1371f2-68c6-4187-84f8-c080f2b028ca
+state:        starting
+image:        <my-org>/postgres
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       8e9d810b-b1da-a30b-fd42-5c30c1900cb5
+  name:       young-thunder-fbafrsxj
+  domains:
+  - fqdn:     young-thunder-fbafrsxj.fra.unikraft.app
+networks:
+- uuid:       f1fab4c9-7951-75e3-ea1c-d87e47b4c9e2
+  private-ip: 10.0.3.1
+  mac:        12:b0:31:34:b1:96
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `postgres-saan9` and the service `young-thunder-fbafrsxj`.
@@ -104,15 +130,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME            STATE    IMAGE              ARGS  MEMORY  VCPUS  FQDN                                     CREATED
+fra    postgres-saan9  running  <my-org>/postgres        1.0GiB  1      young-thunder-fbafrsxj.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME            FQDN                                     STATE    STATUS         IMAGE                                   MEMORY   VCPUS  ARGS                                      BOOT TIME
-postgres-saan9  young-thunder-fbafrsxj.fra.unikraft.app  running  6 minutes ago  postgres@sha256:2476c0373d663d7604d...  1.0 GiB  1      wrapper.sh docker-entrypoint.sh postgres  603.42 ms
+```ansi title="kraft"
+NAME            FQDN                                     STATE    STATUS         IMAGE                                           MEMORY   VCPUS  ARGS  BOOT TIME
+postgres-saan9  young-thunder-fbafrsxj.fra.unikraft.app  running  6 minutes ago  oci://unikraft.io/<my-org>/postgres@sha256:...  1.0 GiB  1            603.42 ms
 ```
 
 When done, you can remove the instance:
@@ -152,7 +183,7 @@ unikraft run --metro fra -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=unikraft -e
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 5432:5432/tls -M 1G -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres -v postgres:/volume .
+kraft cloud deploy -p 5432:5432/tls -M 1Gi -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres -v postgres:/volume .
 ```
 
 ## Customize your deployment

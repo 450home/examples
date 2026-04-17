@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a Bun app.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-bun` directory:
 
@@ -39,24 +41,48 @@ unikraft run --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 512M .
+kraft cloud deploy -p 443:3000/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-bun-700mp
- ├────────── uuid: e467a880-075c-41e0-97ac-88e3e938523e
- ├───────── state: starting
- ├──────── domain: https://quiet-pond-ao44imcg.fra.unikraft.app
- ├───────── image: httpserver-bun@sha256:dfcbee1efe0d8a1d43ab2dab70cf1cc5066bb1353aa1c528c745533d2cc33276
- ├──────── memory: 512 MiB
- ├─────── service: quiet-pond-ao44imcg
- ├── private fqdn: httpserver-bun-700mp.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/bin/bun run /usr/src/server.ts
+ ├───────── name: httpserver-bun-700mp
+ ├───────── uuid: e467a880-075c-41e0-97ac-88e3e938523e
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://quiet-pond-ao44imcg.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-bun@sha256:dfcbee1efe0d8a1d43ab2dab70cf1cc5066bb1353aa1c528c745533d2cc33276
+ ├─────── memory: 512 MiB
+ ├────── service: quiet-pond-ao44imcg
+ ├─ private fqdn: httpserver-bun-700mp.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-bun-700mp
+uuid:         e467a880-075c-41e0-97ac-88e3e938523e
+state:        starting
+image:        <my-org>/httpserver-bun
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       00cddace-e5e1-be6e-3423-86cccb5a1031
+  name:       quiet-pond-ao44imcg
+  domains:
+  - fqdn:     quiet-pond-ao44imcg.fra.unikraft.app
+networks:
+- uuid:       3e41aab5-96c3-23e8-4afc-e2109f3f60de
+  private-ip: 10.0.3.3
+  mac:        12:b0:6e:91:eb:5a
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-bun-700mp` and the address is `https://quiet-pond-ao44imcg.fra.unikraft.app`.
@@ -78,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                  STATE    IMAGE                    ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    httpserver-bun-700mp  running  <my-org>/httpserver-bun        512MiB  1      quiet-pond-ao44imcg.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                  FQDN                                  STATE    STATUS       IMAGE                               MEMORY   VCPUS  ARGS                                 BOOT TIME
-httpserver-bun-700mp  quiet-pond-ao44imcg.fra.unikraft.app  running  since 3mins  httpserver-bun@sha256:dfcbee1ef...  512 MiB  1      /usr/bin/bun run /usr/src/server.ts  289.03 ms
+```ansi title="kraft"
+NAME                  FQDN                                  STATE    STATUS       IMAGE                                                 MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-bun-700mp  quiet-pond-ao44imcg.fra.unikraft.app  running  since 3mins  oci://unikraft.io/<my-org>/httpserver-bun@sha256:...  512 MiB  1            289.03 ms
 ```
 
 When done, you can remove the instance:

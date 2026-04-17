@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a simple Go-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-go1.21/` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-go1.21-9a2wv
- ├────────── uuid: 8bb34040-9434-4a28-bd1e-c24ee532e2da
- ├───────── state: running
- ├─────────── url: https://red-dew-jtk6yxk1.fra.unikraft.app
- ├───────── image: httpserver-go1.21@sha256:b16d61bb7898e764d8c11ab5a0b995e8c25a25b5ff89e161fc994ebf25a75680
- ├───── boot time: 11.05 ms
- ├──────── memory: 256 MiB
- ├─────── service: red-dew-jtk6yxk1
- ├── private fqdn: httpserver-go1.21-9a2wv.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /server
+ ├───────── name: httpserver-go1.21-9a2wv
+ ├───────── uuid: 8bb34040-9434-4a28-bd1e-c24ee532e2da
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://red-dew-jtk6yxk1.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-go1.21@sha256:b16d61bb7898e764d8c11ab5a0b995e8c25a25b5ff89e161fc994ebf25a75680
+ ├─────── memory: 256 MiB
+ ├────── service: red-dew-jtk6yxk1
+ ├─ private fqdn: httpserver-go1.21-9a2wv.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-go1.21-9a2wv
+uuid:         8bb34040-9434-4a28-bd1e-c24ee532e2da
+state:        starting
+image:        <my-org>/httpserver-go1.21
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       cc4ed399-32da-eb56-3671-b477108d1040
+  name:       red-dew-jtk6yxk1
+  domains:
+  - fqdn:     red-dew-jtk6yxk1.fra.unikraft.app
+networks:
+- uuid:       51f79dc1-e989-908d-894b-bdf0a87e7901
+  private-ip: 10.0.3.3
+  mac:        12:b0:57:91:bb:a5
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-go1.21-9a2wv` and the address is `https://red-dew-jtk6yxk1.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                               CREATED
+fra    httpserver-go1.21-9a2wv  running  <my-org>/httpserver-go1.21        256MiB  1      red-dew-jtk6yxk1.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                     FQDN                               STATE    STATUS        IMAGE                                          MEMORY   VCPUS  ARGS     BOOT TIME
-httpserver-go1.21-9a2wv  red-dew-jtk6yxk1.fra.unikraft.app  running  1 minute ago  httpserver-go1.21@sha256:b16d61bb7898e764d...  256 MiB  1      /server  9324us
+```ansi title="kraft"
+NAME                     FQDN                               STATE    STATUS        IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-go1.21-9a2wv  red-dew-jtk6yxk1.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-go1.21@sha256:...  256 MiB  1            9.32 ms
 ```
 
 When done, you can remove the instance:

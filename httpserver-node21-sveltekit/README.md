@@ -5,8 +5,10 @@ This guide explains how to create and deploy a [SvelteKit](https://kit.svelte.de
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node21-sveltekit/` directory:
 
@@ -41,25 +43,48 @@ unikraft run --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 512M .
+kraft cloud deploy -p 443:3000/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-node21-sveltekit-zmt39
- ├────────── uuid: cd5071b0-5605-4771-b75d-4789393e60de
- ├───────── state: running
- ├─────────── url: https://dark-fog-z18n0ej1.fra.unikraft.app
- ├───────── image: httpserver-node21-sveltekit@sha256:4cea210aef3513bd68490640b511ebcff2b867e9222028b9938faccffc21cb83
- ├───── boot time: 72.86ms
- ├──────── memory: 512 MiB
- ├─────── service: dark-fog-z18n0ej1
- ├── private fqdn: httpserver-node21-sveltekit-zmt39.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/bin/node /app/build/index.js
+ ├───────── name: httpserver-node21-sveltekit-zmt39
+ ├───────── uuid: cd5071b0-5605-4771-b75d-4789393e60de
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://dark-fog-z18n0ej1.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-node21-sveltekit@sha256:4cea210aef3513bd68490640b511ebcff2b867e9222028b9938faccffc21cb83
+ ├─────── memory: 512 MiB
+ ├────── service: dark-fog-z18n0ej1
+ ├─ private fqdn: httpserver-node21-sveltekit-zmt39.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-node21-sveltekit-zmt39
+uuid:         cd5071b0-5605-4771-b75d-4789393e60de
+state:        starting
+image:        <my-org>/httpserver-node21-sveltekit
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       2cd097b5-795c-7184-2968-1508c630fb2b
+  name:       dark-fog-z18n0ej1
+  domains:
+  - fqdn:     dark-fog-z18n0ej1.fra.unikraft.app
+networks:
+- uuid:       e715723d-4659-2006-bd7b-68a5a3c33cce
+  private-ip: 10.0.3.3
+  mac:        12:b0:a0:31:90:5a
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-node21-sveltekit-zmt39` and the address is `https://dark-fog-z18n0ej1.fra.unikraft.app`.
@@ -88,15 +113,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                               STATE    IMAGE                                 ARGS  MEMORY  VCPUS  FQDN                                CREATED
+fra    httpserver-node21-sveltekit-zmt39  running  <my-org>/httpserver-node21-sveltekit        512MiB  1      dark-fog-z18n0ej1.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                               FQDN                                STATE    STATUS         IMAGE                                            MEMORY   VCPUS  ARGS                               BOOT TIME
-httpserver-node21-sveltekit-zmt39  dark-fog-z18n0ej1.fra.unikraft.app  running  5 minutes ago  httpserver-node21-sveltekit@sha256:4cea210ae...  512 MiB  1      /usr/bin/node /app/build/index.js  72.86 ms
+```ansi title="kraft"
+NAME                               FQDN                                STATE    STATUS         IMAGE                                                              MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-node21-sveltekit-zmt39  dark-fog-z18n0ej1.fra.unikraft.app  running  5 minutes ago  oci://unikraft.io/<my-org>/httpserver-node21-sveltekit@sha256:...  512 MiB  1            72.86 ms
 ```
 
 When done, you can remove the instance:

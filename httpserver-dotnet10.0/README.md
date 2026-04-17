@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a simple .NET-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-dotnet10.0/` directory:
 
@@ -39,24 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-dotnet100-dsmkh
- ├────────── uuid: 25459494-cb43-4009-9d05-f0996de5b7e4
- ├───────── state: starting
- ├─────────── url: https://cold-fog-hl98aw6q.fra.unikraft.app
- ├───────── image: httpserver-dotnet100@sha256:4fad7453995ae96b636696e9929ee0e7376bfbbd63ab9698c1f1e02602aa2575
- ├──────── memory: 512 MiB
- ├─────── service: cold-fog-hl98aw6q
- ├── private fqdn: httpserver-dotnet100-dsmkh.internal
- ├──── private ip: 172.16.3.1
- └────────── args: /usr/bin/app/src
+ ├───────── name: httpserver-dotnet100-dsmkh
+ ├───────── uuid: 25459494-cb43-4009-9d05-f0996de5b7e4
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://cold-fog-hl98aw6q.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-dotnet100@sha256:4fad7453995ae96b636696e9929ee0e7376bfbbd63ab9698c1f1e02602aa2575
+ ├─────── memory: 512 MiB
+ ├────── service: cold-fog-hl98aw6q
+ ├─ private fqdn: httpserver-dotnet100-dsmkh.internal
+ └─── private ip: 10.0.3.1
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-dotnet100-dsmkh
+uuid:         25459494-cb43-4009-9d05-f0996de5b7e4
+state:        starting
+image:        <my-org>/httpserver-dotnet100
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       35a84131-01b7-b3cd-03a4-7acdd2c4f5f9
+  name:       cold-fog-hl98aw6q
+  domains:
+  - fqdn:     cold-fog-hl98aw6q.fra.unikraft.app
+networks:
+- uuid:       d4ddf6b4-91e5-8692-03a2-1e42552f6dbe
+  private-ip: 10.0.3.1
+  mac:        12:b0:c0:f1:05:bd
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-dotnet100-dsmkh` and the address is `https://cold-fog-hl98aw6q.fra.unikraft.app`.
@@ -78,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                        STATE    IMAGE                          ARGS  MEMORY  VCPUS  FQDN                                CREATED
+fra    httpserver-dotnet100-dsmkh  running  <my-org>/httpserver-dotnet100        512MiB  1      cold-fog-hl98aw6q.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                          FQDN                                STATE    STATUS         IMAGE                                   MEMORY   VCPUS  ARGS              BOOT TIME
-httpserver-dotnet100-dsmkh    cold-fog-hl98aw6q.fra.unikraft.app  running  2 minutes ago  httpserver-dotnet100@sha256:4fad74e...  512 MiB  1      /usr/bin/app/src  328.69 ms
+```ansi title="kraft"
+NAME                        FQDN                                STATE    STATUS         IMAGE                                                       MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-dotnet100-dsmkh  cold-fog-hl98aw6q.fra.unikraft.app  running  2 minutes ago  oci://unikraft.io/<my-org>/httpserver-dotnet100@sha256:...  512 MiB  1            328.69 ms
 ```
 
 When done, you can remove the instance:

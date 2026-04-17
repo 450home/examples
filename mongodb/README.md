@@ -4,8 +4,10 @@ This guide shows you how to use [MongoDB](https://www.mongodb.com), a source-ava
 
 To run it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mongodb/` directory:
 
@@ -40,25 +42,48 @@ unikraft run --metro fra -p 27017:27017/tls -m 1G --image <my-org>/mongodb:lates
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 27017:27017/tls -M 1G .
+kraft cloud deploy -p 27017:27017/tls -M 1Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: mongodb-6tiuu
- ├────────── uuid: 99779597-0bdb-4160-b902-a160c3ab4b2a
- ├───────── state: running
- ├────────── fqdn: bold-brook-khkwv7of.fra.unikraft.app
- ├───────── image: mongodb@sha256:e6ff5153f106e2d5e2a10881818cd1b90fe3ff1294ad80879b2239ffc52aff0e
- ├───── boot time: 82.41 ms
- ├──────── memory: 1024 MiB
- ├─────── service: bold-brook-khkwv7of
- ├── private fqdn: mongodb-6tiuu.internal
- ├──── private ip: 172.16.6.4
- └────────── args: /usr/bin/mongod --bind_ip_all --nounixsocket
+ ├───────── name: mongodb-6tiuu
+ ├───────── uuid: 99779597-0bdb-4160-b902-a160c3ab4b2a
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://bold-brook-khkwv7of.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/mongodb@sha256:e6ff5153f106e2d5e2a10881818cd1b90fe3ff1294ad80879b2239ffc52aff0e
+ ├─────── memory: 1024 MiB
+ ├────── service: bold-brook-khkwv7of
+ ├─ private fqdn: mongodb-6tiuu.internal
+ └─── private ip: 10.0.6.4
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         mongodb-6tiuu
+uuid:         99779597-0bdb-4160-b902-a160c3ab4b2a
+state:        starting
+image:        <my-org>/mongodb
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       91309c0c-fd6f-271d-cab6-2694b0991fbe
+  name:       bold-brook-khkwv7of
+  domains:
+  - fqdn:     bold-brook-khkwv7of.fra.unikraft.app
+networks:
+- uuid:       24cc79e5-bb3f-cdcd-fd5d-e4605015a228
+  private-ip: 10.0.6.4
+  mac:        12:b0:d7:7b:83:97
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `mongodb-6tiuu` and the the address is
@@ -91,15 +116,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME           STATE    IMAGE             ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    mongodb-6tiuu  running  <my-org>/mongodb        1.0GiB  1      bold-brook-khkwv7of.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME           FQDN                                  STATE    STATUS          IMAGE                             MEMORY   VCPUS  ARGS                              BOOT TIME
-mongodb-6tiuu  bold-brook-khkwv7of.fra.unikraft.app  running  20 minutes ago  mongodb@sha256:e6ff5153f106e2...  1.0 GiB  1      /usr/bin/mongod --bind_ip_all...  82410us
+```ansi title="kraft"
+NAME           FQDN                                  STATE    STATUS          IMAGE                                          MEMORY   VCPUS  ARGS  BOOT TIME
+mongodb-6tiuu  bold-brook-khkwv7of.fra.unikraft.app  running  20 minutes ago  oci://unikraft.io/<my-org>/mongodb@sha256:...  1.0 GiB  1            82.41 ms
 ```
 
 When done, you can remove the instance:
@@ -139,7 +169,7 @@ unikraft run --metro fra -p 27017:27017/tls -m 1G --volume mongodb-store:/data/d
 or
 
 ```bash title="kraft"
-kraft cloud deploy -M 1G -p 27017:27017/tls --volume mongodb-store:/data/db .
+kraft cloud deploy -M 1Gi -p 27017:27017/tls --volume mongodb-store:/data/db .
 ```
 
 ## Customize your app

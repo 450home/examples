@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a Next.js app.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node21-nextjs` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:3000/tls+http -m 768M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 768M .
+kraft cloud deploy -p 443:3000/tls+http -M 768Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-node21-nextjs-bfrq0
- ├────────── uuid: 2adf9664-c4ae-4e0e-99de-c9781282b370
- ├───────── state: running
- ├─────────── url: https://small-frog-ri8c1vtw.fra.unikraft.app
- ├───────── image: httpserver-node21-nextjs@sha256:ea5b2f145eea9762431ebdea933dd1dfb8427fe23306d2bd7966dd502d6c88f6
- ├───── boot time: 83.60 ms
- ├──────── memory: 768 MiB
- ├─────── service: small-frog-ri8c1vtw
- ├── private fqdn: httpserver-node21-nextjs-bfrq0.internal
- ├──── private ip: 172.16.28.2
- └────────── args: /usr/bin/node /usr/src/server.js
+ ├───────── name: httpserver-node21-nextjs-bfrq0
+ ├───────── uuid: 2adf9664-c4ae-4e0e-99de-c9781282b370
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://small-frog-ri8c1vtw.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-node21-nextjs@sha256:ea5b2f145eea9762431ebdea933dd1dfb8427fe23306d2bd7966dd502d6c88f6
+ ├─────── memory: 768 MiB
+ ├────── service: small-frog-ri8c1vtw
+ ├─ private fqdn: httpserver-node21-nextjs-bfrq0.internal
+ └─── private ip: 10.0.28.2
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-node21-nextjs-bfrq0
+uuid:         2adf9664-c4ae-4e0e-99de-c9781282b370
+state:        starting
+image:        <my-org>/httpserver-node21-nextjs
+resources:
+  memory:     768MiB
+  vcpus:      1
+service:
+  uuid:       43e93d04-615b-0d81-07af-8506c25b1802
+  name:       small-frog-ri8c1vtw
+  domains:
+  - fqdn:     small-frog-ri8c1vtw.fra.unikraft.app
+networks:
+- uuid:       e6e3adf9-8512-b678-4dae-6bbf2f4aad17
+  private-ip: 10.0.28.2
+  mac:        12:b0:2a:aa:d4:82
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-node21-nextjs-bfrq0` and the address is `https://small-frog-ri8c1vtw.fra.unikraft.app`.
@@ -81,15 +106,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                            STATE    IMAGE                                     ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    httpserver-node21-nextjs-bfrq0  running  <my-org>/httpserver-node21-nextjs@sha256        768MiB  1      small-frog-ri8c1vtw.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                            FQDN                                  STATE    STATUS        IMAGE                               MEMORY   VCPUS  ARGS                              BOOT TIME
-httpserver-node21-nextjs-bfrq0  small-frog-ri8c1vtw.fra.unikraft.app  running  1 minute ago  httpserver-node21-nextjs@sha256...  768 MiB  1      /usr/bin/node /usr/src/server.js  83600us
+```ansi title="kraft"
+NAME                            FQDN                                  STATE    STATUS        IMAGE                                                          MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-node21-nextjs-bfrq0  small-frog-ri8c1vtw.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-node21-nextjs@sha256...  768 MiB  1            83.60 ms
 ```
 
 When done, you can remove the instance:
@@ -162,7 +192,7 @@ unikraft run --metro fra -p 443:3000/tls+http -m 256M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 256M .
+kraft cloud deploy -p 443:3000/tls+http -M 256Mi .
 ```
 
 Differences from the `http-node21` app are also the steps required to create an `npm`-based app:

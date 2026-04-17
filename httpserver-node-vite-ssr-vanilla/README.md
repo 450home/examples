@@ -1,4 +1,4 @@
-# Vite (vanilla) SSR mode on Unikraft Cloud
+# Vite (vanilla) SSR
 
 This example demonstrates how to run [Vite](https://vite.dev) with [server-side
 rendering (SSR)](https://vite.dev/guide/ssr.html).
@@ -12,13 +12,43 @@ The project was instantiated via:
 npm create vite-extra@latest node-vite-ssr-vanilla -- --template ssr-vanilla
 ```
 
-The accompanying [`Dockerfile`](./Dockerfile) and [`Kraftfile`](./Kraftfile) are
+The accompanying `Dockerfile` and `Kraftfile` are
 necessary for deploying to Unikraft Cloud.
 
 
 ## Deployment
 
-To deploy, `cd` into this directory and run:
+To run this example, follow these steps:
+
+1. Install the CLI.
+   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
+
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node-vite-ssr-vanilla/` directory:
+
+```bash
+git clone https://github.com/unikraft-cloud/examples
+cd examples/httpserver-node-vite-ssr-vanilla/
+```
+
+Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
+
+```bash title="unikraft"
+unikraft login
+```
+
+or
+
+```bash title="kraft"
+# Set Unikraft Cloud access token
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
+export UKC_METRO=fra
+```
+
+When done, run:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-node-vite-ssr-vanilla:latest
@@ -28,8 +58,52 @@ unikraft run --metro fra -p 443:8080/tls+http -m 1G -e PWD=/app -e NODE_ENV=prod
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 1G -e PWD=/app -e NODE_ENV=production .
+kraft cloud deploy -p 443:8080/tls+http -M 1Gi -e PWD=/app -e NODE_ENV=production .
 ```
+
+The output shows the instance address and other details:
+
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: httpserver-node-vite-ssr-vanilla-k8x2m
+ ├───────── uuid: 1a2b3c4d-5e6f-7a8b-9c0d-a1b2c3d4e5f6
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://warm-sky-qp3mn4rs.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-node-vite-ssr-vanilla@sha256:4f8a2c6e1b3d5f7a9c0e2b4d6f8a0c2e4b6d8f0a2c4e6b8d0f2a4c6e8b0d2f4a
+ ├─────── memory: 1024 MiB
+ ├────── service: warm-sky-qp3mn4rs
+ ├─ private fqdn: httpserver-node-vite-ssr-vanilla-k8x2m.internal
+ └─── private ip: 10.0.3.4
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-node-vite-ssr-vanilla-k8x2m
+uuid:         1a2b3c4d-5e6f-7a8b-9c0d-a1b2c3d4e5f6
+state:        starting
+image:        <my-org>/httpserver-node-vite-ssr-vanilla
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       2b3c4d5e-6f7a-8b9c-0d1e-b2c3d4e5f6a7
+  name:       warm-sky-qp3mn4rs
+  domains:
+  - fqdn:     warm-sky-qp3mn4rs.fra.unikraft.app
+networks:
+- uuid:       3c4d5e6f-7a8b-9c0d-1e2f-c3d4e5f6a7b8
+  private-ip: 10.0.3.4
+  mac:        12:b0:5b:2d:9a:84
+timestamps:
+  created:    just now
+```
+
+In this case, the instance name is `httpserver-node-vite-ssr-vanilla-k8x2m` and the address is `https://warm-sky-qp3mn4rs.fra.unikraft.app`.
+They're different for each run.
 
 After deploying, you can query the service using the provided URL.
 
@@ -40,10 +114,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                    STATE    IMAGE                                      ARGS  MEMORY   VCPUS  FQDN                                CREATED
+fra    httpserver-node-vite-ssr-vanilla-k8x2m  running  <my-org>/httpserver-node-vite-ssr-vanilla        1024MiB  1      warm-sky-qp3mn4rs.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
+```
+
+```ansi title="kraft"
+NAME                                    FQDN                                STATE    STATUS        IMAGE                                                                   MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-node-vite-ssr-vanilla-k8x2m  warm-sky-qp3mn4rs.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-node-vite-ssr-vanilla@sha256:...  1.0 GiB  1            89.34 ms
 ```
 
 When done, you can remove the instance:

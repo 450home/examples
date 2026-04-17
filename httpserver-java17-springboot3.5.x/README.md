@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a Spring Boot web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-java17-springboot3.5.x/` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 1G --image <my-org>/httpserver-
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 1G .
+kraft cloud deploy -p 443:8080/tls+http -M 1Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-java17-springboot32x-qseeo
- ├────────── uuid: b081166d-a2a0-43af-982d-1aa17f06b5c4
- ├───────── state: running
- ├─────────── url: https://long-dust-si7xsngk.fra.unikraft.app
- ├───────── image: httpserver-java17-springboot32x@sha256:cc2f2ad18ce8e36b8e8f4debee096fef7b0bb8b47762575a2ba5a9de8199c64a
- ├───── boot time: 153.97 ms
- ├──────── memory: 1024 MiB
- ├─────── service: long-dust-si7xsngk
- ├── private fqdn: httpserver-java17-springboot32x-qseeo.internal
- ├──── private ip: 172.16.6.2
- └────────── args: /usr/lib/jvm/java-17-openjdk-amd64/bin/java -jar /usr/src/demo-0.0.1-SNAPSHOT.jar
+ ├───────── name: httpserver-java17-springboot32x-qseeo
+ ├───────── uuid: b081166d-a2a0-43af-982d-1aa17f06b5c4
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://long-dust-si7xsngk.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-java17-springboot32x@sha256:cc2f2ad18ce8e36b8e8f4debee096fef7b0bb8b47762575a2ba5a9de8199c64a
+ ├─────── memory: 1024 MiB
+ ├────── service: long-dust-si7xsngk
+ ├─ private fqdn: httpserver-java17-springboot32x-qseeo.internal
+ └─── private ip: 10.0.6.2
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-java17-springboot32x-qseeo
+uuid:         b081166d-a2a0-43af-982d-1aa17f06b5c4
+state:        starting
+image:        <my-org>/httpserver-java17-springboot32x
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       04f5b3ce-0aae-a50a-9d58-e6fa618b2cdc
+  name:       long-dust-si7xsngk
+  domains:
+  - fqdn:     long-dust-si7xsngk.fra.unikraft.app
+networks:
+- uuid:       4bde3abf-faf8-3a14-ceb9-bc05e646dfac
+  private-ip: 10.0.6.2
+  mac:        12:b0:eb:ad:60:a2
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-java17-springboot32x-qseeo` and the address is `https://long-dust-si7xsngk.fra.unikraft.app`.
@@ -125,10 +150,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                   STATE    IMAGE                                     ARGS  MEMORY   VCPUS  FQDN                                 CREATED
+fra    httpserver-java17-springboot32x-qseeo  running  <my-org>/httpserver-java17-springboot32x        1024MiB  1      long-dust-si7xsngk.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
+```
+
+```ansi title="kraft"
+NAME                                   FQDN                                 STATE    STATUS        IMAGE                                                                  MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-java17-springboot32x-qseeo  long-dust-si7xsngk.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-java17-springboot32x@sha256:...  1.0 GiB  1            421.30 ms
 ```
 
 When done, you can remove the instance:

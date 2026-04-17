@@ -4,8 +4,10 @@
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-expressjs4.18-node21` directory:
 
@@ -40,24 +42,48 @@ unikraft run --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 512M .
+kraft cloud deploy -p 443:3000/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-expressjs4.18-node21-lb3p2
- ├────────── uuid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
- ├───────── state: starting
- ├──────── domain: https://calm-ocean-r9x4mk7v.fra.unikraft.app
- ├───────── image: httpserver-expressjs4.18-node21@sha256:2e7d3f1a9c4b8e05d6f2a3b7c1e4d8f0a2b5c9e3d7f1a4b8
- ├──────── memory: 512 MiB
- ├─────── service: calm-ocean-r9x4mk7v
- ├── private fqdn: httpserver-expressjs4.18-node21-lb3p2.internal
- ├──── private ip: 172.16.3.4
- └────────── args: /usr/bin/node /usr/src/server.js
+ ├───────── name: httpserver-expressjs4.18-node21-lb3p2
+ ├───────── uuid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://calm-ocean-r9x4mk7v.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-expressjs4.18-node21@sha256:2e7d3f1a9c4b8e05d6f2a3b7c1e4d8f0a2b5c9e3d7f1a4b8
+ ├─────── memory: 512 MiB
+ ├────── service: calm-ocean-r9x4mk7v
+ ├─ private fqdn: httpserver-expressjs4.18-node21-lb3p2.internal
+ └─── private ip: 10.0.3.4
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-expressjs4.18-node21-lb3p2
+uuid:         a1b2c3d4-e5f6-7890-abcd-ef1234567890
+state:        starting
+image:        <my-org>/httpserver-expressjs4.18-node21
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       aa081882-8173-7ea1-4136-aeee1d7d2316
+  name:       calm-ocean-r9x4mk7v
+  domains:
+  - fqdn:     calm-ocean-r9x4mk7v.fra.unikraft.app
+networks:
+- uuid:       98ee012f-7acb-82f2-ddcb-7866393890a6
+  private-ip: 10.0.3.4
+  mac:        12:b0:97:42:f6:d9
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-expressjs4.18-node21-lb3p2` and the address is `https://calm-ocean-r9x4mk7v.fra.unikraft.app`.
@@ -79,15 +105,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                   STATE    IMAGE                                     ARGS  MEMORY  VCPUS  FQDN                        CREATED
+fra    httpserver-expressjs4.18-node21-lb3p2  running  <my-org>/httpserver-expressjs4.18-node21        512MiB  1      calm-ocean-r9x4mk7v.fra...  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                                   FQDN                        STATE    STATUS       IMAGE                                        MEMORY   VCPUS  ARGS                              BOOT TIME
-httpserver-expressjs4.18-node21-lb3p2  calm-ocean-r9x4mk7v.fra...  running  since 3mins  httpserver-expressjs4.18-node21@sha256:2...  512 MiB  1      /usr/bin/node /usr/src/server.js  312.45 ms
+```ansi title="kraft"
+NAME                                   FQDN                        STATE    STATUS       IMAGE                                                                  MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-expressjs4.18-node21-lb3p2  calm-ocean-r9x4mk7v.fra...  running  since 3mins  oci://unikraft.io/<my-org>/httpserver-expressjs4.18-node21@sha256:...  512 MiB  1            312.45 ms
 ```
 
 When done, you can remove the instance:

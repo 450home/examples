@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a C app.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-gcc13.2` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────── name: httpserver-gcc13.2-is2s9
- ├────── uuid: bec814ce-6ed5-4858-b247-e7f0b17750f5
- ├───── metro: https://api.fra.unikraft.cloud/v1
- ├───── state: running
- ├──── domain: https://still-resonance-bja3lste.fra.unikraft.app
- ├───── image: httpserver-gcc13.2@sha256:375677bf052f14c18ca79c86d2f47a68f3ea5f8636bcd8830753a254f0e06c1b
- ├─ boot time: 13.29 ms
- ├──── memory: 256 MiB
- ├─── service: still-resonance-bja3lste
- ├ private ip: 10.0.0.49
- └────── args: /http_server
+ ├───────── name: httpserver-gcc13.2-is2s9
+ ├───────── uuid: bec814ce-6ed5-4858-b247-e7f0b17750f5
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://still-resonance-bja3lste.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-gcc13.2@sha256:375677bf052f14c18ca79c86d2f47a68f3ea5f8636bcd8830753a254f0e06c1b
+ ├─────── memory: 256 MiB
+ ├────── service: still-resonance-bja3lste
+ ├─ private fqdn: httpserver-gcc13.2-is2s9.internal
+ └─── private ip: 10.0.0.49
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-gcc13.2-is2s9
+uuid:         bec814ce-6ed5-4858-b247-e7f0b17750f5
+state:        starting
+image:        <my-org>/httpserver-gcc13.2
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       c36a4df6-b78d-677e-ea24-3e7a519a4130
+  name:       still-resonance-bja3lste
+  domains:
+  - fqdn:     still-resonance-bja3lste.fra.unikraft.app
+networks:
+- uuid:       0f17e562-b57a-d40b-eecc-74e9058ecaaf
+  private-ip: 10.0.0.49
+  mac:        12:b0:10:70:49:2f
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-gcc13.2-is2s9` and the address is `https://still-resonance-bja3lste.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                      STATE    IMAGE                        ARGS  MEMORY  VCPUS  FQDN                                    CREATED
+fra    httpserver-gcc13.2-is2s9  standby  <my-org>/httpserver-gcc13.2        256MiB  1      still-resonance-bja3lste.fra.unikraft…  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                      FQDN                                       STATE    STATUS   IMAGE                                              MEMORY   VCPUS  ARGS          BOOT TIME
-httpserver-gcc13.2-is2s9  still-resonance-bja3lste.fra.unikraft.app  standby  standby  httpserver-gcc13.2@sha256:375677bf052f14c18cc8...  256 MiB  1      /http_server  12.91 ms
+```ansi title="kraft"
+NAME                      FQDN                                       STATE    STATUS   IMAGE                                                     MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-gcc13.2-is2s9  still-resonance-bja3lste.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/httpserver-gcc13.2@sha256:...  256 MiB  1            12.91 ms
 ```
 
 When done, you can remove the instance:

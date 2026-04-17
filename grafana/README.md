@@ -4,8 +4,10 @@ This guide shows you how to use [Grafana](https://grafana.com), the open source 
 
 To run it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/grafana/` directory:
 
@@ -40,25 +42,48 @@ unikraft run --metro fra -p 443:3000/tls+http -m 2G --image <my-org>/grafana:lat
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 2G .
+kraft cloud deploy -p 443:3000/tls+http -M 2Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: grafana-sikrv
- ├────────── uuid: 1d8f0b36-39ff-45a2-8baa-664640c60885
- ├───────── state: running
- ├─────────── url: https://icy-sea-i6m5fwyk.fra.unikraft.app
- ├───────── image: grafana@sha256:484d6f98cdc321443188b8f2900035182dffdb45069f3cd087dcb6851ddff3bc
- ├───── boot time: 502.65 ms
- ├──────── memory: 2048 MiB
- ├─────── service: dawn-water-4jlnvgpy
- ├── private fqdn: grafana-mgby4.internal
- ├──── private ip: 172.16.6.6
- └────────── args: /usr/share/grafana/bin/grafana server -homepath /usr/share/grafana/
+ ├───────── name: grafana-sikrv
+ ├───────── uuid: 1d8f0b36-39ff-45a2-8baa-664640c60885
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://icy-sea-i6m5fwyk.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/grafana@sha256:484d6f98cdc321443188b8f2900035182dffdb45069f3cd087dcb6851ddff3bc
+ ├─────── memory: 2048 MiB
+ ├────── service: dawn-water-4jlnvgpy
+ ├─ private fqdn: grafana-mgby4.internal
+ └─── private ip: 10.0.6.6
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         grafana-sikrv
+uuid:         1d8f0b36-39ff-45a2-8baa-664640c60885
+state:        starting
+image:        <my-org>/grafana
+resources:
+  memory:     2048MiB
+  vcpus:      1
+service:
+  uuid:       baedae7b-0836-4b53-d1f5-a6bbcd373155
+  name:       dawn-water-4jlnvgpy
+  domains:
+  - fqdn:     dawn-water-4jlnvgpy.fra.unikraft.app
+networks:
+- uuid:       de0faba6-9c16-f108-a32a-f6bc4133a9cd
+  private-ip: 10.0.6.6
+  mac:        12:b0:fb:95:5b:66
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `grafana-sikrv` and the address is `https://icy-sea-i6m5fwyk.fra.unikraft.app`.
@@ -73,15 +98,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME           STATE    IMAGE             ARGS  MEMORY   VCPUS  FQDN                               CREATED
+fra    grafana-sikrv  running  <my-org>/grafana        2048MiB  1      icy-sea-i6m5fwyk.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME           FQDN                               STATE    STATUS          IMAGE                        MEMORY    VCPUS  ARGS                                      BOOT TIME
-grafana-sikrv  icy-sea-i6m5fwyk.fra.unikraft.app  running  11 minutes ago  grafana@sha256:484d6f98c...  2048 MiB  1      /usr/share/grafana/bin/grafana server...  502651us
+```ansi title="kraft"
+NAME           FQDN                               STATE    STATUS          IMAGE                                          MEMORY    VCPUS  ARGS  BOOT TIME
+grafana-sikrv  icy-sea-i6m5fwyk.fra.unikraft.app  running  11 minutes ago  oci://unikraft.io/<my-org>/grafana@sha256:...  2048 MiB  1            502.65 ms
 ```
 
 When done, you can remove the instance:

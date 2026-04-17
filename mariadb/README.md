@@ -3,8 +3,10 @@
 This guide shows you how to use [MariaDB](https://mariadb.org), one of the most popular open source relational databases.
 To run it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mariadb/` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 3306:3306/tls -m 1G -e MARIADB_ROOT_PASSWORD="unikra
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 3306:3306/tls -M 1G --env MARIADB_ROOT_PASSWORD="unikraft" .
+kraft cloud deploy -p 3306:3306/tls -M 1Gi --env MARIADB_ROOT_PASSWORD="unikraft" .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: mariadb-w2g2z
- ├────────── uuid: ba696c22-adff-4fba-88b9-d1b790ca2357
- ├───────── state: running
- ├────────── fqdn: twilight-sun-82lt4ddk.fra.unikraft.app
- ├───────── image: mariadb@sha256:6e31d28b351eb12a070e3074f0a500532d0a494332947e9d8dbfa093d2d551fd
- ├───── boot time: 159.06 ms
- ├──────── memory: 1024 MiB
- ├─────── service: twilight-sun-82lt4ddk
- ├── private fqdn: mariadb-w2g2z.internal
- ├──── private ip: 172.16.6.3
- └────────── args: /usr/sbin/mariadbd --user=root --log-bin
+ ├───────── name: mariadb-w2g2z
+ ├───────── uuid: ba696c22-adff-4fba-88b9-d1b790ca2357
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://twilight-sun-82lt4ddk.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/mariadb@sha256:6e31d28b351eb12a070e3074f0a500532d0a494332947e9d8dbfa093d2d551fd
+ ├─────── memory: 1024 MiB
+ ├────── service: twilight-sun-82lt4ddk
+ ├─ private fqdn: mariadb-w2g2z.internal
+ └─── private ip: 10.0.6.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         mariadb-w2g2z
+uuid:         ba696c22-adff-4fba-88b9-d1b790ca2357
+state:        starting
+image:        <my-org>/mariadb
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       ca8ae7e9-3767-85f6-3d70-b77bcf894a7c
+  name:       twilight-sun-82lt4ddk
+  domains:
+  - fqdn:     twilight-sun-82lt4ddk.fra.unikraft.app
+networks:
+- uuid:       935ba4ef-39c2-07e7-d2ae-8cd3c9aae07c
+  private-ip: 10.0.6.3
+  mac:        12:b0:ee:29:71:e4
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `mariadb-w2g2z` which is different for each run.
@@ -102,19 +127,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME           STATE    IMAGE             ARGS  MEMORY   VCPUS  FQDN                                    CREATED
+fra    mariadb-w2g2z  running  <my-org>/mariadb        1024MiB  1      twilight-sun-82lt4ddk.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```bash
-kraft cloud instance list
-```
-
-```ansi
-NAME           FQDN                                    STATE    STATUS        IMAGE         MEMORY   VCPUS  ARGS                             BOOT TIME
-mariadb-w2g2z  twilight-sun-82lt4ddk.fra.unikraft.app  running  1 minute ago  mariadb@s...  1.0 GiB  1      /usr/sbin/mariadbd --user=ro...  159065us
+```ansi title="kraft"
+NAME           FQDN                                    STATE    STATUS        IMAGE                                    MEMORY   VCPUS  ARGS  BOOT TIME
+mariadb-w2g2z  twilight-sun-82lt4ddk.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/mariadb@s...  1.0 GiB  1            159.06 ms
 ```
 
 When done, you can remove the instance:
@@ -157,7 +183,7 @@ unikraft run --metro fra -p 3306:3306/tls -m 1G -e MARIADB_ROOT_PASSWORD="unikra
 or
 
 ```bash title="kraft"
-kraft cloud deploy -M 1G -p 3306:3306/tls --env MARIADB_ROOT_PASSWORD="unikraft" --volume mariadb-store:/var/lib .
+kraft cloud deploy -M 1Gi -p 3306:3306/tls --env MARIADB_ROOT_PASSWORD="unikraft" --volume mariadb-store:/var/lib .
 ```
 
 ## Customize your app

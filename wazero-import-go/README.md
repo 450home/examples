@@ -2,10 +2,13 @@
 
 This example comes from [Wazero's "import go" example](https://github.com/tetratelabs/wazero/tree/main/examples/import-go)
 and shows how to define, import and call a wasm blob from Go and run it on Unikraft Cloud.
-To run this it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+To run this example, follow these steps:
+
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/wazero-import-go/` directory:
 
@@ -40,25 +43,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/wazero-im
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: wazero-import-go-r4dx8
- ├────────── uuid: a763e1c3-bb38-475f-95b6-1e78d8ca74fc
- ├───────── state: running
- ├─────────── url: https://cool-morning-camrrhsa.fra.unikraft.app
- ├───────── image: wazero-import-go@sha256:865700d358ffb2751888798ec8f302d23310b1fcf84f4d3f17f79fc25ff71153
- ├───── boot time: 20.04 m
- ├──────── memory: 512 MiB
- ├─────── service: cool-morning-camrrhsa
- ├── private fqdn: wazero-import-go-r4dx8.internal
- ├──── private ip: 172.16.6.7
- └────────── args: /age-calculator 2000
+ ├───────── name: wazero-import-go-r4dx8
+ ├───────── uuid: a763e1c3-bb38-475f-95b6-1e78d8ca74fc
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://cool-morning-camrrhsa.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/wazero-import-go@sha256:865700d358ffb2751888798ec8f302d23310b1fcf84f4d3f17f79fc25ff71153
+ ├─────── memory: 512 MiB
+ ├────── service: cool-morning-camrrhsa
+ ├─ private fqdn: wazero-import-go-r4dx8.internal
+ └─── private ip: 10.0.6.7
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         wazero-import-go-r4dx8
+uuid:         a763e1c3-bb38-475f-95b6-1e78d8ca74fc
+state:        starting
+image:        <my-org>/wazero-import-go
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       f38a171d-e283-24ca-1158-c7907948071e
+  name:       cool-morning-camrrhsa
+  domains:
+  - fqdn:     cool-morning-camrrhsa.fra.unikraft.app
+networks:
+- uuid:       bc4bb64c-8185-3b83-8693-b1464ab4723e
+  private-ip: 10.0.6.7
+  mac:        12:b0:05:55:02:fe
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `wazero-import-go-r4dx8` and the address is `https://cool-morning-camrrhsa.fra.unikraft.app`.
@@ -81,15 +107,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                    STATE    IMAGE                        ARGS  MEMORY  VCPUS  FQDN                                    CREATED
+fra    wazero-import-go-r4dx8  running  <my-org>/wazero-import-go@s        512MiB  1      cool-morning-camrrhsa.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                    FQDN                                    STATE    STATUS        IMAGE                  MEMORY   VCPUS  ARGS                  BOOT TIME
-wazero-import-go-r4dx8  cool-morning-camrrhsa.fra.unikraft.app  running  1 minutes ag  wazero-import-go@s...  512 MiB  1      /age-calculator 2000  20040us
+```ansi title="kraft"
+NAME                    FQDN                                    STATE    STATUS        IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
+wazero-import-go-r4dx8  cool-morning-camrrhsa.fra.unikraft.app  running  1 minutes ag  oci://unikraft.io/<my-org>/wazero-import-go@s...  512 MiB  1            20.04 ms
 ```
 
 When done, you can remove the instance:

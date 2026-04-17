@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a [Flask](https://flask.palletsprojects.com/en/3.0.x/) web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-python3.12-flask3.0/` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-python312-flask30-bxwxm
- ├────────── uuid: 3ff1ebad-2639-4214-bab4-ed35c4c32fa4
- ├───────── state: running
- ├─────────── url: https://damp-sunset-azd6dtyt.fra.unikraft.app
- ├───────── image: httpserver-python312-flask30@sha256:d6c8e4c5a4f44e1d642d8eaeaa1d820b2841194dd6c5d4a872ae0a895c767da9
- ├───── boot time: 222.27 ms
- ├──────── memory: 512 MiB
- ├─────── service: damp-sunset-azd6dtyt
- ├── private fqdn: httpserver-python312-flask30-bxwxm.internal
- ├──── private ip: 172.16.6.5
- └────────── args: /usr/bin/python3 /app/server.py
+ ├───────── name: httpserver-python312-flask30-bxwxm
+ ├───────── uuid: 3ff1ebad-2639-4214-bab4-ed35c4c32fa4
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://damp-sunset-azd6dtyt.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-python312-flask30@sha256:d6c8e4c5a4f44e1d642d8eaeaa1d820b2841194dd6c5d4a872ae0a895c767da9
+ ├─────── memory: 512 MiB
+ ├────── service: damp-sunset-azd6dtyt
+ ├─ private fqdn: httpserver-python312-flask30-bxwxm.internal
+ └─── private ip: 10.0.6.5
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-python312-flask30-bxwxm
+uuid:         3ff1ebad-2639-4214-bab4-ed35c4c32fa4
+state:        starting
+image:        <my-org>/httpserver-python312-flask30
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       2021ca1e-5e47-a35c-bde2-7190f3815c07
+  name:       damp-sunset-azd6dtyt
+  domains:
+  - fqdn:     damp-sunset-azd6dtyt.fra.unikraft.app
+networks:
+- uuid:       4dc3b272-4fa2-ddb4-7ce0-5e66e8112a61
+  private-ip: 10.0.6.5
+  mac:        12:b0:66:99:b3:3f
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-python312-flask30-bxwxm` and the address is `https://damp-sunset-azd6dtyt.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                STATE    IMAGE                                  ARGS  MEMORY  VCPUS  FQDN                                   CREATED
+fra    httpserver-python312-flask30-bxwxm  running  <my-org>/httpserver-python312-flask30        512MiB  1      damp-sunset-azd6dtyt.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                                FQDN                                   STATE    STATUS        IMAGE                                        MEMORY   VCPUS  ARGS                             BOOT TIME
-httpserver-python312-flask30-bxwxm  damp-sunset-azd6dtyt.fra.unikraft.app  running  1 minute ago  httpserver-python312-flask30@sha256:d6c8...  512 MiB  1      /usr/bin/python3 /app/server.py  222273us
+```ansi title="kraft"
+NAME                                FQDN                                   STATE    STATUS        IMAGE                                                               MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-python312-flask30-bxwxm  damp-sunset-azd6dtyt.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-python312-flask30@sha256:...  512 MiB  1            222.27 ms
 ```
 
 When done, you can remove the instance:

@@ -3,11 +3,13 @@
 This guide explains how to create and deploy a simple Spin HTTP app.
 This guide comes from  [Spin's `spin-wagi-http` example](https://github.com/fermyon/spin/tree/v2.1.0/examples/spin-wagi-http).
 It shows how to run a Spin app serving routes from two programs written in different languages (Rust and C++).
-Both the Spin executor and the Wagi executor on Unikraft Cloud.
-To run it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+To run this example, follow these steps:
+
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/spin-wagi-http/` directory:
 
@@ -42,25 +44,48 @@ unikraft run --metro fra -p 443:3000/tls+http -m 4G --image <my-org>/spin-wagi-h
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 4G .
+kraft cloud deploy -p 443:3000/tls+http -M 4Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: spin-wagi-http-is72r
- ├────────── uuid: 045c1bda-0f2e-4f8b-98c7-a208bfa7d143
- ├───────── state: running
- ├─────────── url: https://damp-bobo-wg43p36e.fra.unikraft.app
- ├───────── image: spin-wagi-http@sha256:57a5151996d83332af6da521e1cd92271a8c3ac7ae26bc44a7c0dbbc0a30e577
- ├───── boot time: 300.06 ms
- ├──────── memory: 4096 MiB
- ├─────── service: damp-bobo-wg43p36e
- ├── private fqdn: spin-wagi-http-is72r.internal
- ├──── private ip: 172.16.28.16
- └────────── args: /usr/bin/spin up --from /app/spin.toml --listen 0.0.0.0:3000
+ ├───────── name: spin-wagi-http-is72r
+ ├───────── uuid: 045c1bda-0f2e-4f8b-98c7-a208bfa7d143
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://damp-bobo-wg43p36e.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/spin-wagi-http@sha256:57a5151996d83332af6da521e1cd92271a8c3ac7ae26bc44a7c0dbbc0a30e577
+ ├─────── memory: 4096 MiB
+ ├────── service: damp-bobo-wg43p36e
+ ├─ private fqdn: spin-wagi-http-is72r.internal
+ └─── private ip: 10.0.28.16
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         spin-wagi-http-is72r
+uuid:         045c1bda-0f2e-4f8b-98c7-a208bfa7d143
+state:        starting
+image:        <my-org>/spin-wagi-http
+resources:
+  memory:     4096MiB
+  vcpus:      1
+service:
+  uuid:       9b5b88fd-16ce-3db6-a828-ee885647d820
+  name:       damp-bobo-wg43p36e
+  domains:
+  - fqdn:     damp-bobo-wg43p36e.fra.unikraft.app
+networks:
+- uuid:       db3851f6-ace1-8601-b6fa-925b7fdf8390
+  private-ip: 10.0.28.16
+  mac:        12:b0:fc:f5:09:d5
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `spin-wagi-http-is72r` and the address is `https://damp-bobo-wg43p36e.fra.unikraft.app`.
@@ -88,15 +113,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                  STATE    IMAGE                         ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    spin-wagi-http-is72r  running  <my-org>/spin-wagi-http@sha2        4.0GiB  1      damp-bobo-wg43p36e.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                  FQDN                                 STATE    STATUS        IMAGE                   MEMORY   VCPUS  ARGS                                      BOOT TIME
-spin-wagi-http-is72r  damp-bobo-wg43p36e.fra.unikraft.app  running  1 minute ago  spin-wagi-http@sha2...  4.0 GiB  1      /usr/bin/spin up --from /app/spin.tom...  300064us
+```ansi title="kraft"
+NAME                  FQDN                                 STATE    STATUS        IMAGE                                              MEMORY   VCPUS  ARGS  BOOT TIME
+spin-wagi-http-is72r  damp-bobo-wg43p36e.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/spin-wagi-http@sha2...  4.0 GiB  1            300.06 ms
 ```
 
 When done, you can remove the instance:

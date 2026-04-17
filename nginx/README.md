@@ -5,8 +5,10 @@ Nginx can be used with Unikraft / Unikraft Cloud to serve static web content.
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/nginx/` directory:
 
@@ -41,25 +43,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/nginx:lat
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: nginx-67zbu
- ├────────── uuid: 8a8bc1b9-0af6-420e-a426-190dc2da9eaa
- ├───────── state: running
- ├─────────── url: https://nameless-fog-0tvh1uov.fra.unikraft.app
- ├───────── image: nginx@sha256:f51ecc121c9ca34abb88a2bc6a69765501304f7893f7e85af15fbec3dc86e2bd
- ├───── boot time: 11.13ms
- ├──────── memory: 256 MiB
- ├─────── service: nameless-fog-0tvh1uov
- ├── private fqdn: nginx-67zbu.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/bin/nginx -c /etc/nginx/nginx.conf
+ ├───────── name: nginx-67zbu
+ ├───────── uuid: 8a8bc1b9-0af6-420e-a426-190dc2da9eaa
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://nameless-fog-0tvh1uov.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/nginx@sha256:f51ecc121c9ca34abb88a2bc6a69765501304f7893f7e85af15fbec3dc86e2bd
+ ├─────── memory: 256 MiB
+ ├────── service: nameless-fog-0tvh1uov
+ ├─ private fqdn: nginx-67zbu.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         nginx-67zbu
+uuid:         8a8bc1b9-0af6-420e-a426-190dc2da9eaa
+state:        starting
+image:        <my-org>/nginx
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       a942b9b5-ad17-3ffe-dcd2-ef4331f9087a
+  name:       nameless-fog-0tvh1uov
+  domains:
+  - fqdn:     nameless-fog-0tvh1uov.fra.unikraft.app
+networks:
+- uuid:       62d9bbf0-aec8-61f6-7bdb-86edf63dd068
+  private-ip: 10.0.3.3
+  mac:        12:b0:c6:23:ed:15
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `nginx-67zbu` and the address is `https://nameless-fog-0tvh1uov.fra.unikraft.app`.
@@ -85,15 +110,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME         STATE    IMAGE           ARGS  MEMORY  VCPUS  FQDN                                    CREATED
+fra    nginx-67zbu  running  <my-org>/nginx        256MiB  1      nameless-fog-0tvh1uov.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME         FQDN                                    STATE    STATUS         IMAGE                               MEMORY   VCPUS  ARGS                                     BOOT TIME
-nginx-67zbu  nameless-fog-0tvh1uov.fra.unikraft.app  running  5 minutes ago  nginx@sha256:f51ecc121c9ca34abb...  256 MiB  1      /usr/bin/nginx -c /etc/nginx/nginx.conf  11129us
+```ansi title="kraft"
+NAME         FQDN                                    STATE    STATUS         IMAGE                                        MEMORY   VCPUS  ARGS  BOOT TIME
+nginx-67zbu  nameless-fog-0tvh1uov.fra.unikraft.app  running  5 minutes ago  oci://unikraft.io/<my-org>/nginx@sha256:...  256 MiB  1            11.13 ms
 ```
 
 When done, you can remove the instance:

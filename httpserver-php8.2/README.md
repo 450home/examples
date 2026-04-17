@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a simple PHP-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-php8.2/` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-php82-g00si
- ├────────── uuid: 033b2f4b-72ff-414d-b0de-63571477c657
- ├───────── state: running
- ├─────────── url: https://aged-fire-rh0oi0tj.fra.unikraft.app
- ├───────── image: httpserver-php82@sha256:dccaac053982673765b8f00497a9736c31458ab23ad59a550b09aa8dedfabb34
- ├───── boot time: 32.80 ms
- ├──────── memory: 512 MiB
- ├─────── service: aged-fire-rh0oi0tj
- ├── private fqdn: httpserver-php82-g00si.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/local/bin/php /usr/src/server.php
+ ├───────── name: httpserver-php82-g00si
+ ├───────── uuid: 033b2f4b-72ff-414d-b0de-63571477c657
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://aged-fire-rh0oi0tj.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-php82@sha256:dccaac053982673765b8f00497a9736c31458ab23ad59a550b09aa8dedfabb34
+ ├─────── memory: 512 MiB
+ ├────── service: aged-fire-rh0oi0tj
+ ├─ private fqdn: httpserver-php82-g00si.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-php82-g00si
+uuid:         033b2f4b-72ff-414d-b0de-63571477c657
+state:        starting
+image:        <my-org>/httpserver-php82
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       a6f268b1-05c3-31c1-7d9b-76cb952fd713
+  name:       aged-fire-rh0oi0tj
+  domains:
+  - fqdn:     aged-fire-rh0oi0tj.fra.unikraft.app
+networks:
+- uuid:       f18bc9d1-a75d-dbd0-6566-599c2a1a95a6
+  private-ip: 10.0.3.3
+  mac:        12:b0:af:34:d3:e8
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-php82-g00si` and the address is `https://aged-fire-rh0oi0tj.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                    STATE    IMAGE                      ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    httpserver-php82-g00si  running  <my-org>/httpserver-php82        512MiB  1      aged-fire-rh0oi0tj.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                    FQDN                                 STATE    STATUS          IMAGE                                   MEMORY   VCPUS  ARGS                                    BOOT TIME
-httpserver-php82-g00si  aged-fire-rh0oi0tj.fra.unikraft.app  running  50 seconds ago  httpserver-php82@sha256:dccaac05398...  512 MiB  1      /usr/local/bin/php /usr/src/server.php  32801us
+```ansi title="kraft"
+NAME                    FQDN                                 STATE    STATUS          IMAGE                                                   MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-php82-g00si  aged-fire-rh0oi0tj.fra.unikraft.app  running  50 seconds ago  oci://unikraft.io/<my-org>/httpserver-php82@sha256:...  512 MiB  1            32.80 ms
 ```
 
 When done, you can remove the instance:

@@ -5,8 +5,10 @@ Caddy can be used with Unikraft / Unikraft Cloud to serve static web content.
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/caddy2.7-go1.21/` directory:
 
@@ -41,25 +43,48 @@ unikraft run --metro fra -p 443:2015/http+tls -m 256M --image <my-org>/caddy27-g
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:2015/http+tls -M 256M .
+kraft cloud deploy -p 443:2015/http+tls -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: caddy27-go121-vhf4m
- ├────────── uuid: db624eff-4739-4500-873c-f7c58e4eefd7
- ├───────── state: running
- ├─────────── url: https://frosty-sky-vz8kwsmb.fra.unikraft.app
- ├───────── image: caddy27-go121@sha256:25df97e3c43147c683f31dd062d0fa75122358b596de5804ca246c4e8613dd56
- ├───── boot time: 20.18ms
- ├──────── memory: 256 MiB
- ├─────── service: frosty-sky-vz8kwsmb
- ├── private fqdn: caddy27-go121-vhf4m.internal
- ├──── private ip: 172.16.6.2
- └────────── args: /usr/bin/caddy run --config /etc/caddy/Caddyfile
+ ├───────── name: caddy27-go121-vhf4m
+ ├───────── uuid: db624eff-4739-4500-873c-f7c58e4eefd7
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://frosty-sky-vz8kwsmb.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/caddy27-go121@sha256:25df97e3c43147c683f31dd062d0fa75122358b596de5804ca246c4e8613dd56
+ ├─────── memory: 256 MiB
+ ├────── service: frosty-sky-vz8kwsmb
+ ├─ private fqdn: caddy27-go121-vhf4m.internal
+ └─── private ip: 10.0.6.2
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         caddy27-go121-vhf4m
+uuid:         db624eff-4739-4500-873c-f7c58e4eefd7
+state:        starting
+image:        <my-org>/caddy27-go121
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       085cfc91-34d2-0e4d-5f19-fe67832f16a8
+  name:       frosty-sky-vz8kwsmb
+  domains:
+  - fqdn:     frosty-sky-vz8kwsmb.fra.unikraft.app
+networks:
+- uuid:       a72ea1ab-9686-c5b5-a8c2-fd58922f30f3
+  private-ip: 10.0.6.2
+  mac:        12:b0:a9:b2:fd:13
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `caddy27-go121-vhf4m` and the address is `https://frosty-sky-vz8kwsmb.fra.unikraft.app`.
@@ -81,15 +106,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                 STATE    IMAGE                   ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    caddy27-go121-vhf4m  running  <my-org>/caddy27-go121        256MiB  1      frosty-sky-vz8kwsmb.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                 FQDN                                  STATE    STATUS        IMAGE                              MEMORY   VCPUS  ARGS                               BOOT TIME
-caddy27-go121-vhf4m  frosty-sky-vz8kwsmb.fra.unikraft.app  running  1 minute ago  caddy27-go121@sha256:25df97e3c...  256 MiB  1      /usr/bin/caddy run --config /e...  20180us
+```ansi title="kraft"
+NAME                 FQDN                                  STATE    STATUS        IMAGE                                                MEMORY   VCPUS  ARGS  BOOT TIME
+caddy27-go121-vhf4m  frosty-sky-vz8kwsmb.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/caddy27-go121@sha256:...  256 MiB  1            20.18 ms
 ```
 
 When done, you can remove the instance:

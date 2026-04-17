@@ -1,10 +1,12 @@
 # Rust (Rocket) HTTP Server
 
 This example uses [`Rocket`](https://rocket.rs/), a popular Rust web framework.
-To run this example, follow these steps:
+To run it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-rust1.81-rocket0.5/` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-rust181-rocket05-tuwq3
- ├────────── uuid: b6fe13e4-93b7-402b-bdec-1bc4d81bc275
- ├───────── state: running
- ├─────────── url: https://empty-bobo-n3htmpye.fra.unikraft.app
- ├───────── image: httpserver-rust181-rocket05@sha256:23a7a6e155758e6e8f75e9570f0aec5fb744f08c1bad2454d7386367c5ea45d6
- ├───── boot time: 17.41 ms
- ├──────── memory: 256 MiB
- ├─────── service: empty-bobo-n3htmpye
- ├── private fqdn: httpserver-rust181-rocket05-tuwq3.internal
- ├──── private ip: 172.16.6.6
- └────────── args: /server
+ ├───────── name: httpserver-rust181-rocket05-tuwq3
+ ├───────── uuid: b6fe13e4-93b7-402b-bdec-1bc4d81bc275
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://empty-bobo-n3htmpye.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-rust181-rocket05@sha256:23a7a6e155758e6e8f75e9570f0aec5fb744f08c1bad2454d7386367c5ea45d6
+ ├─────── memory: 256 MiB
+ ├────── service: empty-bobo-n3htmpye
+ ├─ private fqdn: httpserver-rust181-rocket05-tuwq3.internal
+ └─── private ip: 10.0.6.6
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-rust181-rocket05-tuwq3
+uuid:         b6fe13e4-93b7-402b-bdec-1bc4d81bc275
+state:        starting
+image:        <my-org>/httpserver-rust181-rocket05
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       57da8f4a-5c68-3d4c-3b8f-987ee2ba0fb3
+  name:       empty-bobo-n3htmpye
+  domains:
+  - fqdn:     empty-bobo-n3htmpye.fra.unikraft.app
+networks:
+- uuid:       fb33101e-f3b6-0859-38b9-71fb057cab4a
+  private-ip: 10.0.6.6
+  mac:        12:b0:07:e5:d1:fe
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-rust181-rocket05-tuwq3` and the address is `https://empty-bobo-n3htmpye.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                               STATE    IMAGE                                 ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    httpserver-rust181-rocket05-tuwq3  running  <my-org>/httpserver-rust181-rocket05        256MiB  1      empty-bobo-n3htmpye.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                               FQDN                                  STATE    STATUS        IMAGE                                         MEMORY   VCPUS  ARGS     BOOT TIME
-httpserver-rust181-rocket05-tuwq3  empty-bobo-n3htmpye.fra.unikraft.app  running  1 minute ago  httpserver-rust181-rocket05@sha256:23a7a6...  256 MiB  1      /server  17412us
+```ansi title="kraft"
+NAME                               FQDN                                  STATE    STATUS        IMAGE                                                              MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-rust181-rocket05-tuwq3  empty-bobo-n3htmpye.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-rust181-rocket05@sha256:...  256 MiB  1            17.41 ms
 ```
 
 When done, you can remove the instance:

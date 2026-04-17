@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a C++-based HTTP web server using the [Boost](https://www.boost.org/) libraries.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [example repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-boost1.74-gpp13.2/` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```text
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-boost1.74-gpp13.2-rae7s
- ├────────── uuid: 5a9886fa-f8a3-4860-afcf-d5eb13fdc38d
- ├───────── state: running
- ├─────────── url: https://red-snow-3bn7bzc8.fra.unikraft.app
- ├───────── image: httpserver-boost1.74-gpp13.2@sha256:61cf86b89fed46351af53689e27189315e466576475f61c7240bf17644613489
- ├───── boot time: 15.00 ms
- ├──────── memory: 256 MiB
- ├─────── service: red-snow-3bn7bzc8
- ├── private fqdn: httpserver-boost1.74-gpp13.2-rae7s.internal
- ├──── private ip: 172.16.6.4
- └────────── args: /http_server
+ ├───────── name: httpserver-boost1.74-gpp13.2-rae7s
+ ├───────── uuid: 5a9886fa-f8a3-4860-afcf-d5eb13fdc38d
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://red-snow-3bn7bzc8.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-boost1.74-gpp13.2@sha256:61cf86b89fed46351af53689e27189315e466576475f61c7240bf17644613489
+ ├─────── memory: 256 MiB
+ ├────── service: red-snow-3bn7bzc8
+ ├─ private fqdn: httpserver-boost1.74-gpp13.2-rae7s.internal
+ └─── private ip: 10.0.6.4
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-boost1.74-gpp13.2-rae7s
+uuid:         5a9886fa-f8a3-4860-afcf-d5eb13fdc38d
+state:        starting
+image:        <my-org>/httpserver-boost1.74-gpp13.2
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       52cfb573-c035-9f0c-5db7-63615d26f182
+  name:       red-snow-3bn7bzc8
+  domains:
+  - fqdn:     red-snow-3bn7bzc8.fra.unikraft.app
+networks:
+- uuid:       44a3d2c5-9ee5-fffc-b72f-d6109072bb8c
+  private-ip: 10.0.6.4
+  mac:        12:b0:97:bc:2c:03
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-boost1.74-gpp13.2-rae7s` and the address is `https://red-snow-3bn7bzc8.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                STATE    IMAGE                                  ARGS  MEMORY  VCPUS  FQDN                                CREATED
+fra    httpserver-boost1.74-gpp13.2-rae7s  running  <my-org>/httpserver-boost1.74-gpp13.2        256MiB  1      red-snow-3bn7bzc8.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                                FQDN                                STATE    STATUS        IMAGE                                          MEMORY   VCPUS  ARGS          BOOT TIME
-httpserver-boost1.74-gpp13.2-rae7s  red-snow-3bn7bzc8.fra.unikraft.app  running  1 minute ago  httpserver-boost1.74-gpp13.2@sha256:61cf86...  256 MiB  1      /http_server  15000us
+```ansi title="kraft"
+NAME                                FQDN                                STATE    STATUS        IMAGE                                                               MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-boost1.74-gpp13.2-rae7s  red-snow-3bn7bzc8.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-boost1.74-gpp13.2@sha256:...  256 MiB  1            15.00 ms
 ```
 
 When done, you can remove the instance:

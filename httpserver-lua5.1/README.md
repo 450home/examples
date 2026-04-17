@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a simple Lua-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-lua5.1/` directory:
 
@@ -39,25 +41,48 @@ unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserve
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-lua51-ma2i9
- ├────────── uuid: e7389eee-9808-4152-b2ec-1f3c0541fd05
- ├───────── state: running
- ├─────────── url: https://young-night-5fpf0jj8.fra.unikraft.app
- ├───────── image: httpserver-lua51@sha256:278cb8b14f9faf9c2702dddd8bfb6124912d82c11b4a2c6590b6e32fc4049472
- ├───── boot time: 15.09 ms
- ├──────── memory: 256 MiB
- ├─────── service: young-night-5fpf0jj8
- ├── private fqdn: httpserver-lua51-ma2i9.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/bin/lua /http_server.lua
+ ├───────── name: httpserver-lua51-ma2i9
+ ├───────── uuid: e7389eee-9808-4152-b2ec-1f3c0541fd05
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://young-night-5fpf0jj8.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-lua51@sha256:278cb8b14f9faf9c2702dddd8bfb6124912d82c11b4a2c6590b6e32fc4049472
+ ├─────── memory: 256 MiB
+ ├────── service: young-night-5fpf0jj8
+ ├─ private fqdn: httpserver-lua51-ma2i9.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-lua51-ma2i9
+uuid:         e7389eee-9808-4152-b2ec-1f3c0541fd05
+state:        starting
+image:        <my-org>/httpserver-lua51
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       51a41f63-7e88-c443-b9bf-83cd7c04d975
+  name:       young-night-5fpf0jj8
+  domains:
+  - fqdn:     young-night-5fpf0jj8.fra.unikraft.app
+networks:
+- uuid:       afcc149e-cd07-a4b6-905a-6d498e251e14
+  private-ip: 10.0.3.3
+  mac:        12:b0:fe:e4:63:48
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-lua51-ma2i9` and the address is `https://young-night-5fpf0jj8.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                    STATE    IMAGE                      ARGS  MEMORY  VCPUS  FQDN                                   CREATED
+fra    httpserver-lua51-ma2i9  running  <my-org>/httpserver-lua51        256MiB  1      young-night-5fpf0jj8.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                      FQDN                                   STATE    STATUS        IMAGE                                    MEMORY   VCPUS  ARGS                           BOOT TIME
-httpserver-lua51-ma2i9    young-night-5fpf0jj8.fra.unikraft.app  running  1 minute ago  httpserver-lua51@sha256:278cb8b14f9f...  256 MiB  1      /usr/bin/lua /http_server.lua  15094us
+```ansi title="kraft"
+NAME                    FQDN                                   STATE    STATUS        IMAGE                                                   MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-lua51-ma2i9  young-night-5fpf0jj8.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-lua51@sha256:...  256 MiB  1            15.09 ms
 ```
 
 When done, you can remove the instance:
