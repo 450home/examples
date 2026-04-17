@@ -36,13 +36,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-java17-spring-petclinic:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 1G --image <my-org>/httpserver-java17-spring-petclinic:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 1G --image <my-org>/httpserver-java17-spring-petclinic:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy --metro fra -p 443:8080/tls+http -M 1Gi .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s --metro fra -p 443:8080/tls+http -M 1Gi .
 ```
 
 The output shows the instance address and other details:

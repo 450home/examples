@@ -36,13 +36,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/grafana:latest
-unikraft run --metro fra -p 443:3000/tls+http -m 2G --image <my-org>/grafana:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 2G --image <my-org>/grafana:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 2Gi .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:3000/tls+http -M 2Gi .
 ```
 
 The output shows the instance address and other details:

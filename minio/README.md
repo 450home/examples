@@ -37,13 +37,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/minio:latest
-unikraft run --metro fra -p 443:9001/tls+http -p 9000:9000/tls -m 512M --image <my-org>/minio:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:9001/tls+http -p 9000:9000/tls -m 512M --image <my-org>/minio:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:9001/tls+http -p 9000:9000/tls -M 512Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:9001/tls+http -p 9000:9000/tls -M 512Mi .
 ```
 
 The output shows the instance address and other details:

@@ -37,13 +37,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/memcached1.6:latest
-unikraft run --metro fra -p 11211:11211/tls -m 256M --image <my-org>/memcached1.6:latest
+unikraft run --scale-to-zero policy=off --metro fra -p 11211:11211/tls -m 256M --image <my-org>/memcached1.6:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 11211:11211/tls -M 256Mi .
+kraft cloud deploy --scale-to-zero off -p 11211:11211/tls -M 256Mi .
 ```
 
 The output shows the instance address and other details:

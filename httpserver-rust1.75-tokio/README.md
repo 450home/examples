@@ -35,13 +35,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-rust1.75-tokio:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-rust1.75-tokio:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-rust1.75-tokio:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
@@ -55,7 +55,7 @@ The output shows the instance address and other details:
  ├──────── state: starting
  ├─────── domain: https://empty-dawn-3coedrce.fra.unikraft.app
  ├──────── image: oci://unikraft.io/<my-org>/httpserver-rust175-tokio@sha256:0ce75912711aa2329232a2ca6c3ccb7a244b6d546fafc081f815c2fde8224856
- ├─────── memory: 256 Mi
+ ├─────── memory: 256 MiB
  ├────── service: empty-dawn-3coedrce
  ├─ private fqdn: httpserver-rust175-tokio-6gxsp.internal
  └─── private ip: 10.0.6.3
@@ -70,7 +70,7 @@ uuid:         d5719f64-0653-42d7-b2de-aa6dee0ce467
 state:        starting
 image:        <my-org>/httpserver-rust175-tokio
 resources:
-  memory:     256Mi
+  memory:     256MiB
   vcpus:      1
 service:
   uuid:       b59ce5aa-7dac-5241-386c-be48db955f3f

@@ -35,13 +35,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-flask3.0-sqlite:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 768M --image <my-org>/httpserver-python3.12-flask3.0-sqlite:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 768M --image <my-org>/httpserver-python3.12-flask3.0-sqlite:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 768Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 768Mi .
 ```
 
 The output shows the instance address and other details:
@@ -122,8 +122,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                                       STATE    IMAGE                                                ARGS  MEMORY  VCPUS  FQDN                                  CREATED
-fra    httpserver-python312-flask30-sqlite-qodkd  running  <my-org>/httpserver-python312-flask30-sqlite@sha256        768MiB  1      lingering-orangutan-840mmdvd.fra....  2 minutes ago
+METRO  NAME                                       STATE    IMAGE                                         ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    httpserver-python312-flask30-sqlite-qodkd  running  <my-org>/httpserver-python312-flask30-sqlite        768MiB  1      lingering-orangutan-840mmdvd.fra....  2 minutes ago
 ```
 
 or

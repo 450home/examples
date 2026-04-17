@@ -48,13 +48,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mcp-server-arxiv:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 2G --image <my-org>/mcp-server-arxiv:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 2G --image <my-org>/mcp-server-arxiv:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 2Gi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 2Gi .
 ```
 
 The output shows your instance details:
@@ -158,20 +158,20 @@ unikraft volume create --set metro=fra --set name=mcp-server-arxiv-data --set si
 or
 
 ```bash title="kraft"
-kraft cloud volume create --name mcp-server-arxiv-data --size 500M
+kraft cloud volume create --name mcp-server-arxiv-data --size 500Mi
 ```
 
 Then start the MCP server instance and mount that volume (while specifying the storage path):
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mcp-server-arxiv:latest
-unikraft run --metro fra -v mcp-server-arxiv-data:/volume -p 443:8080/tls+http -m 2G --image <my-org>/mcp-server-arxiv:latest -- "/usr/local/bin/python /src/server.py --storage-path /volume"
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -v mcp-server-arxiv-data:/volume -p 443:8080/tls+http -m 2G --image <my-org>/mcp-server-arxiv:latest -- "/usr/local/bin/python /src/server.py --storage-path /volume"
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -v mcp-server-arxiv-data:/volume -p 443:8080/tls+http -M 2Gi . --entrypoint "/usr/local/bin/python /src/server.py --storage-path /volume"
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -v mcp-server-arxiv-data:/volume -p 443:8080/tls+http -M 2Gi . --entrypoint "/usr/local/bin/python /src/server.py --storage-path /volume"
 ```
 
 ## Available tools

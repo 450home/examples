@@ -38,13 +38,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/spin-wagi-http:latest
-unikraft run --metro fra -p 443:3000/tls+http -m 4G --image <my-org>/spin-wagi-http:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 4G --image <my-org>/spin-wagi-http:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 4Gi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:3000/tls+http -M 4Gi .
 ```
 
 The output shows the instance address and other details:
@@ -114,8 +114,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                  STATE    IMAGE                         ARGS  MEMORY  VCPUS  FQDN                                 CREATED
-fra    spin-wagi-http-is72r  running  <my-org>/spin-wagi-http@sha2        4.0GiB  1      damp-bobo-wg43p36e.fra.unikraft.app  2 minutes ago
+METRO  NAME                  STATE    IMAGE                    ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    spin-wagi-http-is72r  running  <my-org>/spin-wagi-http        4.0GiB  1      damp-bobo-wg43p36e.fra.unikraft.app  2 minutes ago
 ```
 
 or

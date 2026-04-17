@@ -35,13 +35,13 @@ For extensive debug information with `strace`, add the `USE_STRACE=1` environmen
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-c-debug:latest
-unikraft run --metro fra -p 443:8080/tls+http -p 2222:2222/tls -e PUBKEY=.... -e USE_STRACE=1 -m 256M --image <my-org>/httpserver-c-debug:latest
+unikraft run --scale-to-zero policy=off --metro fra -p 443:8080/tls+http -p 2222:2222/tls -e PUBKEY=.... -e USE_STRACE=1 -m 256M --image <my-org>/httpserver-c-debug:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -p 2222:2222/tls -M 256Mi -e PUBKEY="...." -e USE_STRACE=1 .
+kraft cloud deploy --scale-to-zero off -p 443:8080/tls+http -p 2222:2222/tls -M 256Mi -e PUBKEY="...." -e USE_STRACE=1 .
 ```
 
 The output shows the instance address and other details:

@@ -52,9 +52,9 @@ jobs:
           cd grafana;
           kraft cloud deploy \
             --no-start \
-            --scale-to-zero on \
+            --scale-to-zero idle \
             --scale-to-zero-stateful \
-            --scale-to-zero-cooldown 4s \
+            --scale-to-zero-cooldown 1s \
             --name grafana-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-testing/base-compat:latest \
             --subdomain grafana-${GITHUB_RUN_ID} \

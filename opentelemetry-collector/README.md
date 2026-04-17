@@ -38,16 +38,16 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/opentelemetry-collector:latest
-unikraft run --metro fra -p 443:4318/tls+http -m 1536M --image <my-org>/opentelemetry-collector:latest
+unikraft run --metro fra -m 1536M --image <my-org>/opentelemetry-collector:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:4318/tls+http -M 1536Mi .
+kraft cloud deploy -M 1536Mi .
 ```
 
-The output shows the instance address and other details:
+The output shows the instance details:
 
 ```ansi title="kraft"
 [●] Deployed successfully!
@@ -73,11 +73,6 @@ image:        <my-org>/opentelemetry-collector
 resources:
   memory:     1536MiB
   vcpus:      1
-service:
-  uuid:       63ee8fb4-108c-eff8-00a1-2f35d82bdd72
-  name:       
-  domains:
-  - fqdn:     (none)
 networks:
 - uuid:       e74ba590-cbec-404b-d076-16aca1b52404
   private-ip: 10.0.3.3
@@ -91,6 +86,7 @@ They're different for each run.
 
 Note that the instance doesn't export a service.
 The default configuration can receive telemetry data from other instances by specifying the private IP or internal DNS as destination.
+Use port 4317 for gRPC and port 4318 for HTTP.
 The only configured exporter is the debug exporter.
 Feel free to change and redeploy!
 

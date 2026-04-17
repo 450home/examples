@@ -35,13 +35,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mariadb:latest
-unikraft run --metro fra -p 3306:3306/tls -m 1G -e MARIADB_ROOT_PASSWORD="unikraft" --image <my-org>/mariadb:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 3306:3306/tls -m 1G -e MARIADB_ROOT_PASSWORD="unikraft" --image <my-org>/mariadb:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 3306:3306/tls -M 1Gi --env MARIADB_ROOT_PASSWORD="unikraft" .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 3306:3306/tls -M 1Gi --env MARIADB_ROOT_PASSWORD="unikraft" .
 ```
 
 The output shows the instance address and other details:
@@ -139,8 +139,8 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME           FQDN                                    STATE    STATUS        IMAGE                                    MEMORY   VCPUS  ARGS  BOOT TIME
-mariadb-w2g2z  twilight-sun-82lt4ddk.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/mariadb@s...  1.0 GiB  1            159.06 ms
+NAME           FQDN                                    STATE    STATUS        IMAGE                                         MEMORY   VCPUS  ARGS  BOOT TIME
+mariadb-w2g2z  twilight-sun-82lt4ddk.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/mariadb@sha256...  1.0 GiB  1            159.06 ms
 ```
 
 When done, you can remove the instance:
@@ -170,20 +170,20 @@ unikraft volume create --set metro=fra --set name=mariadb-store --set size=512M
 or
 
 ```bash title="kraft"
-kraft cloud volume create --name mariadb-store --size 512M
+kraft cloud volume create --name mariadb-store --size 512Mi
 ```
 
 Then start the MariaDB instance and mount that volume:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mariadb:latest
-unikraft run --metro fra -p 3306:3306/tls -m 1G -e MARIADB_ROOT_PASSWORD="unikraft" --volume mariadb-store:/var/lib --image <my-org>/mariadb:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 3306:3306/tls -m 1G -e MARIADB_ROOT_PASSWORD="unikraft" --volume mariadb-store:/var/lib --image <my-org>/mariadb:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -M 1Gi -p 3306:3306/tls --env MARIADB_ROOT_PASSWORD="unikraft" --volume mariadb-store:/var/lib .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 1Gi -p 3306:3306/tls --env MARIADB_ROOT_PASSWORD="unikraft" --volume mariadb-store:/var/lib .
 ```
 
 ## Customize your app

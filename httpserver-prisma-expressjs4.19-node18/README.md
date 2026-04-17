@@ -37,13 +37,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-prisma-expressjs4.19-node18:latest
-unikraft run --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserver-prisma-expressjs4.19-node18:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserver-prisma-expressjs4.19-node18:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 512Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:3000/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:

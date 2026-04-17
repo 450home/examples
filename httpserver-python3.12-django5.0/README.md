@@ -35,13 +35,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-django5.0:latest
-unikraft run --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:80/tls+http -M 1Gi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 1Gi .
 ```
 
 The output shows the instance address and other details:
@@ -199,13 +199,13 @@ Run the command below to deploy the app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-django5.0:latest
-unikraft run --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:80/tls+http -M 1Gi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 1Gi .
 ```
 
 Differences from the Django app are also the steps required to create an `pip`-based app:

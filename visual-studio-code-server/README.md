@@ -47,7 +47,7 @@ unikraft run --metro fra -p 443:8443/tls+http -m 2G --volume code-workspace:/wor
 or
 
 ```bash title="kraft"
-kraft cloud volume create --name code-workspace --size 1G
+kraft cloud volume create --name code-workspace --size 1Gi
 
 kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 4s --name code-server -p 443:8443/tls+http -M 2Gi -v code-workspace:/workspace -e PGUID=0 -e PGID=0 -e PASSWORD=unikraft -e SUDO_PASSWORD=unikraft -e DEFAULT_WORKSPACE="/workspace" .
 ```

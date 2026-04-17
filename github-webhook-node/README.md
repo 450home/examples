@@ -38,13 +38,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/github-webhook-node:latest
-unikraft run --metro fra -p 443:3000/tls+http -m 1G -e GITHUB_WEBHOOK_SECRET=your_secret_here --image <my-org>/github-webhook-node:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 1G -e GITHUB_WEBHOOK_SECRET=your_secret_here --image <my-org>/github-webhook-node:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 1Gi -e GITHUB_WEBHOOK_SECRET=your_secret_here .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:3000/tls+http -M 1Gi -e GITHUB_WEBHOOK_SECRET=your_secret_here .
 ```
 
 `GITHUB_WEBHOOK_SECRET` is the secret used to verify incoming webhook requests from GitHub.

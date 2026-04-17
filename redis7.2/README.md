@@ -35,14 +35,14 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/redis7.2:latest
-unikraft run --metro fra -p 6379:6379/tls -m 512M --image <my-org>/redis7.2:latest
+unikraft build . --output <my-org>/redis72:latest
+unikraft run --scale-to-zero policy=off --metro fra -p 6379:6379/tls -m 512M --image <my-org>/redis72:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 6379:6379/tls -M 512Mi .
+kraft cloud deploy --scale-to-zero off -p 6379:6379/tls -M 512Mi .
 ```
 
 The output shows the instance address and other details:
@@ -50,26 +50,26 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: redis-alb4r
+ ├───────── name: redis72-alb4r
  ├───────── uuid: d3c3141b-97b2-4e1d-87ae-39e4f14ab49e
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://rough-wind-8vxrd1ms.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/redis7.2@sha256:9665c51faf7deb538cf7907b012b55700cad08cd391f5ba099d95d018c8da7d
+ ├──────── image: oci://unikraft.io/<my-org>/redis72@sha256:9665c51faf7deb538cf7907b012b55700cad08cd391f5ba099d95d018c8da7d
  ├─────── memory: 512 MiB
  ├────── service: rough-wind-8vxrd1ms
- ├─ private fqdn: redis-alb4r.internal
- └─── private ip: 172.16.6.2
+ ├─ private fqdn: redis72-alb4r.internal
+ └─── private ip: 10.0.3.2
 ```
 
 or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         redis-alb4r
+name:         redis72-alb4r
 uuid:         d3c3141b-97b2-4e1d-87ae-39e4f14ab49e
 state:        starting
-image:        <my-org>/redis7.2
+image:        <my-org>/redis72
 resources:
   memory:     512MiB
   vcpus:      1
@@ -80,13 +80,13 @@ service:
   - fqdn:     rough-wind-8vxrd1ms.fra.unikraft.app
 networks:
 - uuid:       9b5e1f8d-3c2a-7b46-d1e9-f2a3b4c5d6e7
-  private-ip: 172.16.6.2
+  private-ip: 10.0.3.2
   mac:        12:b0:4e:20:b3:e7
 timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `redis-alb4r` which is different for every run.
+In this case, the instance name is `redis72-alb4r` which is different for every run.
 
 To test the deployment, first forward the port using `socat`:
 
@@ -139,8 +139,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME         STATE    IMAGE              ARGS                              MEMORY  VCPUS  FQDN                                  CREATED
-fra    redis-alb4r  running  <my-org>/redis7.2  /usr/bin/redis-server /etc/re...  512MiB  1      rough-wind-8vxrd1ms.fra.unikraft.app  1 minute ago
+METRO  NAME           STATE    IMAGE              ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    redis72-alb4r  running  <my-org>/redis72        512MiB  1      rough-wind-8vxrd1ms.fra.unikraft.app  1 minute ago
 ```
 
 or
@@ -150,20 +150,20 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME         FQDN                                  STATE    STATUS        IMAGE                                           MEMORY   VCPUS  ARGS  BOOT TIME
-redis-alb4r  rough-wind-8vxrd1ms.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/redis7.2@sha256:...  512 MiB  1            26.13 ms
+NAME           FQDN                                  STATE    STATUS        IMAGE                                           MEMORY   VCPUS  ARGS  BOOT TIME
+redis72-alb4r  rough-wind-8vxrd1ms.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/redis72@sha256:...  512 MiB  1            26.13 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete redis-alb4r
+unikraft instances delete redis72-alb4r
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove redis-alb4r
+kraft cloud instance remove redis72-alb4r
 ```
 
 ## Customize your app

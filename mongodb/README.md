@@ -36,13 +36,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mongodb:latest
-unikraft run --metro fra -p 27017:27017/tls -m 1G --image <my-org>/mongodb:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 27017:27017/tls -m 1G --image <my-org>/mongodb:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 27017:27017/tls -M 1Gi .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 27017:27017/tls -M 1Gi .
 ```
 
 The output shows the instance address and other details:
@@ -156,20 +156,20 @@ unikraft volume create --set metro=fra --set name=mongodb-store --set size=512M
 or
 
 ```bash title="kraft"
-kraft cloud volume create --name mongodb-store --size 512M
+kraft cloud volume create --name mongodb-store --size 512Mi
 ```
 
 Then start the MongoDB instance and mount that volume:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mongodb:latest
-unikraft run --metro fra -p 27017:27017/tls -m 1G --volume mongodb-store:/data/db --image <my-org>/mongodb:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 27017:27017/tls -m 1G --volume mongodb-store:/data/db --image <my-org>/mongodb:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -M 1Gi -p 27017:27017/tls --volume mongodb-store:/data/db .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 1Gi -p 27017:27017/tls --volume mongodb-store:/data/db .
 ```
 
 ## Customize your app

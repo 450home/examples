@@ -35,13 +35,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
@@ -104,8 +104,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                                      STATE    IMAGE                                              ARGS  MEMORY  VCPUS  FQDN                                 CREATED
-fra    httpserver-python312-fastapi-01213-0n84f  standby  <my-org>/httpserver-python312-fastapi-01213@sha25        512MiB  1      dry-water-0oexx89g.fra.unikraft.app  2 minutes ago
+METRO  NAME                                      STATE    IMAGE                                        ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    httpserver-python312-fastapi-01213-0n84f  standby  <my-org>/httpserver-python312-fastapi-01213        512MiB  1      dry-water-0oexx89g.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -176,13 +176,13 @@ Run the command below to deploy the app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 Differences from the FastAPI app are also the steps required to create an `pip`-based app:

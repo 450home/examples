@@ -43,7 +43,7 @@ unikraft run --metro fra --scale-to-zero policy=on,cooldown-time=40000,stateful=
 or
 
 ```bash title="kraft"
-kraft cloud volume create --name vsftpd-workspace --size 1G
+kraft cloud volume create --name vsftpd-workspace --size 1Gi
 
 kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 3s --name vsftpd -p 20:20/tls -p 21:21/tls -p 222:22/tls -p 990:990/tls -p 10100:10100/tls -M 1Gi -v vsftpd-workspace:/root .
 ```

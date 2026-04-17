@@ -35,13 +35,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-node21-nextjs:latest
-unikraft run --metro fra -p 443:3000/tls+http -m 768M --image <my-org>/httpserver-node21-nextjs:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 768M --image <my-org>/httpserver-node21-nextjs:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 768Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:3000/tls+http -M 768Mi .
 ```
 
 The output shows the instance address and other details:
@@ -186,13 +186,13 @@ Run the command below to deploy the app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-expressjs4.18-node21:latest
-unikraft run --metro fra -p 443:3000/tls+http -m 256M --image <my-org>/httpserver-expressjs4.18-node21:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 256M --image <my-org>/httpserver-expressjs4.18-node21:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 256Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:3000/tls+http -M 256Mi .
 ```
 
 Differences from the `http-node21` app are also the steps required to create an `npm`-based app:

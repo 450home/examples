@@ -37,13 +37,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/wazero-import-go:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/wazero-import-go:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/wazero-import-go:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512Mi .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
@@ -108,8 +108,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                    STATE    IMAGE                        ARGS  MEMORY  VCPUS  FQDN                                    CREATED
-fra    wazero-import-go-r4dx8  running  <my-org>/wazero-import-go@s        512MiB  1      cool-morning-camrrhsa.fra.unikraft.app  2 minutes ago
+METRO  NAME                    STATE    IMAGE                      ARGS  MEMORY  VCPUS  FQDN                                    CREATED
+fra    wazero-import-go-r4dx8  running  <my-org>/wazero-import-go        512MiB  1      cool-morning-camrrhsa.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -119,8 +119,8 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                    FQDN                                    STATE    STATUS        IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
-wazero-import-go-r4dx8  cool-morning-camrrhsa.fra.unikraft.app  running  1 minutes ag  oci://unikraft.io/<my-org>/wazero-import-go@s...  512 MiB  1            20.04 ms
+NAME                    FQDN                                    STATE    STATUS         IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
+wazero-import-go-r4dx8  cool-morning-camrrhsa.fra.unikraft.app  running  1 minutes ago  oci://unikraft.io/<my-org>/wazero-import-go@s...  512 MiB  1            20.04 ms
 ```
 
 When done, you can remove the instance:

@@ -1,13 +1,6 @@
 spec: v0.6
 
-name: node18-wingsio
-
 runtime: base-compat:latest
-
-labels:
-  cloud.unikraft.v1.instances/scale_to_zero.policy: "on"
-  cloud.unikraft.v1.instances/scale_to_zero.stateful: "true"
-  cloud.unikraft.v1.instances/scale_to_zero.cooldown_time_ms: 1500
 
 rootfs:
   source: ./Dockerfile

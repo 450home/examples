@@ -36,13 +36,13 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/postgres:latest
-unikraft run --metro fra -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=unikraft --image <my-org>/postgres:latest
+unikraft run --metro fra --scale-to-zero policy=idle,cooldown-time=1000,stateful=true -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=unikraft --image <my-org>/postgres:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 5432:5432/tls -M 1Gi -e POSTGRES_PASSWORD=unikraft .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 5432:5432/tls -M 1Gi -e POSTGRES_PASSWORD=unikraft .
 ```
 
 The output shows the instance address and other details:
@@ -170,20 +170,20 @@ unikraft volume create --set metro=fra --set name=postgres --set size=200M
 or
 
 ```bash title="kraft"
-kraft cloud volume create --name postgres --size 200M
+kraft cloud volume create --name postgres --size 200Mi
 ```
 
 Then start the PostgreSQL instance and mount that volume:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/postgres:latest
-unikraft run --metro fra -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres --volume postgres:/volume --image <my-org>/postgres:latest
+unikraft run --metro fra --scale-to-zero policy=idle,cooldown-time=1000,stateful=true -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres --volume postgres:/volume --image <my-org>/postgres:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 5432:5432/tls -M 1Gi -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres -v postgres:/volume .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 5432:5432/tls -M 1Gi -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres -v postgres:/volume .
 ```
 
 ## Customize your deployment

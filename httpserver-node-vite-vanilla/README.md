@@ -56,13 +56,13 @@ When done, run:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-node-vite-vanilla:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 4G -e PWD=/app --image <my-org>/httpserver-node-vite-vanilla:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=2000,stateful=true --metro fra -p 443:8080/tls+http -m 4G -e PWD=/app --image <my-org>/httpserver-node-vite-vanilla:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 4Gi -e PWD=/app .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 2s -p 443:8080/tls+http -M 4Gi -e PWD=/app .
 ```
 
 The output shows the instance address and other details:
