@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a [Ruby on Rails](https://rubyonrails.org/) app.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/ruby3.2-rails/` directory:
 
@@ -33,31 +35,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/ruby3.2-rails:latest
-unikraft run --metro fra -p 443:3000/tls+http -m 1G -e GEM_HOME=/usr/local/bundle -e BUNDLE_APP_CONFIG=/usr/local/bundle --image <my-org>/ruby3.2-rails:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 1G -e GEM_HOME=/usr/local/bundle -e BUNDLE_APP_CONFIG=/usr/local/bundle --image <my-org>/ruby3.2-rails:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 1G -e GEM_HOME=/usr/local/bundle -e BUNDLE_APP_CONFIG=/usr/local/bundle .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:3000/tls+http -M 1Gi -e GEM_HOME=/usr/local/bundle -e BUNDLE_APP_CONFIG=/usr/local/bundle .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: ruby32-rails-apa93
- ├────────── uuid: 2f85b9db-94f8-45d2-8e38-ed9b56cb8695
- ├───────── state: running
- ├─────────── url: https://aged-waterfall-qraz0s7d.fra.unikraft.app
- ├───────── image: ruby32-rails@sha256:fdd46011408fdee05644665ad59b24115737e3fdb352169ec2f3f16a45d4f31d
- ├───── boot time: 577.34 ms
- ├──────── memory: 1024 MiB
- ├─────── service: aged-waterfall-qraz0s7d
- ├── private fqdn: ruby32-rails-apa93.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/bin/ruby /app/bin/rails server -b 0.0.0.0
+ ├───────── name: ruby32-rails-apa93
+ ├───────── uuid: 2f85b9db-94f8-45d2-8e38-ed9b56cb8695
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://aged-waterfall-qraz0s7d.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/ruby32-rails@sha256:fdd46011408fdee05644665ad59b24115737e3fdb352169ec2f3f16a45d4f31d
+ ├─────── memory: 1024 MiB
+ ├────── service: aged-waterfall-qraz0s7d
+ ├─ private fqdn: ruby32-rails-apa93.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         ruby32-rails-apa93
+uuid:         2f85b9db-94f8-45d2-8e38-ed9b56cb8695
+state:        starting
+image:        <my-org>/ruby32-rails
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       42265dab-df44-6d66-0075-fc07455178c8
+  name:       aged-waterfall-qraz0s7d
+  domains:
+  - fqdn:     aged-waterfall-qraz0s7d.fra.unikraft.app
+networks:
+- uuid:       7ae3414b-1d87-c831-d26a-506a4cf9ac71
+  private-ip: 10.0.3.3
+  mac:        12:b0:39:3e:b5:36
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `ruby32-rails-apa93` and the address is `https://aged-waterfall-qraz0s7d.fra.unikraft.app`.
@@ -85,15 +110,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                STATE    IMAGE                  ARGS  MEMORY  VCPUS  FQDN                                      CREATED
+fra    ruby32-rails-apa93  running  <my-org>/ruby32-rails        1.0GiB  1      aged-waterfall-qraz0s7d.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                FQDN                                      STATE    STATUS         IMAGE                                   MEMORY   VCPUS  ARGS                                            BOOT TIME
-ruby32-rails-apa93  aged-waterfall-qraz0s7d.fra.unikraft.app  running  2 minutes ago  ruby32-rails@sha256:fdd46011408fdee...  1.0 GiB  1      /usr/bin/ruby /app/bin/rails server -b 0.0.0.0  577.34 ms
+```ansi title="kraft"
+NAME                FQDN                                      STATE    STATUS         IMAGE                                               MEMORY   VCPUS  ARGS  BOOT TIME
+ruby32-rails-apa93  aged-waterfall-qraz0s7d.fra.unikraft.app  running  2 minutes ago  oci://unikraft.io/<my-org>/ruby32-rails@sha256:...  1.0 GiB  1            577.34 ms
 ```
 
 When done, you can remove the instance:

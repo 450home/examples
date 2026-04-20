@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a simple C++-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [example repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-gpp13.2/` directory:
 
@@ -33,31 +35,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-gpp13.2:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-gpp13.2:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-gpp13.2:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```text
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-gpp13.2-jzbuo
- ├────────── uuid: b8e015fd-d006-49d5-849e-3fd497c9159a
- ├───────── state: running
- ├─────────── url: https://throbbing-wave-grxjih4t.fra.unikraft.app
- ├───────── image: httpserver-gpp13.2@sha256:a58873987104b52c13b79168a2e2f1a81876ba6efacd6dbc98e996afe5c09699
- ├───── boot time: 15.61 ms
- ├──────── memory: 256 MiB
- ├─────── service: throbbing-wave-grxjih4t
- ├── private fqdn: httpserver-gpp13.2-jzbuo.internal
- ├──── private ip: 172.16.6.5
- └────────── args: /http_server
+ ├───────── name: httpserver-gpp13.2-jzbuo
+ ├───────── uuid: b8e015fd-d006-49d5-849e-3fd497c9159a
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://throbbing-wave-grxjih4t.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-gpp13.2@sha256:a58873987104b52c13b79168a2e2f1a81876ba6efacd6dbc98e996afe5c09699
+ ├─────── memory: 256 MiB
+ ├────── service: throbbing-wave-grxjih4t
+ ├─ private fqdn: httpserver-gpp13.2-jzbuo.internal
+ └─── private ip: 10.0.6.5
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-gpp13.2-jzbuo
+uuid:         b8e015fd-d006-49d5-849e-3fd497c9159a
+state:        starting
+image:        <my-org>/httpserver-gpp13.2
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       fd89859a-cf60-fa1f-1d43-0989a7c18b10
+  name:       throbbing-wave-grxjih4t
+  domains:
+  - fqdn:     throbbing-wave-grxjih4t.fra.unikraft.app
+networks:
+- uuid:       636ebc7e-bf82-d71d-5432-5445084a4308
+  private-ip: 10.0.6.5
+  mac:        12:b0:0f:20:02:9d
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-gpp13.2-jzbuo` and the address is `https://throbbing-wave-grxjih4t.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                      STATE    IMAGE                        ARGS  MEMORY  VCPUS  FQDN                                      CREATED
+fra    httpserver-gpp13.2-jzbuo  running  <my-org>/httpserver-gpp13.2        256MiB  1      throbbing-wave-grxjih4t.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                      FQDN                                      STATE    STATUS        IMAGE                                                           MEMORY   VCPUS  ARGS          BOOT TIME
-httpserver-gpp13.2-jzbuo  throbbing-wave-grxjih4t.fra.unikraft.app  running  1 minute ago  httpserver-gpp13.2@sha256:a58873987104b52c13b79168a2e2f1a81...  256 MiB  1      /http_server  15614us
+```ansi title="kraft"
+NAME                      FQDN                                      STATE    STATUS        IMAGE                                                     MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-gpp13.2-jzbuo  throbbing-wave-grxjih4t.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-gpp13.2@sha256:...  256 MiB  1            15.61 ms
 ```
 
 When done, you can remove the instance:

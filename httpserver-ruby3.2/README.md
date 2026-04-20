@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a simple Ruby-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-ruby3.2/` directory:
 
@@ -33,31 +35,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-ruby3.2:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-ruby3.2:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-ruby3.2:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-ruby32-s6l8n
- ├────────── uuid: b1ebbbc0-5efa-476c-adb6-99866773245c
- ├───────── state: running
- ├─────────── url: https://silent-resonance-1jtz5c66.fra.unikraft.app
- ├───────── image: httpserver-ruby32@sha256:4cf3b341898e6ebff18ff2b68353ef872dded650c9d16a6f005a8fbe8a7cbb3d
- ├───── boot time: 71.19 ms
- ├──────── memory: 256 MiB
- ├─────── service: silent-resonance-1jtz5c66
- ├── private fqdn: httpserver-ruby32-s6l8n.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/bin/ruby /src/server.rb
+ ├───────── name: httpserver-ruby32-s6l8n
+ ├───────── uuid: b1ebbbc0-5efa-476c-adb6-99866773245c
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://silent-resonance-1jtz5c66.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-ruby32@sha256:4cf3b341898e6ebff18ff2b68353ef872dded650c9d16a6f005a8fbe8a7cbb3d
+ ├─────── memory: 256 MiB
+ ├────── service: silent-resonance-1jtz5c66
+ ├─ private fqdn: httpserver-ruby32-s6l8n.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-ruby32-s6l8n
+uuid:         b1ebbbc0-5efa-476c-adb6-99866773245c
+state:        starting
+image:        <my-org>/httpserver-ruby32
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       bcc07c7c-9289-11f4-6e3d-8f7fdde45256
+  name:       silent-resonance-1jtz5c66
+  domains:
+  - fqdn:     silent-resonance-1jtz5c66.fra.unikraft.app
+networks:
+- uuid:       50203783-cf51-81d1-aa2d-615f939043af
+  private-ip: 10.0.3.3
+  mac:        12:b0:0a:4f:7a:84
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-ruby32-s6l8n` and the address is `https://silent-resonance-1jtz5c66.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                                    CREATED
+fra    httpserver-ruby32-s6l8n  running  <my-org>/httpserver-ruby32        256MiB  1      silent-resonance-1jtz5c66.fra.unikraf…  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                     FQDN                                        STATE    STATUS          IMAGE                                                 MEMORY   VCPUS  ARGS                          BOOT TIME
-httpserver-ruby32-s6l8n  silent-resonance-1jtz5c66.fra.unikraft.app  running  12 minutes ago  httpserver-ruby32@sha256:4cf3b341898e6ff2b68353ef...  256 MiB  1      /usr/bin/ruby /src/server.rb  71191us
+```ansi title="kraft"
+NAME                     FQDN                                        STATE    STATUS          IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-ruby32-s6l8n  silent-resonance-1jtz5c66.fra.unikraft.app  running  12 minutes ago  oci://unikraft.io/<my-org>/httpserver-ruby32@sha256:...  256 MiB  1            71.19 ms
 ```
 
 When done, you can remove the instance:

@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a Python Flask app using SQLite.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-python3.12-flask3.0-sqlite/` directory:
 
@@ -33,29 +35,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-flask3.0-sqlite:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 768M --image <my-org>/httpserver-python3.12-flask3.0-sqlite:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 768M --image <my-org>/httpserver-python3.12-flask3.0-sqlite:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 768M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 768Mi .
 ```
 
-```ansi
+The output shows the instance address and other details:
+
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-python312-flask30-sqlite-qodkd
- ├────────── uuid: e00e7aca-962d-409c-87c2-c245ca08b54b
- ├───────── state: running
- ├─────────── url: https://lingering-orangutan-840mmdvd.fra.unikraft.app
- ├───────── image: httpserver-python312-flask30-sqlite@sha256:bdb0bf35a9675b9b3836cbb626606da0606334d91768c7ba31195c3062d6f517
- ├───── boot time: 166.25 ms
- ├──────── memory: 768 MiB
- ├─────── service: lingering-orangutan-840mmdvd
- ├── private fqdn: httpserver-python312-flask30-sqlite-qodkd.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/bin/python3 /app/server.py
+ ├───────── name: httpserver-python312-flask30-sqlite-qodkd
+ ├───────── uuid: e00e7aca-962d-409c-87c2-c245ca08b54b
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://lingering-orangutan-840mmdvd.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-python312-flask30-sqlite@sha256:bdb0bf35a9675b9b3836cbb626606da0606334d91768c7ba31195c3062d6f517
+ ├─────── memory: 768 MiB
+ ├────── service: lingering-orangutan-840mmdvd
+ ├─ private fqdn: httpserver-python312-flask30-sqlite-qodkd.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-python312-flask30-sqlite-qodkd
+uuid:         e00e7aca-962d-409c-87c2-c245ca08b54b
+state:        starting
+image:        <my-org>/httpserver-python312-flask30-sqlite
+resources:
+  memory:     768MiB
+  vcpus:      1
+service:
+  uuid:       1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+  name:       lingering-orangutan-840mmdvd
+  domains:
+  - fqdn:     lingering-orangutan-840mmdvd.fra.unikraft.app
+networks:
+- uuid:       2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
+  private-ip: 10.0.3.3
+  mac:        12:b0:8a:4f:2c:91
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-python312-flask30-sqlite-qodkd` and the address is `https://lingering-orangutan-840mmdvd.fra.unikraft.app`.
@@ -94,15 +121,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                       STATE    IMAGE                                         ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    httpserver-python312-flask30-sqlite-qodkd  running  <my-org>/httpserver-python312-flask30-sqlite        768MiB  1      lingering-orangutan-840mmdvd.fra....  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                                       FQDN                                  STATE    STATUS        IMAGE                                          MEMORY   VCPUS  ARGS                             BOOT TIME
-httpserver-python312-flask30-sqlite-qodkd  lingering-orangutan-840mmdvd.fra....  running  1 minute ago  httpserver-python312-flask30-sqlite@sha256...  768 MiB  1      /usr/bin/python3 /app/server.py  166250us
+```ansi title="kraft"
+NAME                                       FQDN                                  STATE    STATUS        IMAGE                                                                     MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-python312-flask30-sqlite-qodkd  lingering-orangutan-840mmdvd.fra....  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-python312-flask30-sqlite@sha256...  768 MiB  1            166.25 ms
 ```
 
 When done, you can remove the instance:

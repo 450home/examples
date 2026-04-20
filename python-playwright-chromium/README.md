@@ -1,20 +1,93 @@
-# Playwright (Chromium) with Python FastAPI on Unikraft Cloud
+# Playwright (Chromium) with Python FastAPI
 
 [Playwright](https://playwright.dev/) is a framework for web testing and Automation.
 
-To run Playwright (Chromium) with Python using the [FastAPI framework](https://fastapi.tiangolo.com/) on Unikraft Cloud, first install the CLI. Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
-Then clone this repository and `cd` into this directory, and invoke:
+To run this example, follow these steps:
+
+1. Install the CLI.
+   Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
+
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/python-playwright-chromium/` directory:
+
+```bash
+git clone https://github.com/unikraft-cloud/examples
+cd examples/python-playwright-chromium/
+```
+
+Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
+This guide uses `fra` (Frankfurt, 🇩🇪):
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/python-playwright-chromium:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 4G --image <my-org>/python-playwright-chromium:latest
+unikraft login
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 4G .
+# Set Unikraft Cloud access token
+export UKC_TOKEN=token
+# Set metro to Frankfurt, DE
+export UKC_METRO=fra
 ```
+
+When done, invoke the following command to deploy this app on Unikraft Cloud:
+
+```bash title="unikraft"
+unikraft build . --output <my-org>/python-playwright-chromium:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 4G --image <my-org>/python-playwright-chromium:latest
+```
+
+or
+
+```bash title="kraft"
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 4Gi .
+```
+
+The output shows the instance address and other details:
+
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: python-playwright-chromium-m6k3p
+ ├───────── uuid: e6f7a8b9-c0d1-2e3f-4a5b-e6f7a8b9c0d1
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://young-night-kq8bv2mx.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/python-playwright-chromium@sha256:3c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d
+ ├─────── memory: 4096 MiB
+ ├────── service: young-night-kq8bv2mx
+ ├─ private fqdn: python-playwright-chromium-m6k3p.internal
+ └─── private ip: 10.0.6.5
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         python-playwright-chromium-m6k3p
+uuid:         e6f7a8b9-c0d1-2e3f-4a5b-e6f7a8b9c0d1
+state:        starting
+image:        <my-org>/python-playwright-chromium
+resources:
+  memory:     4096MiB
+  vcpus:      1
+service:
+  uuid:       f7a8b9c0-d1e2-3f4a-5b6c-f7a8b9c0d1e2
+  name:       young-night-kq8bv2mx
+  domains:
+  - fqdn:     young-night-kq8bv2mx.fra.unikraft.app
+networks:
+- uuid:       a8b9c0d1-e2f3-4a5b-6c7d-a8b9c0d1e2f3
+  private-ip: 10.0.6.5
+  mac:        12:b0:e4:b0:23:1d
+timestamps:
+  created:    just now
+```
+
+In this case, the instance name is `python-playwright-chromium-m6k3p` and the address is `https://young-night-kq8bv2mx.fra.unikraft.app`.
+They're different for each run.
 
 The command will deploy the files in the current directory.
 It results in the creation of a remote web-based service for creating PNG screenshots of remote pages.
@@ -33,10 +106,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                              STATE    IMAGE                                ARGS  MEMORY   VCPUS  FQDN                                   CREATED
+fra    python-playwright-chromium-m6k3p  running  <my-org>/python-playwright-chromium        4096MiB  1      young-night-kq8bv2mx.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
+```
+
+```ansi title="kraft"
+NAME                              FQDN                                   STATE    STATUS        IMAGE                                                             MEMORY  VCPUS  ARGS  BOOT TIME
+python-playwright-chromium-m6k3p  young-night-kq8bv2mx.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/python-playwright-chromium@sha256:...  4 GiB   1            3.47 s
 ```
 
 When done, you can remove the instance:

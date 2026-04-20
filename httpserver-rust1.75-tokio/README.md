@@ -3,8 +3,10 @@
 This example uses [`Tokio`](https://tokio.rs/), a popular Rust asynchronous runtime.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-rust1.75-tokio/` directory:
 
@@ -33,31 +35,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-rust1.75-tokio:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-rust1.75-tokio:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-rust1.75-tokio:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-rust175-tokio-6gxsp
- ├────────── uuid: d5719f64-0653-42d7-b2de-aa6dee0ce467
- ├───────── state: running
- ├─────────── url: https://empty-dawn-3coedrce.fra.unikraft.app
- ├───────── image: httpserver-rust175-tokio@sha256:0ce75912711aa2329232a2ca6c3ccb7a244b6d546fafc081f815c2fde8224856
- ├───── boot time: 21.41 ms
- ├──────── memory: 256 Mi
- ├─────── service: empty-dawn-3coedrce
- ├── private fqdn: httpserver-rust175-tokio-6gxsp.internal
- ├──── private ip: 172.16.6.3
- └────────── args: /server
+ ├───────── name: httpserver-rust175-tokio-6gxsp
+ ├───────── uuid: d5719f64-0653-42d7-b2de-aa6dee0ce467
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://empty-dawn-3coedrce.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-rust175-tokio@sha256:0ce75912711aa2329232a2ca6c3ccb7a244b6d546fafc081f815c2fde8224856
+ ├─────── memory: 256 MiB
+ ├────── service: empty-dawn-3coedrce
+ ├─ private fqdn: httpserver-rust175-tokio-6gxsp.internal
+ └─── private ip: 10.0.6.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-rust175-tokio-6gxsp
+uuid:         d5719f64-0653-42d7-b2de-aa6dee0ce467
+state:        starting
+image:        <my-org>/httpserver-rust175-tokio
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       b59ce5aa-7dac-5241-386c-be48db955f3f
+  name:       empty-dawn-3coedrce
+  domains:
+  - fqdn:     empty-dawn-3coedrce.fra.unikraft.app
+networks:
+- uuid:       9136307f-2ee6-2a0b-99af-c5a0fc1727f5
+  private-ip: 10.0.6.3
+  mac:        12:b0:38:a0:73:f3
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-rust175-tokio-6gxsp` and the address is `https://empty-dawn-3coedrce.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                            STATE    IMAGE                              ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    httpserver-rust175-tokio-6gxsp  running  <my-org>/httpserver-rust175-tokio        256MiB  1      empty-dawn-3coedrce.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                            FQDN                                  STATE    STATUS        IMAGE                                        MEMORY   VCPUS  ARGS     BOOT TIME
-httpserver-rust175-tokio-6gxsp  empty-dawn-3coedrce.fra.unikraft.app  running  1 minute ago  httpserver-rust175-tokio@sha256:0ce75912...  256 MiB  1      /server  21412us
+```ansi title="kraft"
+NAME                            FQDN                                  STATE    STATUS        IMAGE                                                           MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-rust175-tokio-6gxsp  empty-dawn-3coedrce.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-rust175-tokio@sha256:...  256 MiB  1            21.41 ms
 ```
 
 When done, you can remove the instance:

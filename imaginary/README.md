@@ -4,8 +4,10 @@ This example uses [`imaginary`](https://github.com/h2non/imaginary), an HTTP mic
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/imaginary/` directory:
 
@@ -34,31 +36,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/imaginary:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/imaginary:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/imaginary:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: imaginary-mwb4y
- ├────────── uuid: 8cf18bf7-2bf6-4f23-be07-f9c234c7962d
- ├───────── state: running
- ├─────────── url: https://divine-wind-1ycjvhqs.fra.unikraft.app
- ├───────── image: imaginary@sha256:673834bc531038bb621266f7fd635a04e559050cbe82876df811fd4b975ea4fe
- ├───── boot time: 32.26 ms
- ├──────── memory: 512 MiB
- ├─────── service: divine-wind-1ycjvhqs
- ├── private fqdn: imaginary-mwb4y.internal
- ├──── private ip: 172.16.3.3
- └────────── args: /usr/bin/imaginary -p 8080
+ ├───────── name: imaginary-mwb4y
+ ├───────── uuid: 8cf18bf7-2bf6-4f23-be07-f9c234c7962d
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://divine-wind-1ycjvhqs.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/imaginary@sha256:673834bc531038bb621266f7fd635a04e559050cbe82876df811fd4b975ea4fe
+ ├─────── memory: 512 MiB
+ ├────── service: divine-wind-1ycjvhqs
+ ├─ private fqdn: imaginary-mwb4y.internal
+ └─── private ip: 10.0.3.3
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         imaginary-mwb4y
+uuid:         8cf18bf7-2bf6-4f23-be07-f9c234c7962d
+state:        starting
+image:        <my-org>/imaginary
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       b9b7fa60-5f4f-13e5-41e9-eeea476f4398
+  name:       divine-wind-1ycjvhqs
+  domains:
+  - fqdn:     divine-wind-1ycjvhqs.fra.unikraft.app
+networks:
+- uuid:       91467bd9-8d52-a378-4426-7014ca09e5d5
+  private-ip: 10.0.3.3
+  mac:        12:b0:e2:ed:95:49
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `imaginary-mwb4y` and the address is `https://divine-wind-1ycjvhqs.fra.unikraft.app`.
@@ -98,15 +123,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME             STATE    IMAGE               ARGS  MEMORY  VCPUS  FQDN                                   CREATED
+fra    imaginary-mwb4y  running  <my-org>/imaginary        512MiB  1      divine-wind-1ycjvhqs.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME             FQDN                                   STATE    STATUS          IMAGE                                         MEMORY   VCPUS  ARGS                        BOOT TIME
-imaginary-mwb4y  divine-wind-1ycjvhqs.fra.unikraft.app  running  54 seconds ago  imaginary@sha256:673834bc531038bb621266f7...  512 MiB  1      /usr/bin/imaginary -p 8080  32262us
+```ansi title="kraft"
+NAME             FQDN                                   STATE    STATUS          IMAGE                                            MEMORY   VCPUS  ARGS  BOOT TIME
+imaginary-mwb4y  divine-wind-1ycjvhqs.fra.unikraft.app  running  54 seconds ago  oci://unikraft.io/<my-org>/imaginary@sha256:...  512 MiB  1            32.26 ms
 ```
 
 When done, you can remove the instance:

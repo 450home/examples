@@ -1,11 +1,13 @@
 # DragonflyDB
 
-This guides shows you how to deploy [Dragonfly](https://www.dragonflydb.io/), a simple, performant, and cost-efficient in-memory data store.
+This guide shows you how to deploy [Dragonfly](https://www.dragonflydb.io/), a simple, performant, and cost-efficient in-memory data store.
 
-To run it example, follow these steps:
+To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/dragonflydb/` directory:
 
@@ -34,31 +36,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/dragonflydb:latest
-unikraft run --metro fra -p 443:6379/http+tls -m 512M --image <my-org>/dragonflydb:latest
+unikraft run --scale-to-zero policy=off --metro fra -p 443:6379/http+tls -m 512M --image <my-org>/dragonflydb:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:6379/http+tls -M 512M .
+kraft cloud deploy --scale-to-zero off -p 443:6379/http+tls -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: dragonflydb-10zgk
- ├────────── uuid: 6282ef0c-2161-494c-a3f3-2d16055096c2
- ├───────── state: running
- ├─────────── url: https://dry-moon-x6bgl6c0.fra.unikraft.app
- ├───────── image: dragonflydb@sha256:21e6d3ff1f86292e14266bcf5c6e73d3b7a86a0ec4102c66a0961373af743f19
- ├───── boot time: 28.74 ms
- ├──────── memory: 512 MiB
- ├─────── service: dry-moon-x6bgl6c0
- ├── private fqdn: dragonflydb-10zgk.internal
- ├──── private ip: 172.16.6.5
- └────────── args: /usr/bin/dragonfly --maxmemory 256MiB
+ ├───────── name: dragonflydb-10zgk
+ ├───────── uuid: 6282ef0c-2161-494c-a3f3-2d16055096c2
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://dry-moon-x6bgl6c0.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/dragonflydb@sha256:21e6d3ff1f86292e14266bcf5c6e73d3b7a86a0ec4102c66a0961373af743f19
+ ├─────── memory: 512 MiB
+ ├────── service: dry-moon-x6bgl6c0
+ ├─ private fqdn: dragonflydb-10zgk.internal
+ └─── private ip: 10.0.6.5
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         dragonflydb-10zgk
+uuid:         6282ef0c-2161-494c-a3f3-2d16055096c2
+state:        starting
+image:        <my-org>/dragonflydb
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       18326b44-a571-6195-b9e6-9368832ff2b3
+  name:       dry-moon-x6bgl6c0
+  domains:
+  - fqdn:     dry-moon-x6bgl6c0.fra.unikraft.app
+networks:
+- uuid:       87aa7a40-2a83-f315-b656-e07a8637af64
+  private-ip: 10.0.6.5
+  mac:        12:b0:8f:c2:51:55
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `dragonflydb-10zgk` and the address is `https://dry-moon-x6bgl6c0.fra.unikraft.app`.
@@ -103,15 +128,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME               STATE    IMAGE                 ARGS  MEMORY  VCPUS  FQDN                                CREATED
+fra    dragonflydb-10zgk  running  <my-org>/dragonflydb        512MiB  1      dry-moon-x6bgl6c0.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME               FQDN                                STATE    STATUS        IMAGE                         MEMORY   VCPUS  ARGS                              BOOT TIME
-dragonflydb-10zgk  dry-moon-x6bgl6c0.fra.unikraft.app  running  1 minute ago  dragonflydb@sha256:21e6d3...  512 MiB  1      /usr/bin/dragonfly --maxmemor...  28740us
+```ansi title="kraft"
+NAME               FQDN                                STATE    STATUS        IMAGE                                              MEMORY   VCPUS  ARGS  BOOT TIME
+dragonflydb-10zgk  dry-moon-x6bgl6c0.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/dragonflydb@sha256:...  512 MiB  1            28.74 ms
 ```
 
 When done, you can remove the instance:

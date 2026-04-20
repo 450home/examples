@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a Python FastAPI web app.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-python3.12-fastapi-0.121.3/` directory:
 
@@ -33,31 +35,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```text
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────── name: httpserver-python312-fastapi-01213-0n84f
- ├────── uuid: 5d7fc331-3c23-4953-b025-d152a872ea29
- ├───── metro: fra
- ├───── state: running
- ├──── domain: https://dry-water-0oexx89g.fra.unikraft.app
- ├───── image: httpserver-python312-fastapi-01213@sha256:fb2a00dcf1cfc3ac821cbda05f82f38d66e63121344b9bc60c6a6e2f11917b98
- ├─ boot time: 170.42 ms
- ├──── memory: 512 MiB
- ├─── service: dry-water-0oexx89g
- ├ private ip: 10.0.1.69
- └────── args: /usr/bin/python3 -m uvicorn src.server:app --host 0.0.0.0 --port 8080
+ ├───────── name: httpserver-python312-fastapi-01213-0n84f
+ ├───────── uuid: 5d7fc331-3c23-4953-b025-d152a872ea29
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://dry-water-0oexx89g.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-python312-fastapi-01213@sha256:fb2a00dcf1cfc3ac821cbda05f82f38d66e63121344b9bc60c6a6e2f11917b98
+ ├─────── memory: 512 MiB
+ ├────── service: dry-water-0oexx89g
+ ├─ private fqdn: httpserver-python312-fastapi-01213-0n84f.internal
+ └─── private ip: 10.0.1.69
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-python312-fastapi-01213-0n84f
+uuid:         5d7fc331-3c23-4953-b025-d152a872ea29
+state:        starting
+image:        <my-org>/httpserver-python312-fastapi-01213
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       ced3df54-64cc-9217-3441-e0b4995319f0
+  name:       dry-water-0oexx89g
+  domains:
+  - fqdn:     dry-water-0oexx89g.fra.unikraft.app
+networks:
+- uuid:       66d1766f-0a03-8b62-eb1a-0adb09b07b1d
+  private-ip: 10.0.1.69
+  mac:        12:b0:a1:15:7c:4a
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-python312-fastapi-01213-0n84f` and the address is `https://dry-water-0oexx89g.fra.unikraft.app`.
@@ -78,15 +103,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                      STATE    IMAGE                                        ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    httpserver-python312-fastapi-01213-0n84f  standby  <my-org>/httpserver-python312-fastapi-01213        512MiB  1      dry-water-0oexx89g.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                                      FQDN                                 STATE    STATUS   IMAGE                                        MEMORY   VCPUS  ARGS                                                 BOOT TIME
-httpserver-python312-fastapi-01213-0n84f  dry-water-0oexx89g.fra.unikraft.app  standby  standby  httpserver-python312-fastapi-01213@sha25...  512 MiB  1      /usr/bin/python3 -m uvicorn src.server:app --hos...  169.45 ms
+```ansi title="kraft"
+NAME                                      FQDN                                 STATE    STATUS   IMAGE                                                                   MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-python312-fastapi-01213-0n84f  dry-water-0oexx89g.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/httpserver-python312-fastapi-01213@sha25...  512 MiB  1            169.45 ms
 ```
 
 When done, you can remove the instance:
@@ -146,13 +176,13 @@ Run the command below to deploy the app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 Differences from the FastAPI app are also the steps required to create an `pip`-based app:

@@ -7,8 +7,10 @@ a web interface inside a modern browser.
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/novnc-browser` directory:
 
@@ -48,26 +50,50 @@ kraft cloud deploy \
     --scale-to-zero-stateful \
     --scale-to-zero-cooldown 4s \
     -p 443:6080/tls+http \
-    -M 4G \
+    -M 4Gi \
     -n vnc-browser \
     .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├─────── name: vnc-browser
- ├─────── uuid: 90a59b05-0ae1-4ca6-8383-79c5115355ee
- ├────── metro: https://api.fra.unikraft.cloud/v1
- ├────── state: starting
- ├───── domain: https://weathered-fog-y5jjmwfd.fra.unikraft.app
- ├────── image: novnc-browser@sha256:fdb4887e84362ebbaf54c713e0d85f547e8ee173fe63a6ab39e94b7e612a9892
- ├───── memory: 4096 MiB
- ├──── service: weathered-fog-y5jjmwfd
- ├─ private ip: 10.0.0.49
- └─────── args: /wrapper.sh
+ ├───────── name: vnc-browser
+ ├───────── uuid: 90a59b05-0ae1-4ca6-8383-79c5115355ee
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://weathered-fog-y5jjmwfd.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/novnc-browser@sha256:fdb4887e84362ebbaf54c713e0d85f547e8ee173fe63a6ab39e94b7e612a9892
+ ├─────── memory: 4096 MiB
+ ├────── service: weathered-fog-y5jjmwfd
+ ├─ private fqdn: vnc-browser.internal
+ └─── private ip: 10.0.0.49
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         vnc-browser
+uuid:         90a59b05-0ae1-4ca6-8383-79c5115355ee
+state:        starting
+image:        <my-org>/novnc-browser
+resources:
+  memory:     4096MiB
+  vcpus:      1
+service:
+  uuid:       aaf03f7c-65e6-5624-d5f4-84e87450beee
+  name:       weathered-fog-y5jjmwfd
+  domains:
+  - fqdn:     weathered-fog-y5jjmwfd.fra.unikraft.app
+networks:
+- uuid:       61708609-d291-572d-4a4c-399413238199
+  private-ip: 10.0.0.49
+  mac:        12:b0:1e:47:6c:59
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `vnc-browser` and the address is `https://weathered-fog-y5jjmwfd.fra.unikraft.app`.
@@ -90,15 +116,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME         STATE    IMAGE                   ARGS  MEMORY  VCPUS  FQDN                                     CREATED
+fra    vnc-browser  standby  <my-org>/novnc-browser        4.0GiB  1      weathered-fog-y5jjmwfd.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME         FQDN                                     STATE    STATUS   IMAGE                                        MEMORY   VCPUS  ARGS         BOOT TIME
-vnc-browser  weathered-fog-y5jjmwfd.fra.unikraft.app  standby  standby  novnc-browser@sha256:fdb4887e84362ebbaf5...  4.0 GiB  1      /wrapper.sh  7.17 ms
+```ansi title="kraft"
+NAME         FQDN                                     STATE    STATUS   IMAGE                                                MEMORY   VCPUS  ARGS  BOOT TIME
+vnc-browser  weathered-fog-y5jjmwfd.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/novnc-browser@sha256:...  4.0 GiB  1            7.17 ms
 ```
 
 When done, you can remove the instance:

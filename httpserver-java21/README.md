@@ -4,8 +4,10 @@ This is a simple HTTP server written in the [Java](https://www.java.com/en/) pro
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-java21` directory:
 
@@ -34,30 +36,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-java21:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 1G --image <my-org>/httpserver-java21:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 1G --image <my-org>/httpserver-java21:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 1G .
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 1Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-java21-5xw9m
- ├────────── uuid: b2c3d4e5-f6a7-8901-bcde-f12345678901
- ├───────── state: starting
- ├──────── domain: https://gentle-wind-b2x9pkqm.fra.unikraft.app
- ├───────── image: httpserver-java21@sha256:4f8a2c6e1d9b3f7a5c0e2b4d8f6a1c3e7b9d2f4a6c8e0b2d4f6a8c0e2b4d6f
- ├──────── memory: 1 GiB
- ├─────── service: gentle-wind-b2x9pkqm
- ├── private fqdn: httpserver-java21-5xw9m.internal
- ├──── private ip: 172.16.3.5
- └────────── args: /usr/lib/jvm/java-21-openjdk-amd64/bin/java -classpath /usr/src/ SimpleHttpServer
+ ├───────── name: httpserver-java21-5xw9m
+ ├───────── uuid: b2c3d4e5-f6a7-8901-bcde-f12345678901
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://gentle-wind-b2x9pkqm.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-java21@sha256:4f8a2c6e1d9b3f7a5c0e2b4d8f6a1c3e7b9d2f4a6c8e0b2d4f6a8c0e2b4d6f
+ ├─────── memory: 1 GiB
+ ├────── service: gentle-wind-b2x9pkqm
+ ├─ private fqdn: httpserver-java21-5xw9m.internal
+ └─── private ip: 10.0.3.5
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-java21-5xw9m
+uuid:         b2c3d4e5-f6a7-8901-bcde-f12345678901
+state:        starting
+image:        <my-org>/httpserver-java21
+resources:
+  memory:     1GiB
+  vcpus:      1
+service:
+  uuid:       9d96e042-1601-352b-10c7-4a8c7ececbcb
+  name:       gentle-wind-b2x9pkqm
+  domains:
+  - fqdn:     gentle-wind-b2x9pkqm.fra.unikraft.app
+networks:
+- uuid:       25185154-a4d5-0da1-e28f-3b3e42190b56
+  private-ip: 10.0.3.5
+  mac:        12:b0:29:0f:68:f3
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-java21-5xw9m` and the address is `https://gentle-wind-b2x9pkqm.fra.unikraft.app`.
@@ -79,15 +105,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                              CREATED
+fra    httpserver-java21-5xw9m  running  <my-org>/httpserver-java21        1GiB    1      gentle-wind-b2x9pkqm.fra.unik...  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                      FQDN                              STATE    STATUS       IMAGE                                 MEMORY  VCPUS  ARGS                                                 BOOT TIME
-httpserver-java21-5xw9m   gentle-wind-b2x9pkqm.fra.unik...  running  since 3mins  httpserver-java21@sha256:4f8a2c6e...  1 GiB   1      /usr/lib/jvm/java-21-openjdk-amd64/bin/java -cla...  421.30 ms
+```ansi title="kraft"
+NAME                     FQDN                              STATE    STATUS       IMAGE                                                    MEMORY  VCPUS  ARGS  BOOT TIME
+httpserver-java21-5xw9m  gentle-wind-b2x9pkqm.fra.unik...  running  since 3mins  oci://unikraft.io/<my-org>/httpserver-java21@sha256:...  1 GiB   1            421.30 ms
 ```
 
 When done, you can remove the instance:

@@ -3,12 +3,15 @@
 This example shows how to build a simple GitHub Webhook receiver using Node.js with [Express](https://expressjs.com/) and run it on Unikraft Cloud.
 A webhook, also called a reverse API, is a way for a server to send real-time data to other applications when a specific event occurs.
 In this case, the webhook receiver listens for GitHub events, such as push events or pull request events, and logs them to the console.
-To run this it, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+To run this example, follow these steps:
+
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
-1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/github-webhook-node/` directory:
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/github-webhook-node/` directory:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
@@ -35,32 +38,56 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/github-webhook-node:latest
-unikraft run --metro fra -p 443:3000/tls+http -m 1G -e GITHUB_WEBHOOK_SECRET=your_secret_here --image <my-org>/github-webhook-node:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 1G -e GITHUB_WEBHOOK_SECRET=your_secret_here --image <my-org>/github-webhook-node:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:3000/tls+http -M 1G -e GITHUB_WEBHOOK_SECRET=your_secret_here .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:3000/tls+http -M 1Gi -e GITHUB_WEBHOOK_SECRET=your_secret_here .
 ```
 
 `GITHUB_WEBHOOK_SECRET` is the secret used to verify incoming webhook requests from GitHub.
 Set it to a string with high entropy.
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├─────── name: github-webhook-node-bzq7u
- ├─────── uuid: 8a8634f1-fc78-4cc0-aa36-8f082d8a59f5
- ├────── metro: https://api.fra.unikraft.cloud/v1
- ├────── state: starting
- ├───── domain: https://dry-cloud-uuw0qlb6.fra.unikraft.app
- ├────── image: github-webhook-node@sha256:10974aac67ce6355148e21d91f918960bf0af29ad840fffeeb2fd01f8c905f66
- ├───── memory: 1024 MiB
- ├──── service: dry-cloud-uuw0qlb6
- ├─ private ip: 10.0.1.205
- └─────── args: node /app/server.js
+ ├───────── name: github-webhook-node-bzq7u
+ ├───────── uuid: 8a8634f1-fc78-4cc0-aa36-8f082d8a59f5
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://dry-cloud-uuw0qlb6.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/github-webhook-node@sha256:10974aac67ce6355148e21d91f918960bf0af29ad840fffeeb2fd01f8c905f66
+ ├─────── memory: 1024 MiB
+ ├────── service: dry-cloud-uuw0qlb6
+ ├─ private fqdn: github-webhook-node-bzq7u.internal
+ └─── private ip: 10.0.1.205
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         github-webhook-node-bzq7u
+uuid:         8a8634f1-fc78-4cc0-aa36-8f082d8a59f5
+state:        starting
+image:        <my-org>/github-webhook-node
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       67c7cca2-ca82-1467-e2f1-1b455edb638c
+  name:       dry-cloud-uuw0qlb6
+  domains:
+  - fqdn:     dry-cloud-uuw0qlb6.fra.unikraft.app
+networks:
+- uuid:       6153b689-b713-97c3-f8bb-bd08cc47f6bc
+  private-ip: 10.0.1.205
+  mac:        12:b0:d0:97:b0:d2
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `github-webhook-node-bzq7u` and the address is `https://dry-cloud-uuw0qlb6.fra.unikraft.app`.
@@ -112,15 +139,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                       STATE    IMAGE                         ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    github-webhook-node-bzq7u  standby  <my-org>/github-webhook-node        1.0GiB  1      dry-cloud-uuw0qlb6.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                       FQDN                                 STATE    STATUS   IMAGE                                               MEMORY   VCPUS  ARGS                 BOOT TIME
-github-webhook-node-bzq7u  dry-cloud-uuw0qlb6.fra.unikraft.app  standby  standby  github-webhook-node@sha256:10974aac67ce6355148e...  1.0 GiB  1      node /app/server.js  197.47 ms
+```ansi title="kraft"
+NAME                       FQDN                                 STATE    STATUS   IMAGE                                                      MEMORY   VCPUS  ARGS  BOOT TIME
+github-webhook-node-bzq7u  dry-cloud-uuw0qlb6.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/github-webhook-node@sha256:...  1.0 GiB  1            197.47 ms
 ```
 
 When done, you can remove the instance:

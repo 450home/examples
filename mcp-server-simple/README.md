@@ -8,8 +8,10 @@ This is a great starting point for building your own custom MCP servers with bus
 
 To run this MCP server on Unikraft Cloud:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mcp-server-simple/` directory:
 
@@ -38,31 +40,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mcp-server-simple:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/mcp-server-simple:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/mcp-server-simple:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows your instance details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────── name: mcp-server-simple-bbdcb
- ├────── uuid: e87d3591-3497-4f30-bd76-1dc886059647
- ├───── metro: https://api.fra.unikraft.cloud/v1
- ├───── state: running
- ├──── domain: https://cool-paper-b6mht7jv.fra.unikraft.app
- ├───── image: mcp-server-simple@sha256:cbbfb441ee313a6c7c0de571e9002f0f6031312e203ffb6be3b8f4950df3bc20
- ├─ boot time: 145.96 ms
- ├──── memory: 512 MiB
- ├─── service: cool-paper-b6mht7jv
- ├ private ip: 10.0.0.193
- └────── args: /usr/bin/python3 /src/server.py
+ ├───────── name: mcp-server-simple-bbdcb
+ ├───────── uuid: e87d3591-3497-4f30-bd76-1dc886059647
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://cool-paper-b6mht7jv.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/mcp-server-simple@sha256:cbbfb441ee313a6c7c0de571e9002f0f6031312e203ffb6be3b8f4950df3bc20
+ ├─────── memory: 512 MiB
+ ├────── service: cool-paper-b6mht7jv
+ ├─ private fqdn: mcp-server-simple-bbdcb.internal
+ └─── private ip: 10.0.0.193
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         mcp-server-simple-bbdcb
+uuid:         e87d3591-3497-4f30-bd76-1dc886059647
+state:        starting
+image:        <my-org>/mcp-server-simple
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       3cfc78af-748d-c6ba-5bfb-427b3bd7e9aa
+  name:       cool-paper-b6mht7jv
+  domains:
+  - fqdn:     cool-paper-b6mht7jv.fra.unikraft.app
+networks:
+- uuid:       6a712117-5b67-d89a-7e2e-4a57e1732724
+  private-ip: 10.0.0.193
+  mac:        12:b0:39:2b:a3:15
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `mcp-server-simple-bbdcb` and the service `cool-paper-b6mht7jv`.
@@ -100,15 +125,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    mcp-server-simple-bbdcb  standby  <my-org>/mcp-server-simple        512MiB  1      cool-paper-b6mht7jv.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                     FQDN                                  STATE    STATUS   IMAGE                                               MEMORY   VCPUS  ARGS                             BOOT TIME
-mcp-server-simple-bbdcb  cool-paper-b6mht7jv.fra.unikraft.app  standby  standby  mcp-server-simple@sha256:cbbfb441ee313a6c7c0de5...  512 MiB  1      /usr/bin/python3 /src/server.py  9.15 ms
+```ansi title="kraft"
+NAME                     FQDN                                  STATE    STATUS   IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
+mcp-server-simple-bbdcb  cool-paper-b6mht7jv.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/mcp-server-simple@sha256:...  512 MiB  1            9.15 ms
 ```
 
 When done, you can delete the instance with:

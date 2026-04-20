@@ -6,8 +6,10 @@ To use Vite in server-side rendering (SSR) mode or via the `dev` subcommand on a
 
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-nginx-vite-vanilla` directory:
 
@@ -36,30 +38,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-nginx-vite-vanilla:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-nginx-vite-vanilla:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-nginx-vite-vanilla:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 256M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-nginx-vite-vanilla-2rk6p
- ├────────── uuid: d4e5f6a7-b8c9-0123-defa-234567890123
- ├───────── state: starting
- ├──────── domain: https://swift-lake-m4n8vqzp.fra.unikraft.app
- ├───────── image: httpserver-nginx-vite-vanilla@sha256:9c5f2d8b4e7a1c3f6d9b2e5a8c1f4d7a0b3e6c9f2d5a8b1e4c7f0d3a6b9c2
- ├──────── memory: 256 MiB
- ├─────── service: swift-lake-m4n8vqzp
- ├── private fqdn: httpserver-nginx-vite-vanilla-2rk6p.internal
- ├──── private ip: 172.16.3.7
- └────────── args: /usr/bin/nginx -c /etc/nginx/nginx.conf
+ ├───────── name: httpserver-nginx-vite-vanilla-2rk6p
+ ├───────── uuid: d4e5f6a7-b8c9-0123-defa-234567890123
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://swift-lake-m4n8vqzp.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-nginx-vite-vanilla@sha256:9c5f2d8b4e7a1c3f6d9b2e5a8c1f4d7a0b3e6c9f2d5a8b1e4c7f0d3a6b9c2
+ ├─────── memory: 256 MiB
+ ├────── service: swift-lake-m4n8vqzp
+ ├─ private fqdn: httpserver-nginx-vite-vanilla-2rk6p.internal
+ └─── private ip: 10.0.3.7
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-nginx-vite-vanilla-2rk6p
+uuid:         d4e5f6a7-b8c9-0123-defa-234567890123
+state:        starting
+image:        <my-org>/httpserver-nginx-vite-vanilla
+resources:
+  memory:     256MiB
+  vcpus:      1
+service:
+  uuid:       ed42569f-a592-20e1-f506-7cb1bc1c84d6
+  name:       swift-lake-m4n8vqzp
+  domains:
+  - fqdn:     swift-lake-m4n8vqzp.fra.unikraft.app
+networks:
+- uuid:       d05bbdcf-8a0f-b8fe-0d9f-976c4c973701
+  private-ip: 10.0.3.7
+  mac:        12:b0:1a:5c:59:a9
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-nginx-vite-vanilla-2rk6p` and the address is `https://swift-lake-m4n8vqzp.fra.unikraft.app`.
@@ -91,15 +117,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                 STATE    IMAGE                                   ARGS  MEMORY  VCPUS  FQDN                                  CREATED
+fra    httpserver-nginx-vite-vanilla-2rk6p  running  <my-org>/httpserver-nginx-vite-vanilla        256MiB  1      swift-lake-m4n8vqzp.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                                 FQDN                                  STATE    STATUS       IMAGE                                        MEMORY   VCPUS  ARGS                                     BOOT TIME
-httpserver-nginx-vite-vanilla-2rk6p  swift-lake-m4n8vqzp.fra.unikraft.app  running  since 3mins  httpserver-nginx-vite-vanilla@sha256:9c5...  256 MiB  1      /usr/bin/nginx -c /etc/nginx/nginx.conf  198.62 ms
+```ansi title="kraft"
+NAME                                 FQDN                                  STATE    STATUS       IMAGE                                                                MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-nginx-vite-vanilla-2rk6p  swift-lake-m4n8vqzp.fra.unikraft.app  running  since 3mins  oci://unikraft.io/<my-org>/httpserver-nginx-vite-vanilla@sha256:...  256 MiB  1            198.62 ms
 ```
 
 When done, you can remove the instance:

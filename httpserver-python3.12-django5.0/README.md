@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a Python Django web app.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-python3.12-django5.0/` directory:
 
@@ -33,31 +35,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-django5.0:latest
-unikraft run --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:80/tls+http -M 1G .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 1Gi .
 ```
 
 The output shows the instance address and other details:
 
-```text
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────────── name: httpserver-python312-django50-vt56c
- ├────────── uuid: d8469447-fdf6-4caf-9fea-494218ca6f72
- ├───────── state: running
- ├─────────── url: https://dawn-sound-n5wrkxi2.fra.unikraft.app
- ├───────── image: httpserver-python312-django50@sha256:221666d414299aff54dbf10020b3d540270ee0c5907c1c6a728ca254ce8b0e50
- ├───── boot time: 80.32 ms
- ├──────── memory: 1024 MiB
- ├─────── service: dawn-sound-n5wrkxi2
- ├── private fqdn: httpserver-python312-django50-vt56c.internal
- ├──── private ip: 172.16.6.5
- └────────── args: /usr/bin/python3 /app/main.py
+ ├───────── name: httpserver-python312-django50-vt56c
+ ├───────── uuid: d8469447-fdf6-4caf-9fea-494218ca6f72
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://dawn-sound-n5wrkxi2.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-python312-django50@sha256:221666d414299aff54dbf10020b3d540270ee0c5907c1c6a728ca254ce8b0e50
+ ├─────── memory: 1024 MiB
+ ├────── service: dawn-sound-n5wrkxi2
+ ├─ private fqdn: httpserver-python312-django50-vt56c.internal
+ └─── private ip: 10.0.6.5
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-python312-django50-vt56c
+uuid:         d8469447-fdf6-4caf-9fea-494218ca6f72
+state:        starting
+image:        <my-org>/httpserver-python312-django50
+resources:
+  memory:     1024MiB
+  vcpus:      1
+service:
+  uuid:       109aa11f-da45-8d57-d5e4-6eb509ee3e73
+  name:       dawn-sound-n5wrkxi2
+  domains:
+  - fqdn:     dawn-sound-n5wrkxi2.fra.unikraft.app
+networks:
+- uuid:       95f37ba4-2586-54a2-bf3e-5764c91c4fc1
+  private-ip: 10.0.6.5
+  mac:        12:b0:9c:af:65:e7
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-python312-django50-vt56c` and the address is `https://dawn-sound-n5wrkxi2.fra.unikraft.app`.
@@ -101,15 +126,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                                 STATE    IMAGE                                   ARGS  MEMORY   VCPUS  FQDN                                  CREATED
+fra    httpserver-python312-django50-vt56c  running  <my-org>/httpserver-python312-django50        1024MiB  1      dawn-sound-n5wrkxi2.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                                 FQDN                                  STATE    STATUS        IMAGE                                        MEMORY    VCPUS  ARGS                           BOOT TIME
-httpserver-python312-django50-vt56c  dawn-sound-n5wrkxi2.fra.unikraft.app  running  1 minute ago  httpserver-python312-django50@sha256:221...  1024 MiB  1      /usr/bin/python3 /app/main.py  80321us
+```ansi title="kraft"
+NAME                                 FQDN                                  STATE    STATUS        IMAGE                                                                MEMORY    VCPUS  ARGS  BOOT TIME
+httpserver-python312-django50-vt56c  dawn-sound-n5wrkxi2.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-python312-django50@sha256:...  1024 MiB  1            80.32 ms
 ```
 
 When done, you can remove the instance:
@@ -169,13 +199,13 @@ Run the command below to deploy the app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python3.12-django5.0:latest
-unikraft run --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:80/tls+http -M 1G .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 1Gi .
 ```
 
 Differences from the Django app are also the steps required to create an `pip`-based app:

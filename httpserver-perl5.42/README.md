@@ -3,8 +3,10 @@
 This guide explains how to create and deploy a simple Perl-based HTTP web server.
 To run this example, follow these steps:
 
-1. Install the CLI and a container runtime engine, for example [Docker](https://docs.docker.com/engine/install/).
+1. Install the CLI.
    Use the [unikraft CLI](https://unikraft.com/docs/cli/unikraft) or the legacy [kraft CLI](https://unikraft.org/docs/cli/install).
+   You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
+   Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-perl5.42/` directory:
 
@@ -33,31 +35,54 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-perl5.42:latest
-unikraft run --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-perl5.42:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-perl5.42:latest
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 512M .
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi
+```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├────── name: httpserver-perl542-xue8j
- ├────── uuid: 59d08bbc-cbb7-4c6b-a2cb-847828845db9
- ├───── metro: fra
- ├───── state: running
- ├──── domain: https://fragrant-water-wau08gaw.fra.unikraft.app
- ├───── image: httpserver-perl542@sha256:af86e8f03c0d4cfd596ccfd9a9d18ea75ac68c996c9cde31f64db24dc11100fe
- ├─ boot time: 109.36 ms
- ├──── memory: 512 MiB
- ├─── service: fragrant-water-wau08gaw
- ├ private ip: 10.0.1.161
- └────── args: /usr/bin/perl /usr/src/server.pl
+ ├───────── name: httpserver-perl542-xue8j
+ ├───────── uuid: 59d08bbc-cbb7-4c6b-a2cb-847828845db9
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://fragrant-water-wau08gaw.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-perl542@sha256:af86e8f03c0d4cfd596ccfd9a9d18ea75ac68c996c9cde31f64db24dc11100fe
+ ├─────── memory: 512 MiB
+ ├────── service: fragrant-water-wau08gaw
+ ├─ private fqdn: httpserver-perl542-xue8j.internal
+ └─── private ip: 10.0.1.161
+```
+
+or
+
+```ansi title="unikraft"
+metro:        fra
+name:         httpserver-perl542-xue8j
+uuid:         59d08bbc-cbb7-4c6b-a2cb-847828845db9
+state:        starting
+image:        <my-org>/httpserver-perl542
+resources:
+  memory:     512MiB
+  vcpus:      1
+service:
+  uuid:       b62c0c0a-2de6-9068-1e93-223fa8f1edbf
+  name:       fragrant-water-wau08gaw
+  domains:
+  - fqdn:     fragrant-water-wau08gaw.fra.unikraft.app
+networks:
+- uuid:       22bdfc9c-2f69-eb7e-5b5e-929aba51a2c0
+  private-ip: 10.0.1.161
+  mac:        12:b0:d4:aa:c1:98
+timestamps:
+  created:    just now
 ```
 
 In this case, the instance name is `httpserver-perl542-xue8j` and the address is `https://fragrant-water-wau08gaw.fra.unikraft.app`.
@@ -79,15 +104,20 @@ You can list information about the instance by running:
 unikraft instances list
 ```
 
+```ansi title="unikraft"
+METRO  NAME                      STATE    IMAGE                        ARGS  MEMORY  VCPUS  FQDN                                      CREATED
+fra    httpserver-perl542-xue8j  standby  <my-org>/httpserver-perl542        512MiB  1      fragrant-water-wau08gaw.fra.unikraft.app  2 minutes ago
+```
+
 or
 
 ```bash title="kraft"
 kraft cloud instance list
 ```
 
-```ansi
-NAME                      FQDN                                      STATE    STATUS   IMAGE                                           MEMORY   VCPUS  ARGS                              BOOT TIME
-httpserver-perl542-xue8j  fragrant-water-wau08gaw.fra.unikraft.app  standby  standby  httpserver-perl542@sha256:af86e8f03c0d4cfd5...  512 MiB  1      /usr/bin/perl /usr/src/server.pl  109.46 ms
+```ansi title="kraft"
+NAME                      FQDN                                      STATE    STATUS   IMAGE                                                     MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-perl542-xue8j  fragrant-water-wau08gaw.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/httpserver-perl542@sha256:...  512 MiB  1            109.46 ms
 ```
 
 When you list your instances, you might notice they show as standby.
