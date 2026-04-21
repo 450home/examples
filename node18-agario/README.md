@@ -1,4 +1,4 @@
-# Node Agar.io
+# Agar.io (Node)
 
 [Agar.io](https://agar.io/) is a popular multiplayer game where players control a cell and aim to grow by consuming smaller cells while avoiding being consumed by larger ones.
 This guide deploys an implementation of the game using Node.js on Unikraft Cloud.

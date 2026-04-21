@@ -1,4 +1,4 @@
-# Trunk, Rust, Leptos WASM Example
+# Rust (Leptos + Trunk) HTTP Server
 
 This guide shows how to deploy a Rust HTTP server using Trunk and Leptos on Unikraft Cloud.
 To run it, follow these steps:

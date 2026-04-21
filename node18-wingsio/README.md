@@ -1,4 +1,4 @@
-# Node Wings.io
+# Wings.io (Node)
 
 [Wings.io](https://wings.io/) is a multiplayer .io game where players control a plane and try to shoot down other players while avoiding being shot themselves.
 This guide deploys an implementation of the game using Node.js on Unikraft Cloud.
