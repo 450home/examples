@@ -1,0 +1,249 @@
+"""Top-level pytest fixtures shared by all example test suites.
+
+These fixtures wrap the ``unikraft`` CLI binary and provide reusable building
+blocks for end-to-end tests that deploy an example to Unikraft Cloud and
+exercise it over HTTP.
+
+Authentication is expected to come from the caller's existing Unikraft CLI
+profile (set up via ``unikraft login``). The tests do not read or manage API
+tokens themselves.
+
+Required environment variables:
+
+* ``UKC_METRO`` – Unikraft Cloud metro to deploy into, e.g. ``fra``.
+* ``UKC_IMAGE_PREFIX`` – Prefix used when tagging built images, typically the
+  user's organisation name (e.g. ``my-org``). Required for tests that build an
+  image.
+"""
+
+from __future__ import annotations
+
+import logging
+import os
+import time
+import uuid
+from collections.abc import Callable, Sequence
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from _testlib.http_client import http_get
+from _testlib.unikraft import (
+    UnikraftCLI,
+    extract_instance_url,
+)
+
+log = logging.getLogger(__name__)
+
+REPO_ROOT = Path(__file__).resolve().parent
+
+
+# ---------------------------------------------------------------------------
+# Environment / configuration
+# ---------------------------------------------------------------------------
+
+
+def _require_env(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        pytest.skip(f"{name} is not set in the environment")
+    return value
+
+
+@pytest.fixture(scope="session")
+def ukc_metro() -> str:
+    return _require_env("UKC_METRO")
+
+
+@pytest.fixture(scope="session")
+def ukc_image_prefix() -> str:
+    """Image repository prefix (typically the user's org name).
+
+    E.g. if set to ``my-org``, built images will be tagged
+    ``my-org/<example>:<tag>``.
+    """
+    return _require_env("UKC_IMAGE_PREFIX")
+
+
+@pytest.fixture(scope="session")
+def repo_root() -> Path:
+    return REPO_ROOT
+
+
+@pytest.fixture(scope="session")
+def test_run_id() -> str:
+    """Short random identifier unique to this pytest session.
+
+    Used to avoid collisions between concurrent CI runs when naming images
+    and instances.
+    """
+    return uuid.uuid4().hex[:8]
+
+
+# ---------------------------------------------------------------------------
+# Unikraft CLI
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="session")
+def unikraft(ukc_metro: str) -> UnikraftCLI:
+    """Session-scoped Unikraft CLI wrapper."""
+    return UnikraftCLI(metro=ukc_metro)
+
+
+# ---------------------------------------------------------------------------
+# Image build fixture
+# ---------------------------------------------------------------------------
+
+
+BuildImage = Callable[[str, str], str]
+
+
+@pytest.fixture
+def build_image(
+    request: pytest.FixtureRequest,
+    unikraft: UnikraftCLI,
+    repo_root: Path,
+    ukc_image_prefix: str,
+    test_run_id: str,
+) -> BuildImage:
+    """Factory fixture that builds an example directory into an image.
+
+    Usage::
+
+        def test_foo(build_image):
+            image = build_image("nginx", "nginx")
+
+    ``example_dir`` is resolved relative to the repository root. ``image_name``
+    is the short image name (without prefix/tag); the final tag is
+    ``<UKC_IMAGE_PREFIX>/<image_name>:test-<run-id>``.
+
+    A finalizer is registered to delete the image after the test finishes.
+    Pytest runs finalizers in LIFO order across fixtures, so any
+    ``run_instance`` teardowns (registered later in the test) execute
+    *before* this image-delete, ensuring the image is no longer in use.
+    """
+
+    def _build(example_dir: str, image_name: str) -> str:
+        context = repo_root / example_dir
+        assert context.is_dir(), f"example directory not found: {context}"
+
+        tag = f"{ukc_image_prefix}/{image_name}:examples-pytest-{test_run_id}"
+
+        # Register the image-delete finalizer *before* invoking the build
+        # so a partial build is still cleaned up.
+        # TODO: enable once this is suppoerted by the CLI.
+        # request.addfinalizer(lambda: unikraft.delete_image(tag))
+
+        unikraft.build(context, tag)
+
+        # TODO: drop this once the platform exposes a way to wait until a
+        # freshly-built image is fully available for `unikraft run`.
+        time.sleep(3)
+
+        return tag
+
+    return _build
+
+
+# ---------------------------------------------------------------------------
+# Instance lifecycle fixture
+# ---------------------------------------------------------------------------
+
+
+RunInstance = Callable[..., dict[str, Any]]
+
+
+@pytest.fixture
+def run_instance(
+    request: pytest.FixtureRequest,
+    unikraft: UnikraftCLI,
+    test_run_id: str,
+) -> RunInstance:
+    """Factory fixture that launches instances with guaranteed teardown.
+
+    Each call creates a new instance. A cleanup finalizer is registered
+    **before** invoking the CLI, so the instance is deleted even if the
+    ``unikraft run`` command or subsequent JSON parsing fails part-way
+    through. Finalizers registered via :meth:`request.addfinalizer` are
+    executed by pytest unconditionally after the test completes, whether it
+    passed, failed, or errored.
+
+    Parameters passed through to the CLI:
+
+    * ``image`` (positional) – image tag to run.
+    * ``publish`` – iterable of ``-p`` port mappings, e.g.
+      ``["443:8080/tls+http"]``. Defaults to none.
+    * ``memory`` – memory allocation (``-m``), e.g. ``"256M"``. Defaults to
+      the CLI default.
+    * ``name`` – explicit instance name. If omitted, a unique name is
+      generated so parallel runs don't collide.
+    * ``extra_args`` – extra positional CLI flags for escape-hatch needs.
+    """
+
+    def _run(
+        image: str,
+        *,
+        publish: Sequence[str] = (),
+        memory: str | None = None,
+        name: str | None = None,
+        extra_args: Sequence[str] = (),
+    ) -> dict[str, Any]:
+        instance_name = name or f"examples-pytest-{test_run_id}-{uuid.uuid4().hex[:6]}"
+
+        # Identifier used by the finalizer. Seeded with the name we asked
+        # the CLI to use so teardown still works if `unikraft run` raises
+        # before returning a parsed response. Replaced below with the
+        # CLI-reported name/uuid once we have it.
+        cleanup_target = instance_name
+
+        def _cleanup() -> None:
+            log.info("tearing down instance: %s", cleanup_target)
+            unikraft.delete_instance(cleanup_target)
+
+        # Register the finalizer before invoking the CLI so the instance is
+        # torn down even if `unikraft run` fails mid-flight after having
+        # created the instance on the cloud side.
+        request.addfinalizer(_cleanup)
+
+        instance = unikraft.run_instance(
+            image,
+            publish=publish,
+            memory=memory,
+            name=instance_name,
+            extra_args=extra_args,
+        )
+
+        # Prefer the CLI-reported identifier in case it diverges from the
+        # name we requested. `delete_instance` accepts either name or uuid.
+        for key in ("name", "uuid"):
+            value = instance.get(key)
+            if isinstance(value, str) and value:
+                cleanup_target = value
+                break
+
+        return instance
+
+    return _run
+
+
+# ---------------------------------------------------------------------------
+# HTTP helper
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def http():
+    """Expose the shared HTTP GET helper as a fixture for convenience."""
+    return http_get
+
+
+# Re-export for callers that import from conftest.
+__all__ = [
+    "build_image",
+    "extract_instance_url",
+    "http",
+    "run_instance",
+    "unikraft",
+]
