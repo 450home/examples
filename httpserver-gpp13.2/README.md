@@ -142,7 +142,7 @@ To customize the app, update the files in the repository, listed below:
 
 Lines in the `Kraftfile` have the following roles:
 
-* `spec: v0.6`: The current `Kraftfile` specification version is `0.6`.
+* `spec: v0.7`: The current `Kraftfile` specification version is `0.7`.
 
 * `runtime: base`: The Unikraft runtime kernel to use is its base one.
 

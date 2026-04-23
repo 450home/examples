@@ -171,7 +171,7 @@ Update these files, and other files, with required contents for your own app.
 
 Lines in the `Kraftfile` have the following roles:
 
-* `spec: v0.6`: The current `Kraftfile` specification version is `0.6`.
+* `spec: v0.7`: The current `Kraftfile` specification version is `0.7`.
 
 * `runtime: base-compat:latest`: The runtime kernel to use is the base compatibility kernel.
 

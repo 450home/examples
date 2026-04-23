@@ -155,7 +155,7 @@ The Imaginary Unikraft Cloud service works as is: you deploy it and then you que
 You can customize the command line options used to start the service, by updating the `cmd` line in the `Kraftfile`:
 
 ```yaml
-spec: v0.6
+spec: v0.7
 
 runtime: base-compat:latest
 
