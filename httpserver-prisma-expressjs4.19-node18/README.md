@@ -36,8 +36,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-prisma-expressjs4.19-node18:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserver-prisma-expressjs4.19-node18:latest
+unikraft build . --output <my-org>/httpserver-prisma-expressjs419-node18:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserver-prisma-expressjs419-node18:latest
 ```
 
 or
@@ -51,15 +51,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-prisma-expressjs4.19-node18-hdof1
+ ├───────── name: httpserver-prisma-expressjs419-node18-hdof1
  ├───────── uuid: 066f55cb-bcbd-45e5-9f6b-b3866c3a3a4c
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://funky-sun-4bf8v7g9.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-prisma-expressjs4.19-node18@sha256:770d4af1d490daea11171c680eaf99e2a6017a262ba9fbf1ba8d708f5fc32bfe
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-prisma-expressjs419-node18@sha256:770d4af1d490daea11171c680eaf99e2a6017a262ba9fbf1ba8d708f5fc32bfe
  ├─────── memory: 512 MiB
  ├────── service: funky-sun-4bf8v7g9
- ├─ private fqdn: httpserver-prisma-expressjs4.19-node18-hdof1.internal
+ ├─ private fqdn: httpserver-prisma-expressjs419-node18-hdof1.internal
  └─── private ip: 10.0.28.2
 ```
 
@@ -67,10 +67,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-prisma-expressjs4.19-node18-hdof1
+name:         httpserver-prisma-expressjs419-node18-hdof1
 uuid:         066f55cb-bcbd-45e5-9f6b-b3866c3a3a4c
 state:        starting
-image:        <my-org>/httpserver-prisma-expressjs4.19-node18
+image:        <my-org>/httpserver-prisma-expressjs419-node18
 resources:
   memory:     512MiB
   vcpus:      1
@@ -87,7 +87,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-prisma-expressjs4.19-node18-hdof1` and the address is `https://funky-sun-4bf8v7g9.fra.unikraft.app`.
+In this case, the instance name is `httpserver-prisma-expressjs419-node18-hdof1` and the address is `https://funky-sun-4bf8v7g9.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to test the REST API, such as the `/users` endpoint:
@@ -109,8 +109,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                                          STATE    IMAGE                                            ARGS  MEMORY  VCPUS  FQDN                                 CREATED
-fra    httpserver-prisma-expressjs4.19-node18-hdof1  running  <my-org>/httpserver-prisma-expressjs4.19-node18        512MiB  1      funky-sun-4bf8v7g9.fra.unikraft.app  2 minutes ago
+METRO  NAME                                         STATE    IMAGE                                           ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    httpserver-prisma-expressjs419-node18-hdof1  running  <my-org>/httpserver-prisma-expressjs419-node18        512MiB  1      funky-sun-4bf8v7g9.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -120,20 +120,20 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                                          FQDN                                 STATE    STATUS        IMAGE                                                                         MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-prisma-expressjs4.19-node18-hdof1  funky-sun-4bf8v7g9.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-prisma-expressjs4.19-node18@sha256:...  512 MiB  1            37.94 ms
+NAME                                         FQDN                                 STATE    STATUS        IMAGE                                                                        MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-prisma-expressjs419-node18-hdof1  funky-sun-4bf8v7g9.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-prisma-expressjs419-node18@sha256:...  512 MiB  1            37.94 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-prisma-expressjs4.19-node18-hdof1
+unikraft instances delete httpserver-prisma-expressjs419-node18-hdof1
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-prisma-expressjs4.19-node18-hdof1
+kraft cloud instance remove httpserver-prisma-expressjs419-node18-hdof1
 ```
 
 ## Using the app

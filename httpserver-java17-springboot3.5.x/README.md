@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-java17-springboot3.5.x:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 1G --image <my-org>/httpserver-java17-springboot3.5.x:latest
+unikraft build . --output <my-org>/httpserver-java17-springboot35x:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 1G --image <my-org>/httpserver-java17-springboot35x:latest
 ```
 
 or
@@ -49,15 +49,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-java17-springboot32x-qseeo
+ ├───────── name: httpserver-java17-springboot35x-qseeo
  ├───────── uuid: b081166d-a2a0-43af-982d-1aa17f06b5c4
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://long-dust-si7xsngk.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-java17-springboot32x@sha256:cc2f2ad18ce8e36b8e8f4debee096fef7b0bb8b47762575a2ba5a9de8199c64a
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-java17-springboot35x@sha256:cc2f2ad18ce8e36b8e8f4debee096fef7b0bb8b47762575a2ba5a9de8199c64a
  ├─────── memory: 1024 MiB
  ├────── service: long-dust-si7xsngk
- ├─ private fqdn: httpserver-java17-springboot32x-qseeo.internal
+ ├─ private fqdn: httpserver-java17-springboot35x-qseeo.internal
  └─── private ip: 10.0.6.2
 ```
 
@@ -65,10 +65,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-java17-springboot32x-qseeo
+name:         httpserver-java17-springboot35x-qseeo
 uuid:         b081166d-a2a0-43af-982d-1aa17f06b5c4
 state:        starting
-image:        <my-org>/httpserver-java17-springboot32x
+image:        <my-org>/httpserver-java17-springboot35x
 resources:
   memory:     1024MiB
   vcpus:      1
@@ -85,7 +85,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-java17-springboot32x-qseeo` and the address is `https://long-dust-si7xsngk.fra.unikraft.app`.
+In this case, the instance name is `httpserver-java17-springboot35x-qseeo` and the address is `https://long-dust-si7xsngk.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Spring Boot server's `hello` endpoint:
@@ -101,13 +101,13 @@ Hello World!
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-java17-springboot32x-qseeo
+unikraft instances delete httpserver-java17-springboot35x-qseeo
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-java17-springboot32x-qseeo
+kraft cloud instance remove httpserver-java17-springboot35x-qseeo
 ```
 
 ## Customize your app
@@ -152,7 +152,7 @@ unikraft instances list
 
 ```ansi title="unikraft"
 METRO  NAME                                   STATE    IMAGE                                     ARGS  MEMORY   VCPUS  FQDN                                 CREATED
-fra    httpserver-java17-springboot32x-qseeo  running  <my-org>/httpserver-java17-springboot32x        1024MiB  1      long-dust-si7xsngk.fra.unikraft.app  2 minutes ago
+fra    httpserver-java17-springboot35x-qseeo  running  <my-org>/httpserver-java17-springboot35x        1024MiB  1      long-dust-si7xsngk.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -163,19 +163,19 @@ kraft cloud instance list
 
 ```ansi title="kraft"
 NAME                                   FQDN                                 STATE    STATUS        IMAGE                                                                  MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-java17-springboot32x-qseeo  long-dust-si7xsngk.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-java17-springboot32x@sha256:...  1.0 GiB  1            421.30 ms
+httpserver-java17-springboot35x-qseeo  long-dust-si7xsngk.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-java17-springboot35x@sha256:...  1.0 GiB  1            421.30 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-java17-springboot32x-qseeo
+unikraft instances delete httpserver-java17-springboot35x-qseeo
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-java17-springboot32x-qseeo
+kraft cloud instance remove httpserver-java17-springboot35x-qseeo
 ```
 
 

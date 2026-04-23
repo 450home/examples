@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
+unikraft build . --output <my-org>/httpserver-python312-fastapi-01213:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python312-fastapi-01213:latest
 ```
 
 or
@@ -162,67 +162,6 @@ The following options are available for customizing the app:
 * If you create any new source files, copy them into the app filesystem by using the `COPY` command in the `Dockerfile`.
 
 * More extensive changes may require extending the `Dockerfile` ([see `Dockerfile` syntax reference](https://docs.docker.com/engine/reference/builder/)).
-  This includes the use of Python frameworks and the use of `pip`, as shown in the next section.
-
-## Using `pip`
-
-[`pip`](https://pip.pypa.io/en/stable/) is a package manager for Python.
-It's used to install dependencies for Python apps.
-`pip` uses the `requirements.txt` file to list required dependencies (with versions).
-
-The [`httpserver-python3.12-fastapi-0.121.3`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-python3.12-fastapi-0.121.3) guide details the use of `pip` to deploy an app using the [`FastAPI`](https://fastapi.tiangolo.com/) framework on Unikraft Cloud.
-
-Run the command below to deploy the app on Unikraft Cloud:
-
-```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12-fastapi-0.121.3:latest
-```
-
-or
-
-```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
-```
-
-Differences from the FastAPI app are also the steps required to create an `pip`-based app:
-
-1. Add the `requirements.txt` file used by `pip`.
-
-2. Add framework-specific source files.
-   In this case, this means the `server.py` file.
-
-3. Update the `Dockerfile` to:
-
-   3.1. `COPY` the local files.
-
-   3.2. `RUN` the `pip3 install` command to install dependencies.
-
-   3.3. `COPY` of the resulting and required files (`/usr/local/lib/python3.12` and `server.py`) in the app filesystem, using the [`scratch` container](https://hub.docker.com/_/scratch/).
-
-The following lists the files:
-
-The `requirements.txt` file lists the `fastapi` and `uvicorn` dependencies.
-
-The `Kraftfile` is the same one used for `httpserver-python3.12`, except changed lines that have the following roles:
-* `cmd: ["/usr/bin/python3", "-m", "uvicorn", "src.server:app", "--host", "0.0.0.0", "--port", "8080"]`: Use `/usr/bin/python3 -m uvicorn src.server:app --host 0.0.0.0 --port 8080` as the starting command of the instance.
-
-For `Dockerfile` newly added lines have the following roles:
-
-* `FROM python:3.12-bookworm AS build`: Use the base image of the `python:3.12-bookworm` container.
-  This provides the `pip3` binary and other Python-related components.
-  Name the current image `build`.
-
-* `WORKDIR /app`: Use `/app` as working directory.
-  All other commands in the `Dockerfile` run inside this directory.
-
-* `COPY requirements.txt /app`: Copy the package configuration file to the Docker filesystem.
-
-* `RUN pip3 install ...`: Install `pip` components listed in `requirements.txt`.
-
-* `COPY --from=build ...`: Copy generated Python files in the new `build` image in the `scratch`-based image.
-
-Similar actions apply to other `pip3`-based apps.
 
 ## Learn more
 

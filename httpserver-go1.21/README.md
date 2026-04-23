@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-go1.21:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-go1.21:latest
+unikraft build . --output <my-org>/httpserver-go121:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-go121:latest
 ```
 
 or
@@ -49,15 +49,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-go1.21-9a2wv
+ ├───────── name: httpserver-go121-9a2wv
  ├───────── uuid: 8bb34040-9434-4a28-bd1e-c24ee532e2da
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://red-dew-jtk6yxk1.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-go1.21@sha256:b16d61bb7898e764d8c11ab5a0b995e8c25a25b5ff89e161fc994ebf25a75680
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-go121@sha256:b16d61bb7898e764d8c11ab5a0b995e8c25a25b5ff89e161fc994ebf25a75680
  ├─────── memory: 256 MiB
  ├────── service: red-dew-jtk6yxk1
- ├─ private fqdn: httpserver-go1.21-9a2wv.internal
+ ├─ private fqdn: httpserver-go121-9a2wv.internal
  └─── private ip: 10.0.3.3
 ```
 
@@ -65,10 +65,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-go1.21-9a2wv
+name:         httpserver-go121-9a2wv
 uuid:         8bb34040-9434-4a28-bd1e-c24ee532e2da
 state:        starting
-image:        <my-org>/httpserver-go1.21
+image:        <my-org>/httpserver-go121
 resources:
   memory:     256MiB
   vcpus:      1
@@ -85,7 +85,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-go1.21-9a2wv` and the address is `https://red-dew-jtk6yxk1.fra.unikraft.app`.
+In this case, the instance name is `httpserver-go121-9a2wv` and the address is `https://red-dew-jtk6yxk1.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance of the Go-based HTTP web server:
@@ -105,8 +105,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                               CREATED
-fra    httpserver-go1.21-9a2wv  running  <my-org>/httpserver-go1.21        256MiB  1      red-dew-jtk6yxk1.fra.unikraft.app  2 minutes ago
+METRO  NAME                    STATE    IMAGE                      ARGS  MEMORY  VCPUS  FQDN                               CREATED
+fra    httpserver-go121-9a2wv  running  <my-org>/httpserver-go121        256MiB  1      red-dew-jtk6yxk1.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -116,20 +116,20 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                     FQDN                               STATE    STATUS        IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-go1.21-9a2wv  red-dew-jtk6yxk1.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-go1.21@sha256:...  256 MiB  1            9.32 ms
+NAME                    FQDN                               STATE    STATUS        IMAGE                                                   MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-go121-9a2wv  red-dew-jtk6yxk1.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-go121@sha256:...  256 MiB  1            9.32 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-go1.21-9a2wv
+unikraft instances delete httpserver-go121-9a2wv
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-go1.21-9a2wv
+kraft cloud instance remove httpserver-go121-9a2wv
 ```
 
 ## Customize your app

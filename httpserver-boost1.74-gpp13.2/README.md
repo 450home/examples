@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-boost1.74-gpp13.2:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-boost1.74-gpp13.2:latest
+unikraft build . --output <my-org>/httpserver-boost174-gpp132:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-boost174-gpp132:latest
 ```
 
 or
@@ -49,15 +49,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-boost1.74-gpp13.2-rae7s
+ ├───────── name: httpserver-boost174-gpp132-rae7s
  ├───────── uuid: 5a9886fa-f8a3-4860-afcf-d5eb13fdc38d
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://red-snow-3bn7bzc8.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-boost1.74-gpp13.2@sha256:61cf86b89fed46351af53689e27189315e466576475f61c7240bf17644613489
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-boost174-gpp132@sha256:61cf86b89fed46351af53689e27189315e466576475f61c7240bf17644613489
  ├─────── memory: 256 MiB
  ├────── service: red-snow-3bn7bzc8
- ├─ private fqdn: httpserver-boost1.74-gpp13.2-rae7s.internal
+ ├─ private fqdn: httpserver-boost174-gpp132-rae7s.internal
  └─── private ip: 10.0.6.4
 ```
 
@@ -65,10 +65,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-boost1.74-gpp13.2-rae7s
+name:         httpserver-boost174-gpp132-rae7s
 uuid:         5a9886fa-f8a3-4860-afcf-d5eb13fdc38d
 state:        starting
-image:        <my-org>/httpserver-boost1.74-gpp13.2
+image:        <my-org>/httpserver-boost174-gpp132
 resources:
   memory:     256MiB
   vcpus:      1
@@ -85,7 +85,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-boost1.74-gpp13.2-rae7s` and the address is `https://red-snow-3bn7bzc8.fra.unikraft.app`.
+In this case, the instance name is `httpserver-boost174-gpp132-rae7s` and the address is `https://red-snow-3bn7bzc8.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance of the C++ Boost HTTP web server:
@@ -105,8 +105,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                                STATE    IMAGE                                  ARGS  MEMORY  VCPUS  FQDN                                CREATED
-fra    httpserver-boost1.74-gpp13.2-rae7s  running  <my-org>/httpserver-boost1.74-gpp13.2        256MiB  1      red-snow-3bn7bzc8.fra.unikraft.app  2 minutes ago
+METRO  NAME                              STATE    IMAGE                                ARGS  MEMORY  VCPUS  FQDN                                CREATED
+fra    httpserver-boost174-gpp132-rae7s  running  <my-org>/httpserver-boost174-gpp132        256MiB  1      red-snow-3bn7bzc8.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -116,20 +116,20 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                                FQDN                                STATE    STATUS        IMAGE                                                               MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-boost1.74-gpp13.2-rae7s  red-snow-3bn7bzc8.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-boost1.74-gpp13.2@sha256:...  256 MiB  1            15.00 ms
+NAME                              FQDN                                STATE    STATUS        IMAGE                                                             MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-boost174-gpp132-rae7s  red-snow-3bn7bzc8.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-boost174-gpp132@sha256:...  256 MiB  1            15.00 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-boost1.74-gpp13.2-rae7s
+unikraft instances delete httpserver-boost174-gpp132-rae7s
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-boost1.74-gpp13.2-rae7s
+kraft cloud instance remove httpserver-boost174-gpp132-rae7s
 ```
 
 ## Customize your app

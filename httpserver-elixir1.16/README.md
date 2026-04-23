@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-elixir1.16:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=3000,stateful=true --metro fra -p 443:3000/tls+http -m 1G --image <my-org>/httpserver-elixir1.16:latest
+unikraft build . --output <my-org>/httpserver-elixir116:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=3000,stateful=true --metro fra -p 443:3000/tls+http -m 1G --image <my-org>/httpserver-elixir116:latest
 ```
 
 or

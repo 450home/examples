@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-gpp13.2:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-gpp13.2:latest
+unikraft build . --output <my-org>/httpserver-gpp132:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-gpp132:latest
 ```
 
 or
@@ -49,15 +49,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-gpp13.2-jzbuo
+ ├───────── name: httpserver-gpp132-jzbuo
  ├───────── uuid: b8e015fd-d006-49d5-849e-3fd497c9159a
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://throbbing-wave-grxjih4t.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-gpp13.2@sha256:a58873987104b52c13b79168a2e2f1a81876ba6efacd6dbc98e996afe5c09699
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-gpp132@sha256:a58873987104b52c13b79168a2e2f1a81876ba6efacd6dbc98e996afe5c09699
  ├─────── memory: 256 MiB
  ├────── service: throbbing-wave-grxjih4t
- ├─ private fqdn: httpserver-gpp13.2-jzbuo.internal
+ ├─ private fqdn: httpserver-gpp132-jzbuo.internal
  └─── private ip: 10.0.6.5
 ```
 
@@ -65,10 +65,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-gpp13.2-jzbuo
+name:         httpserver-gpp132-jzbuo
 uuid:         b8e015fd-d006-49d5-849e-3fd497c9159a
 state:        starting
-image:        <my-org>/httpserver-gpp13.2
+image:        <my-org>/httpserver-gpp132
 resources:
   memory:     256MiB
   vcpus:      1
@@ -85,7 +85,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-gpp13.2-jzbuo` and the address is `https://throbbing-wave-grxjih4t.fra.unikraft.app`.
+In this case, the instance name is `httpserver-gpp132-jzbuo` and the address is `https://throbbing-wave-grxjih4t.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance of the C++ HTTP web server:
@@ -105,8 +105,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                      STATE    IMAGE                        ARGS  MEMORY  VCPUS  FQDN                                      CREATED
-fra    httpserver-gpp13.2-jzbuo  running  <my-org>/httpserver-gpp13.2        256MiB  1      throbbing-wave-grxjih4t.fra.unikraft.app  2 minutes ago
+METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                                      CREATED
+fra    httpserver-gpp132-jzbuo  running  <my-org>/httpserver-gpp132        256MiB  1      throbbing-wave-grxjih4t.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -116,20 +116,20 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                      FQDN                                      STATE    STATUS        IMAGE                                                     MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-gpp13.2-jzbuo  throbbing-wave-grxjih4t.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-gpp13.2@sha256:...  256 MiB  1            15.61 ms
+NAME                     FQDN                                      STATE    STATUS        IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-gpp132-jzbuo  throbbing-wave-grxjih4t.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/httpserver-gpp132@sha256:...  256 MiB  1            15.61 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-gpp13.2-jzbuo
+unikraft instances delete httpserver-gpp132-jzbuo
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-gpp13.2-jzbuo
+kraft cloud instance remove httpserver-gpp132-jzbuo
 ```
 
 ## Customize your app
