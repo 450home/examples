@@ -87,13 +87,11 @@ timestamps:
 
 In this case, the instance name is `mariadb-w2g2z` which is different for each run.
 
-To test the deployment, first forward the port with the `kraft cloud tunnel` command.
+To test the deployment, first forward the port with the `socat` command.
 
 ```bash
-kraft cloud tunnel 3306:mariadb-w2g2z:3306
+socat TCP-LISTEN:3306,reuseaddr,fork OPENSSL:twilight-sun-82lt4ddk.fra.unikraft.app:3306,verify=0
 ```
-
-The `kraft cloud tunnel` command is only supported by the legacy CLI.
 
 You can now, on a separate console, use the `mysql` command line tool to test that the set up works:
 
@@ -114,12 +112,13 @@ count(*)
 6
 ```
 
-To disconnect, kill the `tunnel` command using `Ctrl+c`.
+To disconnect, kill the `socat` command using `Ctrl+c`.
 
 > **Note:**
-> This guide uses `kraft cloud tunnel` only when a service doesn't support TLS and isn't HTTP-based (TLS/SNI determines the correct instance to send traffic to).
-> Also note that the `tunnel` command isn't needed when connecting via an instance's private IP/FQDN.
-> For example when the MariaDB instance serves as a database server to another instance that acts as a frontend and which **does** support TLS.
+> This guide uses `socat` for port forwarding only when a service doesn't support TLS and isn't HTTP-based (TLS/SNI determines the correct instance to send traffic to).
+> Also note that port forwarding isn't needed when connecting via an instance's private IP/FQDN.
+> For example, when a MariaDB instance serves as a database server to
+> another instance that acts as a frontend and which **does** support TLS.
 
 You can list information about the instance by running:
 
