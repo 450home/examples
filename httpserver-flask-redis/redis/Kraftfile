@@ -1,0 +1,9 @@
+spec: v0.7
+
+runtime: base-compat:latest
+
+rootfs:
+  source: ./Dockerfile
+  type: erofs
+
+cmd: ["/usr/bin/redis-server", "/etc/redis/redis.conf"]
