@@ -1,4 +1,4 @@
-FROM memcached:1.6.23-bookworm as build
+FROM memcached:1.6.23-bookworm AS build
 
 FROM scratch
 

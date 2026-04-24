@@ -89,21 +89,22 @@ timestamps:
 
 In this case, the instance name is `memcached16-arkv7` which is different for each run.
 
-To test the deployment, first forward the port with the `kraft cloud tunnel` command:
+To test the deployment, first forward the port with the `socat` command:
 
 ```bash
-kraft cloud tunnel 11211:memcached16-arkv7:11211
+socat TCP-LISTEN:11211,reuseaddr,fork OPENSSL:weathered-smoke-hehsdinv.fra.unikraft.app:11211,verify=0
 ```
-
-The `kraft cloud tunnel` command is only supported by the legacy CLI.
 
 Now, on a separate console, run the following commands to test that it works (you should see output when incrementing):
 
 ```console
 telnet 127.0.0.1 11211
+
 set test 0 0 1
 0
+
 incr test 1
+
 incr test 1
 ```
 
@@ -114,12 +115,13 @@ Ctrl + ]
 Ctrl + C
 ```
 
-To disconnect, kill the `tunnel` command with ctrl-C.
+To disconnect, kill the `socat` command with ctrl-C.
 
 > **Note:**
-> This guide uses `kraft cloud tunnel` only when a service doesn't support TLS and isn't HTTP-based (TLS/SNI determines the correct instance to send traffic to).
-> Also note that the `tunnel` command isn't needed when connecting via an instance's private IP/FQDN.
-> For example when a Memcached instance serves as a cache server to another instance that acts as a frontend and which **does** support TLS.
+> This guide uses `socat` for port forwarding only when a service doesn't support TLS and isn't HTTP-based (TLS/SNI determines the correct instance to send traffic to).
+> Also note that port forwarding isn't needed when connecting via an instance's private IP/FQDN.
+> For example, when a Memcached instance serves as a cache server to
+> another instance that acts as a frontend and which **does** support TLS.
 
 You can list information about the instance by running:
 

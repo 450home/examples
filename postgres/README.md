@@ -120,8 +120,8 @@ Use SQL and `psql` commands for your work.
 > You can see this in action by running `SELECT pg_sleep(10);` and verifying that the instance keeps on running.
 
 > **Note:**
-> If you'd like to use a port other than `5432/tls` you'll need to use the `kraft cloud tunnel` command to connect to PostgreSQL.
-> See [the tunneling guide](https://unikraft.com/docs/cli/tunnel) for more information.
+> If you'd like to use a port other than `5432/tls` you'll need to use the `socat` command to connect to PostgreSQL.
+> See the [MariaDB](https://github.com/unikraft-cloud/examples/tree/main/mariadb) example for a guide on how to use it.
 > Additionally, you need to explicitly disable scale-to-zero by either changing the label in the `Kraftfile` or use `--scale-to-zero off` in the deploy command.
 
 You can list information about the instance by running:
