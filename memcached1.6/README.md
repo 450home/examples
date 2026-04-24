@@ -36,8 +36,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/memcached1.6:latest
-unikraft run --scale-to-zero policy=off --metro fra -p 11211:11211/tls -m 256M --image <my-org>/memcached1.6:latest
+unikraft build . --output <my-org>/memcached16:latest
+unikraft run --scale-to-zero policy=off --metro fra -p 11211:11211/tls -m 256M --image <my-org>/memcached16:latest
 ```
 
 or

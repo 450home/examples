@@ -35,8 +35,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/hugo0.122:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:1313/tls+http -m 512M --image <my-org>/hugo0.122:latest
+unikraft build . --output <my-org>/hugo0122:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:1313/tls+http -m 512M --image <my-org>/hugo0122:latest
 ```
 
 or

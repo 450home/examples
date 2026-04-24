@@ -185,8 +185,8 @@ cd examples/httpserver-expressjs4.18-node21/
 Run the command below to deploy the app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-expressjs4.18-node21:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 256M --image <my-org>/httpserver-expressjs4.18-node21:latest
+unikraft build . --output <my-org>/httpserver-expressjs418-node21:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:3000/tls+http -m 256M --image <my-org>/httpserver-expressjs418-node21:latest
 ```
 
 or

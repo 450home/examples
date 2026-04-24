@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-python3.12:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12:latest
+unikraft build . --output <my-org>/httpserver-python312:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python312:latest
 ```
 
 or
@@ -178,8 +178,8 @@ The [`httpserver-python3.12-flask3.0`](https://github.com/unikraft-cloud/example
 Run the command below to deploy the app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-python3.12:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python3.12:latest
+unikraft build . --output <my-org>/httpserver-python312-flask30:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python312-flask30:latest
 ```
 
 or
@@ -225,6 +225,7 @@ For `Dockerfile` newly added lines have the following roles:
 * `COPY --from=base ...`: Copy generated Python files in the new `base` image in the `scratch`-based image.
 
 Similar actions apply to other `pip3`-based apps.
+
 See also the [`httpserver-python3.12-django5.0`](https://github.com/unikraft-cloud/examples/tree/main/httpserver-python3.12-django5.0) example.
 
 ## Learn more

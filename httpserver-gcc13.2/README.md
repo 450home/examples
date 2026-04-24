@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-gcc13.2:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-gcc13.2:latest
+unikraft build . --output <my-org>/httpserver-gcc132:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-gcc132:latest
 ```
 
 or
@@ -49,15 +49,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-gcc13.2-is2s9
+ ├───────── name: httpserver-gcc132-is2s9
  ├───────── uuid: bec814ce-6ed5-4858-b247-e7f0b17750f5
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://still-resonance-bja3lste.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-gcc13.2@sha256:375677bf052f14c18ca79c86d2f47a68f3ea5f8636bcd8830753a254f0e06c1b
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-gcc132@sha256:375677bf052f14c18ca79c86d2f47a68f3ea5f8636bcd8830753a254f0e06c1b
  ├─────── memory: 256 MiB
  ├────── service: still-resonance-bja3lste
- ├─ private fqdn: httpserver-gcc13.2-is2s9.internal
+ ├─ private fqdn: httpserver-gcc132-is2s9.internal
  └─── private ip: 10.0.0.49
 ```
 
@@ -65,10 +65,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-gcc13.2-is2s9
+name:         httpserver-gcc132-is2s9
 uuid:         bec814ce-6ed5-4858-b247-e7f0b17750f5
 state:        starting
-image:        <my-org>/httpserver-gcc13.2
+image:        <my-org>/httpserver-gcc132
 resources:
   memory:     256MiB
   vcpus:      1
@@ -85,7 +85,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-gcc13.2-is2s9` and the address is `https://still-resonance-bja3lste.fra.unikraft.app`.
+In this case, the instance name is `httpserver-gcc132-is2s9` and the address is `https://still-resonance-bja3lste.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance:
@@ -105,8 +105,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                      STATE    IMAGE                        ARGS  MEMORY  VCPUS  FQDN                                    CREATED
-fra    httpserver-gcc13.2-is2s9  standby  <my-org>/httpserver-gcc13.2        256MiB  1      still-resonance-bja3lste.fra.unikraft…  2 minutes ago
+METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                                    CREATED
+fra    httpserver-gcc132-is2s9  standby  <my-org>/httpserver-gcc132        256MiB  1      still-resonance-bja3lste.fra.unikraft…  2 minutes ago
 ```
 
 or
@@ -116,20 +116,20 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                      FQDN                                       STATE    STATUS   IMAGE                                                     MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-gcc13.2-is2s9  still-resonance-bja3lste.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/httpserver-gcc13.2@sha256:...  256 MiB  1            12.91 ms
+NAME                     FQDN                                       STATE    STATUS   IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-gcc132-is2s9  still-resonance-bja3lste.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/httpserver-gcc132@sha256:...  256 MiB  1            12.91 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-gcc13.2-is2s9
+unikraft instances delete httpserver-gcc132-is2s9
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-gcc13.2-is2s9
+kraft cloud instance remove httpserver-gcc132-is2s9
 ```
 
 ## Learn more

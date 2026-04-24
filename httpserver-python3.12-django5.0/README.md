@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-python3.12-django5.0:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
+unikraft build . --output <my-org>/httpserver-python312-django50:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python312-django50:latest
 ```
 
 or
@@ -198,8 +198,8 @@ The [`httpserver-python3.12-flask3.0`](https://github.com/unikraft-cloud/example
 Run the command below to deploy the app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-python3.12-django5.0:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python3.12-django5.0:latest
+unikraft build . --output <my-org>/httpserver-python312-flask30:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python312-flask30:latest
 ```
 
 or

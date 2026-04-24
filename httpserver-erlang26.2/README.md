@@ -34,8 +34,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-erlang26.2:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-erlang26.2:latest
+unikraft build . --output <my-org>/httpserver-erlang262:latest
+unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-erlang262:latest
 ```
 
 or
@@ -49,15 +49,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-erlang26.2-sw2bp
+ ├───────── name: httpserver-erlang262-sw2bp
  ├───────── uuid: 1c4a8a51-fb61-45fc-87b8-26d192a7c2bc
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://patient-field-ck629j2u.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-erlang26.2@sha256:d99feefa7973ba43f726356497f54c34a16421aa25a27fa547d2c1add418204e
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-erlang262@sha256:d99feefa7973ba43f726356497f54c34a16421aa25a27fa547d2c1add418204e
  ├─────── memory: 512 MiB
  ├────── service: patient-field-ck629j2u
- ├─ private fqdn: httpserver-erlang26.2-sw2bp.internal
+ ├─ private fqdn: httpserver-erlang262-sw2bp.internal
  └─── private ip: 10.0.3.3
 ```
 
@@ -65,10 +65,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-erlang26.2-sw2bp
+name:         httpserver-erlang262-sw2bp
 uuid:         1c4a8a51-fb61-45fc-87b8-26d192a7c2bc
 state:        starting
-image:        <my-org>/httpserver-erlang26.2
+image:        <my-org>/httpserver-erlang262
 resources:
   memory:     512MiB
   vcpus:      1
@@ -85,7 +85,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-erlang26.2-sw2bp` and the address is `https://patient-field-ck629j2u.fra.unikraft.app`.
+In this case, the instance name is `httpserver-erlang262-sw2bp` and the address is `https://patient-field-ck629j2u.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance of the Erlang-based HTTP web server:
@@ -105,8 +105,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                         STATE    IMAGE                           ARGS  MEMORY  VCPUS  FQDN                                     CREATED
-fra    httpserver-erlang26.2-sw2bp  running  <my-org>/httpserver-erlang26.2        512MiB  1      patient-field-ck629j2u.fra.unikraft.app  2 minutes ago
+METRO  NAME                        STATE    IMAGE                          ARGS  MEMORY  VCPUS  FQDN                                     CREATED
+fra    httpserver-erlang262-sw2bp  running  <my-org>/httpserver-erlang262        512MiB  1      patient-field-ck629j2u.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -116,20 +116,20 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                         FQDN                                     STATE    STATUS        IMAGE                                                        MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-erlang26.2-sw2bp  patient-field-ck629j2u.fra.unikraft.app  running  since 35secs  oci://unikraft.io/<my-org>/httpserver-erlang26.2@sha256:...  512 MiB  1            404.04 ms
+NAME                        FQDN                                     STATE    STATUS        IMAGE                                                       MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-erlang262-sw2bp  patient-field-ck629j2u.fra.unikraft.app  running  since 35secs  oci://unikraft.io/<my-org>/httpserver-erlang262@sha256:...  512 MiB  1            404.04 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-erlang26.2-sw2bp
+unikraft instances delete httpserver-erlang262-sw2bp
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-erlang26.2-sw2bp
+kraft cloud instance remove httpserver-erlang262-sw2bp
 ```
 
 ## Customize your app

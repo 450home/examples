@@ -35,8 +35,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/duckdb-go1.21:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/duckdb-go1.21:latest
+unikraft build . --output <my-org>/duckdb-go121:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/duckdb-go121:latest
 ```
 
 or
@@ -50,15 +50,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: duckdb-go1.21-qfd8x
+ ├───────── name: duckdb-go121-qfd8x
  ├───────── uuid: 90960d27-458b-4dd7-a037-2a9a3a47f095
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://autumn-gorilla-hg4h6sup.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/duckdb-go1.21@sha256:6999293f8694ac00beb6a1d639fab8f96f78c2e6ecb8ccb2311539908895a699
+ ├──────── image: oci://unikraft.io/<my-org>/duckdb-go121@sha256:6999293f8694ac00beb6a1d639fab8f96f78c2e6ecb8ccb2311539908895a699
  ├─────── memory: 256 MiB
  ├────── service: autumn-gorilla-hg4h6sup
- ├─ private fqdn: duckdb-go1.21-qfd8x.internal
+ ├─ private fqdn: duckdb-go121-qfd8x.internal
  └─── private ip: 10.0.6.2
 ```
 
@@ -66,10 +66,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         duckdb-go1.21-qfd8x
+name:         duckdb-go121-qfd8x
 uuid:         90960d27-458b-4dd7-a037-2a9a3a47f095
 state:        starting
-image:        <my-org>/duckdb-go1.21
+image:        <my-org>/duckdb-go121
 resources:
   memory:     256MiB
   vcpus:      1
@@ -86,7 +86,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `duckdb-go1.21-qfd8x` and the address is `https://autumn-gorilla-hg4h6sup.fra.unikraft.app`.
+In this case, the instance name is `duckdb-go121-qfd8x` and the address is `https://autumn-gorilla-hg4h6sup.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance of DuckDB.
@@ -106,8 +106,8 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                 STATE    IMAGE                   ARGS  MEMORY  VCPUS  FQDN                                      CREATED
-fra    duckdb-go1.21-qfd8x  running  <my-org>/duckdb-go1.21        256MiB  1      autumn-gorilla-hg4h6sup.fra.unikraft.app  2 minutes ago
+METRO  NAME                STATE    IMAGE                  ARGS  MEMORY  VCPUS  FQDN                                      CREATED
+fra    duckdb-go121-qfd8x  running  <my-org>/duckdb-go121        256MiB  1      autumn-gorilla-hg4h6sup.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -117,20 +117,20 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                 FQDN                                      STATE    STATUS        IMAGE                                                MEMORY   VCPUS  ARGS  BOOT TIME
-duckdb-go1.21-qfd8x  autumn-gorilla-hg4h6sup.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/duckdb-go1.21@sha256:...  256 MiB  1            32.12 ms
+NAME                FQDN                                      STATE    STATUS        IMAGE                                               MEMORY   VCPUS  ARGS  BOOT TIME
+duckdb-go121-qfd8x  autumn-gorilla-hg4h6sup.fra.unikraft.app  running  1 minute ago  oci://unikraft.io/<my-org>/duckdb-go121@sha256:...  256 MiB  1            32.12 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete duckdb-go1.21-qfd8x
+unikraft instances delete duckdb-go121-qfd8x
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove duckdb-go1.21-qfd8x
+kraft cloud instance remove duckdb-go121-qfd8x
 ```
 
 ## Customize your app
