@@ -11,6 +11,6 @@ labels:
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: [ "docker-entrypoint.sh", "postgres", "-c", "shared_preload_libraries='pg_ukc_scaletozero'" ]

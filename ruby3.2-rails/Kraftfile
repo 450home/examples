@@ -4,6 +4,6 @@ runtime: base-compat:latest
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: ["/usr/bin/ruby", "/app/bin/rails", "server", "-b", "0.0.0.0"]

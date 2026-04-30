@@ -6,6 +6,6 @@ runtime: base-compat:latest
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: ["/usr/bin/wrapper.sh", "/usr/bin/erl", "-noshell", "-s", "http_server"]

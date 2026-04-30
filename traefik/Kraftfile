@@ -4,6 +4,6 @@ runtime: base-compat:latest
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: ["/usr/bin/traefik", "-configFile", "/etc/traefik/default.toml"]

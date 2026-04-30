@@ -4,6 +4,6 @@ runtime: base-compat:latest
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: ["/usr/bin/wrapper.sh", "fastapi", "run", "main.py", "--port", "8080"]
