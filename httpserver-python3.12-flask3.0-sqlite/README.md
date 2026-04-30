@@ -168,7 +168,7 @@ Lines in the `Kraftfile` have the following roles:
 
 * `rootfs`: Build the app root filesystem.
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
-  `type: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
+  `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
 * `cmd: ["/usr/bin/python3", "/app/server.py"]`: Use `/usr/bin/python3 /app/server.py` as the starting command of the instance.
 

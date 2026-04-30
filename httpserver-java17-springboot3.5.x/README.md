@@ -126,7 +126,7 @@ Lines in the `Kraftfile` have the following roles:
 
 * `rootfs`: Build the app root filesystem.
   `source: ./Dockerfile` means the filesystem is built using the `Dockerfile`.
-  `type: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
+  `format: erofs` means the filesystem type is [EROFS](https://erofs.docs.kernel.org/).
 
 * `cmd: ["/usr/lib/jvm/java-17-openjdk-amd64/bin/java", "-jar", "/usr/src/demo-0.0.1-SNAPSHOT.jar"]`: Use as the starting command of the instance.
 

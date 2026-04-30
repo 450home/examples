@@ -9,6 +9,6 @@ labels:
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: [ "nginx" ]

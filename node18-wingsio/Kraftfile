@@ -4,7 +4,7 @@ runtime: base-compat:latest
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: ["node", "/usr/src/app/server.js"]
 

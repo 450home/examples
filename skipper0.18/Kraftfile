@@ -4,6 +4,6 @@ runtime: base-compat:latest
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: ["/usr/bin/skipper", "-address", ":9090", "-routes-file", "/etc/skipper/example.eskip"]

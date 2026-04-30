@@ -11,6 +11,6 @@ labels:
 
 rootfs:
   source: ./Dockerfile
-  type: erofs
+  format: erofs
 
 cmd: [ "/app/bin/server" ]
