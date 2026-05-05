@@ -1,0 +1,75 @@
+name: test-examples
+
+on:
+  workflow_dispatch:
+    inputs:
+      unikraft_version:
+        description: 'Version of the unikraft CLI to install (passed to unikraft/setup-action).'
+        required: false
+        default: 'latest'
+
+  # Run on any change except docs-only updates. `paths-ignore` keeps the
+  # maintenance burden low — we don't need to enumerate every example
+  # directory, and the concurrency group below cancels superseded runs
+  # so cost stays bounded.
+  push:
+    branches: [ main ]
+    paths-ignore:
+    - '**/README.md'
+    - '**/*.md'
+    - 'LICENSE'
+
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches: [ main ]
+    paths-ignore:
+    - '**/README.md'
+    - '**/*.md'
+    - 'LICENSE'
+
+  schedule:
+  - cron: '0 16 * * 1-5'
+
+permissions:
+  contents: read
+
+# Automatically cancel in-progress actions on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request_target' && github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  UKC_METRO: ${{ vars.UKC_METRO_STABLE }}
+  UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
+  UKC_IMAGE_PREFIX: ${{ vars.UKC_IMAGE_PREFIX_STABLE || 'test' }}
+
+jobs:
+  pytest:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+        cache-dependency-path: requirements.txt
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Install Unikraft CLI
+      uses: unikraft/setup-action@v1
+      with:
+        version: ${{ inputs.unikraft_version || 'latest' }}
+
+    - name: Authenticate unikraft CLI
+      run: echo $UKC_TOKEN | unikraft login --token -
+
+    - name: Run tests
+      run: pytest --log-cli-level=INFO
