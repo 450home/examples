@@ -1,4 +1,4 @@
-name: examples/httpserver-node21-remix (stable)
+name: examples/httpserver-node22-react-router (stable)
 
 on:
   workflow_dispatch:
@@ -6,17 +6,17 @@ on:
   push:
     branches: [ main ]
     paths:
-    - '.github/workflows/example-httpserver-node21-remix-stable.yaml'
-    - 'httpserver-node21-remix/**'
-    - '!httpserver-node21-remix/README.md'
+    - '.github/workflows/example-httpserver-node22-react-router-stable.yaml'
+    - 'httpserver-node22-react-router/**'
+    - '!httpserver-node22-react-router/README.md'
 
   pull_request:
     types: [ opened, synchronize, reopened ]
     branches: [ main ]
     paths:
-    - '.github/workflows/example-httpserver-node21-remix-stable.yaml'
-    - 'httpserver-node21-remix/**'
-    - '!httpserver-node21-remix/README.md'
+    - '.github/workflows/example-httpserver-node22-react-router-stable.yaml'
+    - 'httpserver-node22-react-router/**'
+    - '!httpserver-node22-react-router/README.md'
 
   schedule:
   - cron: '30 16 * * 1-5'
@@ -50,22 +50,22 @@ jobs:
         run: |
           set -xe;
 
-          cd httpserver-node21-remix;
+          cd httpserver-node22-react-router;
 
           kraft cloud deploy \
             --no-start \
-            --name httpserver-node21-remix-stable-${GITHUB_RUN_ID} \
+            --name httpserver-node22-react-router-stable-${GITHUB_RUN_ID} \
             --runtime index.unikraft.io/official-testing/base-compat:latest \
-            --subdomain httpserver-node21-remix-stable-${GITHUB_RUN_ID} \
+            --subdomain httpserver-node22-react-router-stable-${GITHUB_RUN_ID} \
             -p 443:3000 \
             -M 768 \
             .;
 
           # wait for the instance to start
-          kraft cloud vm start -w 5s httpserver-node21-remix-stable-${GITHUB_RUN_ID};
+          kraft cloud vm start -w 5s httpserver-node22-react-router-stable-${GITHUB_RUN_ID};
           sleep 5;
 
-          curl -Lv --fail-with-body --max-time 10 https://httpserver-node21-remix-stable-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STABLE }}.unikraft.app
+          curl -Lv --fail-with-body --max-time 10 https://httpserver-node22-react-router-stable-${GITHUB_RUN_ID}.${{ vars.UKC_METRO_STABLE }}.unikraft.app
 
     - name: Cleanup
       uses: unikraft/kraftkit@staging
@@ -74,7 +74,7 @@ jobs:
         run: |
           set -xe;
 
-          kraft cloud vm stop httpserver-node21-remix-stable-${GITHUB_RUN_ID} || true;
-          kraft cloud vm logs httpserver-node21-remix-stable-${GITHUB_RUN_ID} || true;
-          kraft cloud vm rm httpserver-node21-remix-stable-${GITHUB_RUN_ID} || true;
-          kraft cloud img rm index.unikraft.io/test/httpserver-node21-remix-stable-${GITHUB_RUN_ID} || true;
+          kraft cloud vm stop httpserver-node22-react-router-stable-${GITHUB_RUN_ID} || true;
+          kraft cloud vm logs httpserver-node22-react-router-stable-${GITHUB_RUN_ID} || true;
+          kraft cloud vm rm httpserver-node22-react-router-stable-${GITHUB_RUN_ID} || true;
+          kraft cloud img rm index.unikraft.io/test/httpserver-node22-react-router-stable-${GITHUB_RUN_ID} || true;

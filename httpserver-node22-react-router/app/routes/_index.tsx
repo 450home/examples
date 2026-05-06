@@ -1,38 +1,38 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "react-router";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "React Router App" },
+    { name: "description", content: "Welcome to React Router!" },
   ];
 };
 
 export default function Index() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
+      <h1>Welcome to React Router</h1>
       <ul>
         <li>
           <a
             target="_blank"
-            href="https://remix.run/tutorials/blog"
+            href="https://reactrouter.com/start/framework/routing"
             rel="noreferrer"
           >
-            15m Quickstart Blog Tutorial
+            React Router Routing Guide
           </a>
         </li>
         <li>
           <a
             target="_blank"
-            href="https://remix.run/tutorials/jokes"
+            href="https://reactrouter.com/start/framework/data-loading"
             rel="noreferrer"
           >
-            Deep Dive Jokes App Tutorial
+            Data Loading Guide
           </a>
         </li>
         <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
+          <a target="_blank" href="https://reactrouter.com/home" rel="noreferrer">
+            React Router Docs
           </a>
         </li>
       </ul>
