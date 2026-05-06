@@ -10,11 +10,11 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
-2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node21-sveltekit/` directory:
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node22-sveltekit/` directory:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-node21-sveltekit/
+cd examples/httpserver-node22-sveltekit/
 ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
@@ -36,8 +36,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-node21-sveltekit:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserver-node21-sveltekit:latest
+unikraft build . --output <my-org>/httpserver-node22-sveltekit:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:3000/tls+http -m 512M --image <my-org>/httpserver-node22-sveltekit:latest
 ```
 
 or
@@ -51,15 +51,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-node21-sveltekit-zmt39
+ ├───────── name: httpserver-node22-sveltekit-zmt39
  ├───────── uuid: cd5071b0-5605-4771-b75d-4789393e60de
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://dark-fog-z18n0ej1.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-node21-sveltekit@sha256:4cea210aef3513bd68490640b511ebcff2b867e9222028b9938faccffc21cb83
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-node22-sveltekit@sha256:4cea210aef3513bd68490640b511ebcff2b867e9222028b9938faccffc21cb83
  ├─────── memory: 512 MiB
  ├────── service: dark-fog-z18n0ej1
- ├─ private fqdn: httpserver-node21-sveltekit-zmt39.internal
+ ├─ private fqdn: httpserver-node22-sveltekit-zmt39.internal
  └─── private ip: 10.0.3.3
 ```
 
@@ -67,10 +67,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-node21-sveltekit-zmt39
+name:         httpserver-node22-sveltekit-zmt39
 uuid:         cd5071b0-5605-4771-b75d-4789393e60de
 state:        starting
-image:        <my-org>/httpserver-node21-sveltekit
+image:        <my-org>/httpserver-node22-sveltekit
 resources:
   memory:     512MiB
   vcpus:      1
@@ -87,7 +87,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-node21-sveltekit-zmt39` and the address is `https://dark-fog-z18n0ej1.fra.unikraft.app`.
+In this case, the instance name is `httpserver-node22-sveltekit-zmt39` and the address is `https://dark-fog-z18n0ej1.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance:
@@ -115,7 +115,7 @@ unikraft instances list
 
 ```ansi title="unikraft"
 METRO  NAME                               STATE    IMAGE                                 ARGS  MEMORY  VCPUS  FQDN                                CREATED
-fra    httpserver-node21-sveltekit-zmt39  running  <my-org>/httpserver-node21-sveltekit        512MiB  1      dark-fog-z18n0ej1.fra.unikraft.app  2 minutes ago
+fra    httpserver-node22-sveltekit-zmt39  running  <my-org>/httpserver-node22-sveltekit        512MiB  1      dark-fog-z18n0ej1.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -126,19 +126,19 @@ kraft cloud instance list
 
 ```ansi title="kraft"
 NAME                               FQDN                                STATE    STATUS         IMAGE                                                              MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-node21-sveltekit-zmt39  dark-fog-z18n0ej1.fra.unikraft.app  running  5 minutes ago  oci://unikraft.io/<my-org>/httpserver-node21-sveltekit@sha256:...  512 MiB  1            72.86 ms
+httpserver-node22-sveltekit-zmt39  dark-fog-z18n0ej1.fra.unikraft.app  running  5 minutes ago  oci://unikraft.io/<my-org>/httpserver-node22-sveltekit@sha256:...  512 MiB  1            72.86 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-node21-sveltekit-zmt39
+unikraft instances delete httpserver-node22-sveltekit-zmt39
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-node21-sveltekit-zmt39
+kraft cloud instance remove httpserver-node22-sveltekit-zmt39
 ```
 
 ## Customize your app
