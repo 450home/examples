@@ -1,6 +1,6 @@
-# Remix HTTP Server
+# React Router HTTP Server
 
-This guide shows how to deploy a [Remix](https://remix.run/) app.
+This guide shows how to deploy a [React Router](https://reactrouter.com/) app (formerly Remix).
 
 To do so, follow these steps:
 
@@ -9,11 +9,11 @@ To do so, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
-2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node21-remix/` directory:
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node22-react-router/` directory:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-node21-remix/
+cd examples/httpserver-node22-react-router/
 ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
@@ -35,8 +35,8 @@ export UKC_METRO=fra
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-node21-remix:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:3000/tls+http -m 768M --image <my-org>/httpserver-node21-remix:latest
+unikraft build . --output <my-org>/httpserver-node22-react-router:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:3000/tls+http -m 768M --image <my-org>/httpserver-node22-react-router:latest
 ```
 
 or
@@ -50,15 +50,15 @@ The output shows the instance address and other details:
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-node21-remix-jvj6b
+ ├───────── name: httpserver-node22-react-router-jvj6b
  ├───────── uuid: 4e6ccb1f-0533-4dc1-be67-eca8dfc1f8c6
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://long-star-1tms9h1z.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-node21-remix@sha256:300eefce3de136ad9c782f010b69da01100ae5f0ca17f038f92321d735d6675f
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-node22-react-router@sha256:300eefce3de136ad9c782f010b69da01100ae5f0ca17f038f92321d735d6675f
  ├─────── memory: 768 MiB
  ├────── service: long-star-1tms9h1z
- ├─ private fqdn: httpserver-node21-remix-jvj6b.internal
+ ├─ private fqdn: httpserver-node22-react-router-jvj6b.internal
  └─── private ip: 10.0.6.8
 ```
 
@@ -66,10 +66,10 @@ or
 
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-node21-remix-jvj6b
+name:         httpserver-node22-react-router-jvj6b
 uuid:         4e6ccb1f-0533-4dc1-be67-eca8dfc1f8c6
 state:        starting
-image:        <my-org>/httpserver-node21-remix
+image:        <my-org>/httpserver-node22-react-router
 resources:
   memory:     768MiB
   vcpus:      1
@@ -86,7 +86,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `httpserver-node21-remix-jvj6b` and the address is `https://long-star-1tms9h1z.fra.unikraft.app`.
+In this case, the instance name is `httpserver-node22-react-router-jvj6b` and the address is `https://long-star-1tms9h1z.fra.unikraft.app`.
 They're different for each run.
 You can now point your browser at the address to see your deployed instance.
 
@@ -98,7 +98,7 @@ unikraft instances list
 
 ```ansi title="unikraft"
 METRO  NAME                           STATE    IMAGE                             ARGS  MEMORY  VCPUS  FQDN                                 CREATED
-fra    httpserver-node21-remix-jvj6b  running  <my-org>/httpserver-node21-remix        768MiB  1      long-star-1tms9h1z.fra.unikraft.app  2 minutes ago
+fra    httpserver-node22-react-router-jvj6b  running  <my-org>/httpserver-node22-react-router        768MiB  1      long-star-1tms9h1z.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -109,19 +109,19 @@ kraft cloud instance list
 
 ```ansi title="kraft"
 NAME                           FQDN                                 STATE    STATUS         IMAGE                                                         MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-node21-remix-jvj6b  long-star-1tms9h1z.fra.unikraft.app  running  1 minutes ago  oci://unikraft.io/<my-org>/httpserver-node21-remix@sha256...  768 MiB  1            67.65 ms
+httpserver-node22-react-router-jvj6b  long-star-1tms9h1z.fra.unikraft.app  running  1 minutes ago  oci://unikraft.io/<my-org>/httpserver-node22-react-router@sha256...  768 MiB  1            67.65 ms
 ```
 
 When done, you can remove the instance:
 
 ```bash title="unikraft"
-unikraft instances delete httpserver-node21-remix-jvj6b
+unikraft instances delete httpserver-node22-react-router-jvj6b
 ```
 
 or
 
 ```bash title="kraft"
-kraft cloud instance remove httpserver-node21-remix-jvj6b
+kraft cloud instance remove httpserver-node22-react-router-jvj6b
 ```
 
 ## Customize your app
