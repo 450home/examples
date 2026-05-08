@@ -26,7 +26,7 @@ When done, you may create the OpenClaw Unikraft Cloud image and deploy an instan
 
 ```bash
 unikraft build . --output <my-org>/openclaw:latest
-unikraft run --scale-to-zero policy=off --metro fra -p 18789:18789/tls -p 2222:2222/tls -m 4G -e PUBKEY="...." --image <my-org>/openclaw:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=10000 --metro fra -p 18789:18789/tls -p 2222:2222/tls -m 4G -e PUBKEY="...." --image <my-org>/openclaw:latest
 ```
 
 Make sure to replace `<my-org>` with your username / org-name and to set your SSH public key as the `PUBKEY` environment variable above.
@@ -109,7 +109,7 @@ Once you have SSH'd into your instance, you may run:
 openclaw onboard
 ```
 
-This will setup your OpenClaw gateway on the instance.
+This will set up your OpenClaw gateway on the instance.
 You will be asked to provide your LLM's API key here.
 
 Once done, make note of your `gateway.auth.token` (henceforth referenced as `<token>`) from `~/.openclaw/openclaw.json`
@@ -169,7 +169,7 @@ Device IDs look like `cabd915e-137a-4bc4-b640-d0e507684d65`
 Finally, approve your device with:
 
 ```bash
-openclaw devices approve <device ID>
+openclaw devices approve <device-id>
 ```
 
 Once this is done, refresh your OpenClaw web dashboard.
