@@ -1,6 +1,6 @@
-FROM rust:1.75.0-bookworm AS spin-devenv
+FROM rust:1.95.0-bookworm AS spin-devenv
 
-ARG SPIN_VERSION=2.1.0
+ARG SPIN_VERSION=4.0.0
 
 WORKDIR /spin
 
@@ -16,7 +16,7 @@ RUN set -xe; \
     tar xzvf ./spin.tar.gz; \
     mv ./spin /usr/bin/spin; \
     rm -rf spin.tar.gz; \
-    rustup target add wasm32-wasi
+    rustup target add wasm32-wasip1
 
 ARG WASI_SDK_VERSION=21
 
@@ -53,6 +53,9 @@ COPY --from=build /lib/x86_64-linux-gnu/libdl.so.2 /lib/x86_64-linux-gnu/libdl.s
 COPY --from=build /lib/x86_64-linux-gnu/libc.so.6 /lib/x86_64-linux-gnu/libc.so.6
 COPY --from=build /lib64/ld-linux-x86-64.so.2 /lib64/ld-linux-x86-64.so.2
 
+# CA certificates required by Spin for TLS initialization
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
 COPY ./spin.toml /app/spin.toml
 COPY --from=build /app/hello-cpp/hello.wasm /app/hello-cpp/hello.wasm
-COPY --from=build /app/goodbye-rust/target/wasm32-wasi/release/goodbye.wasm /app/goodbye-rust/target/wasm32-wasi/release/goodbye.wasm
+COPY --from=build /app/goodbye-rust/target/wasm32-wasip1/release/goodbye.wasm /app/goodbye-rust/target/wasm32-wasip1/release/goodbye.wasm
