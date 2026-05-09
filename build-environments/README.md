@@ -81,7 +81,7 @@ kraft cloud instance create \
   <my-org>/go-build-env:latest
 ```
 
-The output shows the instance address and other details:
+The output shows the instance details:
 
 ```ansi title="kraft"
 [●] Deployed successfully!
@@ -244,17 +244,6 @@ or
 kraft cloud instance logs go-build-env-rom1 -f
 ```
 
-Grab the fqdn from the output and test the instance.
-You should see the output from the first ROM function:
-
-```bash
-curl https://<fqdn1>
-```
-
-```text
-Bye, World!
-```
-
 Create another instance with the second ROM:
 
 ```bash title="unikraft"
@@ -317,14 +306,39 @@ or
 kraft cloud instance logs go-build-env-rom2 -f
 ```
 
-Grab the fqdn from the output and test the instance.
-You should see the output from the second ROM function:
+List the instances and note their FQDN values:
+
+```bash title="unikraft"
+unikraft instances list
+```
+
+```bash title="unikraft"
+METRO  NAME               STATE    IMAGE                  ARGS  MEMORY  VCPUS  FQDN                                      CREATED
+fra    go-build-env-rom2  standby  <my-org>/go-build-env        512MiB  1      nameless-wood-gw7pbnls.fra.unikraft.app   2 minutes ago
+fra    go-build-env-rom1  standby  <my-org>/go-build-env        512MiB  1      sparkling-dawn-syowlbtj.fra.unikraft.app  3 minutes ago
+```
+
+or
+
+```bash title="kraft"
+kraft cloud instance list
+```
+
+```bash title="kraft"
+NAME               FQDN                                      STATE    STATUS   IMAGE                                                     MEMORY   VCPUS  ARGS  BOOT TIME
+go-build-env-rom2  nameless-wood-gw7pbnls.fra.unikraft.app   standby  standby  oci://unikraft.io/<my-org>/go-build-env@sha256:1cbd64...  512 MiB  1            6.98 ms
+go-build-env-rom1  sparkling-dawn-syowlbtj.fra.unikraft.app  standby  standby  oci://unikraft.io/<my-org>/go-build-env@sha256:1cbd64...  512 MiB  1            7.86 ms
+```
+
+Test both instances:
 
 ```bash
-curl https://<fqdn2>
+curl https://sparkling-dawn-syowlbtj.fra.unikraft.app
+curl https://nameless-wood-gw7pbnls.fra.unikraft.app
 ```
 
 ```text
+Bye, World!
 Auf Wiedersehen!
 ```
 
