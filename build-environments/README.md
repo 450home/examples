@@ -135,8 +135,8 @@ unikraft instances templates list
 ```
 
 ```bash title="unikraft"
-METRO  NAME          STATE     IMAGE               ARGS  MEMORY  VCPUS  CREATED
-fra    go-build-env  template  acioc/go-build-env        512MiB  1      2 minutes ago
+METRO  NAME          STATE     IMAGE                  ARGS  MEMORY  VCPUS  CREATED
+fra    go-build-env  template  <my-org>/go-build-env        512MiB  1      2 minutes ago
 ```
 
 or
@@ -146,8 +146,8 @@ kraft cloud instance template list
 ```
 
 ```bash title="kraft"
-NAME          IMAGE                                                                                                         ARGS  CREATED AT
-go-build-env  oci://unikraft.io/acioc/go-build-env@sha256:1f57e9bb8702d031743acf43164b24cf182158c398f1eda8c5583208ccc9c300        3 minutes ago
+NAME          IMAGE                                                                                                            ARGS  CREATED AT
+go-build-env  oci://unikraft.io/<my-org>/go-build-env@sha256:1f57e9bb8702d031743acf43164b24cf182158c398f1eda8c5583208ccc9c300        3 minutes ago
 ```
 
 ### Package the ROMs
