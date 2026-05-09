@@ -13,11 +13,11 @@ To run this example, follow these steps:
 > The unikraft CLI is the current standard, while kraft is the legacy version.
 > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
-2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node25` directory:
+2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node26` directory:
 
 ```bash
 git clone https://github.com/unikraft-cloud/examples
-cd examples/httpserver-node25/
+cd examples/httpserver-node26/
 ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
@@ -42,8 +42,8 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
-unikraft build . --output <my-org>/httpserver-node25:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-node25:latest
+unikraft build . --output <my-org>/httpserver-node26:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-node26:latest
 ```
 
 or
@@ -58,10 +58,10 @@ The output shows the instance address and other details:
 **Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
-name:         httpserver-node25-v8mp4
+name:         httpserver-node26-v8mp4
 uuid:         c3d4e5f6-a7b8-9012-cdef-123456789012
 state:        starting
-image:        <my-org>/httpserver-node25
+image:        <my-org>/httpserver-node26
 resources:
   memory:     512MiB
   vcpus:      1
@@ -84,19 +84,19 @@ or
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: httpserver-node25-v8mp4
+ ├───────── name: httpserver-node26-v8mp4
  ├───────── uuid: c3d4e5f6-a7b8-9012-cdef-123456789012
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: https://bright-star-k3m7pqnx.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-node25@sha256:7b3e1f9d5a2c8e4b0f6d3a7c5e2b9f4d1a8c6e3b0f7d4a1c8e5b2f9d6a3c0
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-node26@sha256:7b3e1f9d5a2c8e4b0f6d3a7c5e2b9f4d1a8c6e3b0f7d4a1c8e5b2f9d6a3c0
  ├─────── memory: 512 MiB
  ├────── service: bright-star-k3m7pqnx
- ├─ private fqdn: httpserver-node25-v8mp4.internal
+ ├─ private fqdn: httpserver-node26-v8mp4.internal
  └─── private ip: 10.0.3.6
 ```
 
-In this case, the instance name is `httpserver-node25-v8mp4` and the address is `https://bright-star-k3m7pqnx.fra.unikraft.app`.
+In this case, the instance name is `httpserver-node26-v8mp4` and the address is `https://bright-star-k3m7pqnx.fra.unikraft.app`.
 They're different for each run.
 
 Use `curl` to query the Unikraft Cloud instance of the Node.js HTTP server:
@@ -118,7 +118,7 @@ unikraft instances list
 
 ```ansi title="unikraft"
 METRO  NAME                     STATE    IMAGE                       ARGS  MEMORY  VCPUS  FQDN                                   CREATED
-fra    httpserver-node25-v8mp4  running  <my-org>/httpserver-node25        512MiB  1      bright-star-k3m7pqnx.fra.unikraft.app  2 minutes ago
+fra    httpserver-node26-v8mp4  running  <my-org>/httpserver-node26        512MiB  1      bright-star-k3m7pqnx.fra.unikraft.app  2 minutes ago
 ```
 
 or
@@ -130,21 +130,21 @@ kraft cloud instance list
 
 ```ansi title="kraft"
 NAME                     FQDN                                   STATE    STATUS       IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-node25-v8mp4  bright-star-k3m7pqnx.fra.unikraft.app  running  since 3mins  oci://unikraft.io/<my-org>/httpserver-node25@sha256:...  512 MiB  1            276.18 ms
+httpserver-node26-v8mp4  bright-star-k3m7pqnx.fra.unikraft.app  running  since 3mins  oci://unikraft.io/<my-org>/httpserver-node26@sha256:...  512 MiB  1            276.18 ms
 ```
 
 When done, you can remove the instance:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
-unikraft instances delete httpserver-node25-v8mp4
+unikraft instances delete httpserver-node26-v8mp4
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud instance remove httpserver-node25-v8mp4
+kraft cloud instance remove httpserver-node26-v8mp4
 ```
 
 ## Customize your app
@@ -169,7 +169,7 @@ Lines in the `Kraftfile` have the following roles:
 
 Lines in the `Dockerfile` have the following roles:
 
-* `FROM node:25-alpine AS node`: Use the Node.js 25 Alpine image as the source for the `node` binary and libraries.
+* `FROM node:26-alpine AS node`: Use the Node.js 26 Alpine image as the source for the `node` binary and libraries.
 
 * `FROM scratch`: Build the runtime filesystem from a minimal base image.
 
