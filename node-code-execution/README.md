@@ -120,8 +120,8 @@ unikraft instances templates list
 ```
 
 ```bash title="unikraft"
-METRO  NAME       STATE     IMAGE                 ARGS  MEMORY  VCPUS  CREATED
-fra    node-exec  template  acioc/node-code-exec        512MiB  1      5 seconds ago
+METRO  NAME       STATE     IMAGE                    ARGS  MEMORY  VCPUS  CREATED
+fra    node-exec  template  <my-org>/node-code-exec        512MiB  1      5 seconds ago
 ```
 
 or
@@ -131,8 +131,8 @@ kraft cloud instance template list
 ```
 
 ```bash title="kraft"
-NAME       IMAGE                                                                                                           ARGS  CREATED AT
-node-exec  oci://unikraft.io/acioc/node-code-exec@sha256:71487fd6196987cf65fb89eb84405cb796677aba177dabacf391f09618313328        5 seconds ago
+NAME       IMAGE                                                                                                              ARGS  CREATED AT
+node-exec  oci://unikraft.io/<my-org>/node-code-exec@sha256:71487fd6196987cf65fb89eb84405cb796677aba177dabacf391f09618313328        5 seconds ago
 ```
 
 ### Package the ROMs
