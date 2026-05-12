@@ -9,7 +9,7 @@ RUN ssh-keygen -A
 
 COPY sshd_config /etc/ssh/sshd_config
 
-RUN mkdir /run/sshd
+RUN mkdir -p /run/sshd
 
 COPY --chmod=755 wrapper.sh /wrapper.sh
 
