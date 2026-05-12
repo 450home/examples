@@ -5,7 +5,7 @@ WORKDIR /usr/src
 COPY . /usr/src/
 
 RUN set -xe && \
-    npm instal -g pnpm && \
+    npm install -g pnpm@9 && \
     pnpm install && \
     pnpm build
 
