@@ -8,6 +8,10 @@ To run it, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-rust1.88-actix-web4/` directory:
 
 ```bash
@@ -18,12 +22,14 @@ cd examples/httpserver-rust1.88-actix-web4/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -33,6 +39,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-rust188-actix-web4:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-rust188-actix-web4:latest
@@ -40,28 +47,14 @@ unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:808
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-rust188-actix-web4-3pj27
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://autumn-silence-wupu2nus.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-rust188-actix-web4@sha256:11723705230f0f4545d2be7e4867dc67b396870769e91f05e2fa6d9da94f9b59
- ├─────── memory: 256 MiB
- ├────── service: autumn-silence-wupu2nus
- ├─ private fqdn: httpserver-rust188-actix-web4-3pj27.internal
- └─── private ip: 10.0.3.3
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-rust188-actix-web4-3pj27
@@ -84,6 +77,23 @@ timestamps:
   created:    just now
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: httpserver-rust188-actix-web4-3pj27
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://autumn-silence-wupu2nus.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-rust188-actix-web4@sha256:11723705230f0f4545d2be7e4867dc67b396870769e91f05e2fa6d9da94f9b59
+ ├─────── memory: 256 MiB
+ ├────── service: autumn-silence-wupu2nus
+ ├─ private fqdn: httpserver-rust188-actix-web4-3pj27.internal
+ └─── private ip: 10.0.3.3
+```
+
 In this case, the instance name is `httpserver-rust188-actix-web4-3pj27` and the address is `https://autumn-silence-wupu2nus.fra.unikraft.app`.
 They're different for each run.
 
@@ -101,6 +111,7 @@ Hey there!
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -112,6 +123,7 @@ fra    httpserver-rust188-actix-web4-3pj27  running  <my-org>/httpserver-rust188
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -123,12 +135,14 @@ httpserver-rust188-actix-web4-3pj27  autumn-silence-wupu2nus.fra.unikraft.app  r
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-rust188-actix-web4-3pj27
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove httpserver-rust188-actix-web4-3pj27
 ```
@@ -157,12 +171,14 @@ The following options are available for customizing the app:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

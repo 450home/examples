@@ -10,6 +10,10 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/node21-websocket/` directory:
 
 ```bash
@@ -20,12 +24,14 @@ cd examples/node21-websocket/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -35,6 +41,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/node21-websocket:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 1G --image <my-org>/node21-websocket:latest
@@ -42,29 +49,14 @@ unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro 
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s --metro fra -p 443:8080/tls+http -M 1Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: node21-websocket-j2x9r
- ├───────── uuid: d5e6f7a8-b9c0-1d2e-3f4a-d5e6f7a8b9c0
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://lively-breeze-hp3wx6yt.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/node21-websocket@sha256:2b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c
- ├─────── memory: 1024 MiB
- ├────── service: lively-breeze-hp3wx6yt
- ├─ private fqdn: node21-websocket-j2x9r.internal
- └─── private ip: 10.0.5.4
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         node21-websocket-j2x9r
@@ -85,6 +77,24 @@ networks:
   mac:        12:b0:d3:af:12:0c
 timestamps:
   created:    just now
+```
+
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: node21-websocket-j2x9r
+ ├───────── uuid: d5e6f7a8-b9c0-1d2e-3f4a-d5e6f7a8b9c0
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://lively-breeze-hp3wx6yt.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/node21-websocket@sha256:2b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c
+ ├─────── memory: 1024 MiB
+ ├────── service: lively-breeze-hp3wx6yt
+ ├─ private fqdn: node21-websocket-j2x9r.internal
+ └─── private ip: 10.0.5.4
 ```
 
 In this case, the instance name is `node21-websocket-j2x9r` and the address is `https://lively-breeze-hp3wx6yt.fra.unikraft.app`.
@@ -109,6 +119,7 @@ Then enter messages, that will be replied by the server.
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -120,6 +131,7 @@ fra    node21-websocket-j2x9r  running  <my-org>/node21-websocket        1024MiB
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -131,12 +143,14 @@ node21-websocket-j2x9r  lively-breeze-hp3wx6yt.fra.unikraft.app  running  1 minu
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete <instance-name>
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove <instance-name>
 ```
@@ -152,12 +166,14 @@ kraft cloud instance remove <instance-name>
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

@@ -20,12 +20,14 @@ cd examples/node-code-execution/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -38,12 +40,14 @@ export UKC_METRO=fra
 
 First, package and push the base Node.js image (see `server.ts` for the runtime implementation):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/node-code-exec:latest
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft pkg \
    --name index.unikraft.io/<my-org>/node-code-exec:latest \
@@ -61,6 +65,7 @@ There is a little tweak—right before loading the ROM code and starting the ser
 
 Create an instance that uses the base Node.js image without any ROM attached:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft run --metro fra \
   --name node-exec \
@@ -70,6 +75,7 @@ unikraft run --metro fra \
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance create \
   --start \
@@ -80,21 +86,7 @@ kraft cloud instance create \
 
 The output shows the instance details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: node-exec
- ├───────── uuid: 96608ed2-45e0-4c8f-8269-5d8cd3e4b41a
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├──────── image: oci://unikraft.io/<my-org>/node-code-exec@sha256:71487fd6196987cf65fb89eb84405cb796677aba177dabacf391f09618313328
- ├─────── memory: 512 MiB
- ├─ private fqdn: node-exec.internal
- └─── private ip: 10.0.5.4
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         node-exec
@@ -112,13 +104,31 @@ timestamps:
   created:    just now
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: node-exec
+ ├───────── uuid: 96608ed2-45e0-4c8f-8269-5d8cd3e4b41a
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├──────── image: oci://unikraft.io/<my-org>/node-code-exec@sha256:71487fd6196987cf65fb89eb84405cb796677aba177dabacf391f09618313328
+ ├─────── memory: 512 MiB
+ ├─ private fqdn: node-exec.internal
+ └─── private ip: 10.0.5.4
+```
+
 This instance is short-lived, since right before the server starts, it triggers a conversion into a template.
 To check that the template is ready, run:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances templates list
 ```
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 METRO  NAME       STATE     IMAGE                    ARGS  MEMORY  VCPUS  CREATED
 fra    node-exec  template  <my-org>/node-code-exec        512MiB  1      5 seconds ago
@@ -126,10 +136,12 @@ fra    node-exec  template  <my-org>/node-code-exec        512MiB  1      5 seco
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance template list
 ```
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 NAME       IMAGE                                                                                                              ARGS  CREATED AT
 node-exec  oci://unikraft.io/<my-org>/node-code-exec@sha256:71487fd6196987cf65fb89eb84405cb796677aba177dabacf391f09618313328        5 seconds ago
@@ -139,6 +151,7 @@ node-exec  oci://unikraft.io/<my-org>/node-code-exec@sha256:71487fd6196987cf65fb
 
 Create and push the ROMs with the code (see `rom1/fs/rom.js` and `rom2/fs/rom.ts`):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build rom1/ --output <my-org>/node-rom1:latest
 unikraft build rom2/ --output <my-org>/node-rom2:latest
@@ -146,6 +159,7 @@ unikraft build rom2/ --output <my-org>/node-rom2:latest
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft pkg \
    --rom ./fs \
@@ -169,6 +183,7 @@ kraft pkg \
 
 Create a new instance from the template, attaching the first ROM:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft run --metro fra \
   --name node-exec-rom1 \
@@ -180,6 +195,7 @@ unikraft run --metro fra \
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # kraft does not support creating instances with attached ROMs, but you can use the API directly
 curl -X POST "$UKC_METRO/instances" \
@@ -218,6 +234,7 @@ curl -X POST "$UKC_METRO/instances" \
 
 Create another instance from the same template, but with the second ROM attached:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft run --metro fra \
   --name node-exec-rom2 \
@@ -229,6 +246,7 @@ unikraft run --metro fra \
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # kraft does not support creating instances with attached ROMs, but you can use the API directly
 curl -X POST "$UKC_METRO/instances" \
@@ -267,6 +285,7 @@ curl -X POST "$UKC_METRO/instances" \
 
 List the instances and note their FQDN values:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -279,6 +298,7 @@ fra    node-exec-rom1  standby  <my-org>/node-code-exec        512MiB  1      sp
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -305,12 +325,14 @@ Auf Wiedersehen!
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

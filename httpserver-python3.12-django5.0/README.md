@@ -8,6 +8,10 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-python3.12-django5.0/` directory:
 
 ```bash
@@ -18,12 +22,14 @@ cd examples/httpserver-python3.12-django5.0/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -33,6 +39,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python312-django50:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python312-django50:latest
@@ -40,29 +47,14 @@ unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro 
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 1Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-python312-django50-vt56c
- ├───────── uuid: d8469447-fdf6-4caf-9fea-494218ca6f72
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://dawn-sound-n5wrkxi2.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-python312-django50@sha256:221666d414299aff54dbf10020b3d540270ee0c5907c1c6a728ca254ce8b0e50
- ├─────── memory: 1024 MiB
- ├────── service: dawn-sound-n5wrkxi2
- ├─ private fqdn: httpserver-python312-django50-vt56c.internal
- └─── private ip: 10.0.6.5
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-python312-django50-vt56c
@@ -83,6 +75,24 @@ networks:
   mac:        12:b0:9c:af:65:e7
 timestamps:
   created:    just now
+```
+
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: httpserver-python312-django50-vt56c
+ ├───────── uuid: d8469447-fdf6-4caf-9fea-494218ca6f72
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://dawn-sound-n5wrkxi2.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-python312-django50@sha256:221666d414299aff54dbf10020b3d540270ee0c5907c1c6a728ca254ce8b0e50
+ ├─────── memory: 1024 MiB
+ ├────── service: dawn-sound-n5wrkxi2
+ ├─ private fqdn: httpserver-python312-django50-vt56c.internal
+ └─── private ip: 10.0.6.5
 ```
 
 In this case, the instance name is `httpserver-python312-django50-vt56c` and the address is `https://dawn-sound-n5wrkxi2.fra.unikraft.app`.
@@ -122,6 +132,7 @@ You can set the username and password in the `Dockerfile` (more on this file lat
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -133,6 +144,7 @@ fra    httpserver-python312-django50-vt56c  running  <my-org>/httpserver-python3
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -144,12 +156,14 @@ httpserver-python312-django50-vt56c  dawn-sound-n5wrkxi2.fra.unikraft.app  runni
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances remove httpserver-python312-django50-vt56c
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove httpserver-python312-django50-vt56c
 ```
@@ -197,6 +211,7 @@ The [`httpserver-python3.12-flask3.0`](https://github.com/unikraft-cloud/example
 
 Run the command below to deploy the app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python312-flask30:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:80/tls+http -m 1G --image <my-org>/httpserver-python312-flask30:latest
@@ -204,6 +219,7 @@ unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro 
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 1Gi .
 ```
@@ -250,12 +266,14 @@ Similar actions apply to other `pip3`-based apps.
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

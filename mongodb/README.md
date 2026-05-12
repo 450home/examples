@@ -9,6 +9,10 @@ To run it, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mongodb/` directory:
 
 ```bash
@@ -19,12 +23,14 @@ cd examples/mongodb/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -34,6 +40,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mongodb:latest
 unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 27017:27017/tls -m 1G --image <my-org>/mongodb:latest
@@ -41,29 +48,14 @@ unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metr
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 27017:27017/tls -M 1Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: mongodb-6tiuu
- ├───────── uuid: 99779597-0bdb-4160-b902-a160c3ab4b2a
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://bold-brook-khkwv7of.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/mongodb@sha256:e6ff5153f106e2d5e2a10881818cd1b90fe3ff1294ad80879b2239ffc52aff0e
- ├─────── memory: 1024 MiB
- ├────── service: bold-brook-khkwv7of
- ├─ private fqdn: mongodb-6tiuu.internal
- └─── private ip: 10.0.6.4
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         mongodb-6tiuu
@@ -84,6 +76,24 @@ networks:
   mac:        12:b0:d7:7b:83:97
 timestamps:
   created:    just now
+```
+
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: mongodb-6tiuu
+ ├───────── uuid: 99779597-0bdb-4160-b902-a160c3ab4b2a
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://bold-brook-khkwv7of.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/mongodb@sha256:e6ff5153f106e2d5e2a10881818cd1b90fe3ff1294ad80879b2239ffc52aff0e
+ ├─────── memory: 1024 MiB
+ ├────── service: bold-brook-khkwv7of
+ ├─ private fqdn: mongodb-6tiuu.internal
+ └─── private ip: 10.0.6.4
 ```
 
 In this case, the instance name is `mongodb-6tiuu` and the the address is
@@ -112,6 +122,7 @@ test>
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -123,6 +134,7 @@ fra    mongodb-6tiuu  running  <my-org>/mongodb        1.0GiB  1      bold-brook
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -134,12 +146,14 @@ mongodb-6tiuu  bold-brook-khkwv7of.fra.unikraft.app  running  20 minutes ago  oc
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete mongodb-6tiuu
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove mongodb-6tiuu
 ```
@@ -149,18 +163,21 @@ kraft cloud instance remove mongodb-6tiuu
 You can use [volumes](https://unikraft.com/docs/platform/volumes) for data persistence for your MongoDB instance.
 For that you would first create a volume:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume create --set metro=fra --set name=mongodb-store --set size=512M
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud volume create --name mongodb-store --size 512Mi
 ```
 
 Then start the MongoDB instance and mount that volume:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mongodb:latest
 unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 27017:27017/tls -m 1G --volume mongodb-store:/data/db --image <my-org>/mongodb:latest
@@ -168,6 +185,7 @@ unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metr
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 1Gi -p 27017:27017/tls --volume mongodb-store:/data/db .
 ```
@@ -183,12 +201,14 @@ To customize the app, update the files in the repository, listed below:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

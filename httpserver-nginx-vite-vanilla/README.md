@@ -11,6 +11,10 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-nginx-vite-vanilla` directory:
 
 ```bash
@@ -21,12 +25,14 @@ cd examples/httpserver-nginx-vite-vanilla/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -36,6 +42,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-nginx-vite-vanilla:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-nginx-vite-vanilla:latest
@@ -43,29 +50,14 @@ unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:808
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-nginx-vite-vanilla-2rk6p
- ├───────── uuid: d4e5f6a7-b8c9-0123-defa-234567890123
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://swift-lake-m4n8vqzp.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-nginx-vite-vanilla@sha256:9c5f2d8b4e7a1c3f6d9b2e5a8c1f4d7a0b3e6c9f2d5a8b1e4c7f0d3a6b9c2
- ├─────── memory: 256 MiB
- ├────── service: swift-lake-m4n8vqzp
- ├─ private fqdn: httpserver-nginx-vite-vanilla-2rk6p.internal
- └─── private ip: 10.0.3.7
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-nginx-vite-vanilla-2rk6p
@@ -86,6 +78,24 @@ networks:
   mac:        12:b0:1a:5c:59:a9
 timestamps:
   created:    just now
+```
+
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: httpserver-nginx-vite-vanilla-2rk6p
+ ├───────── uuid: d4e5f6a7-b8c9-0123-defa-234567890123
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://swift-lake-m4n8vqzp.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-nginx-vite-vanilla@sha256:9c5f2d8b4e7a1c3f6d9b2e5a8c1f4d7a0b3e6c9f2d5a8b1e4c7f0d3a6b9c2
+ ├─────── memory: 256 MiB
+ ├────── service: swift-lake-m4n8vqzp
+ ├─ private fqdn: httpserver-nginx-vite-vanilla-2rk6p.internal
+ └─── private ip: 10.0.3.7
 ```
 
 In this case, the instance name is `httpserver-nginx-vite-vanilla-2rk6p` and the address is `https://swift-lake-m4n8vqzp.fra.unikraft.app`.
@@ -113,6 +123,7 @@ curl https://swift-lake-m4n8vqzp.fra.unikraft.app
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -124,6 +135,7 @@ fra    httpserver-nginx-vite-vanilla-2rk6p  running  <my-org>/httpserver-nginx-v
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -135,12 +147,14 @@ httpserver-nginx-vite-vanilla-2rk6p  swift-lake-m4n8vqzp.fra.unikraft.app  runni
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-nginx-vite-vanilla-2rk6p
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove httpserver-nginx-vite-vanilla-2rk6p
 ```
@@ -193,12 +207,14 @@ The following options are available for customizing the app:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```
