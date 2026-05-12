@@ -71,5 +71,25 @@ jobs:
     - name: Authenticate unikraft CLI
       run: echo $UKC_TOKEN | unikraft login --token -
 
+    - name: Override metros in CLI config
+      run: |
+        python3 - <<'PY'
+        import yaml, os
+
+        config_path = os.path.expanduser('~/.config/unikraft/config.yaml')
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+
+        metro = os.environ['UKC_METRO']
+        profile = config['profiles'][config['profile']]
+        profile['metros'] = [{
+            'name': metro,
+            'endpoint': f'https://api.{metro}.unikraft.cloud',
+        }]
+
+        with open(config_path, 'w') as f:
+            yaml.safe_dump(config, f, default_flow_style=False)
+        PY
+
     - name: Run tests
       run: pytest --log-cli-level=INFO
