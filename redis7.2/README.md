@@ -9,6 +9,10 @@ To run it, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/redis7.2/` directory:
 
 ```bash
@@ -19,12 +23,14 @@ cd examples/redis7.2/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -34,6 +40,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/redis72:latest
 unikraft run --scale-to-zero policy=off --metro fra -p 6379:6379/tls -m 512M --image <my-org>/redis72:latest
@@ -41,29 +48,14 @@ unikraft run --scale-to-zero policy=off --metro fra -p 6379:6379/tls -m 512M --i
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero off -p 6379:6379/tls -M 512Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: redis72-alb4r
- ├───────── uuid: d3c3141b-97b2-4e1d-87ae-39e4f14ab49e
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://rough-wind-8vxrd1ms.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/redis72@sha256:9665c51faf7deb538cf7907b012b55700cad08cd391f5ba099d95d018c8da7d
- ├─────── memory: 512 MiB
- ├────── service: rough-wind-8vxrd1ms
- ├─ private fqdn: redis72-alb4r.internal
- └─── private ip: 10.0.3.2
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         redis72-alb4r
@@ -84,6 +76,24 @@ networks:
   mac:        12:b0:4e:20:b3:e7
 timestamps:
   created:    just now
+```
+
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: redis72-alb4r
+ ├───────── uuid: d3c3141b-97b2-4e1d-87ae-39e4f14ab49e
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://rough-wind-8vxrd1ms.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/redis72@sha256:9665c51faf7deb538cf7907b012b55700cad08cd391f5ba099d95d018c8da7d
+ ├─────── memory: 512 MiB
+ ├────── service: rough-wind-8vxrd1ms
+ ├─ private fqdn: redis72-alb4r.internal
+ └─── private ip: 10.0.3.2
 ```
 
 In this case, the instance name is `redis72-alb4r` which is different for every run.
@@ -134,6 +144,7 @@ To disconnect, kill the `socat` command with ctrl-C.
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -145,6 +156,7 @@ fra    redis72-alb4r  running  <my-org>/redis72        512MiB  1      rough-wind
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -156,12 +168,14 @@ redis72-alb4r  rough-wind-8vxrd1ms.fra.unikraft.app  running  1 minute ago  oci:
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete redis72-alb4r
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove redis72-alb4r
 ```
@@ -177,12 +191,14 @@ To customize the app, update the files in the repository, listed below:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

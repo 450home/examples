@@ -8,6 +8,10 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-rust1.75-tokio/` directory:
 
 ```bash
@@ -18,12 +22,14 @@ cd examples/httpserver-rust1.75-tokio/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -33,6 +39,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-rust175-tokio:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-rust175-tokio:latest
@@ -40,29 +47,14 @@ unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:808
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-rust175-tokio-6gxsp
- ├───────── uuid: d5719f64-0653-42d7-b2de-aa6dee0ce467
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://empty-dawn-3coedrce.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-rust175-tokio@sha256:0ce75912711aa2329232a2ca6c3ccb7a244b6d546fafc081f815c2fde8224856
- ├─────── memory: 256 MiB
- ├────── service: empty-dawn-3coedrce
- ├─ private fqdn: httpserver-rust175-tokio-6gxsp.internal
- └─── private ip: 10.0.6.3
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-rust175-tokio-6gxsp
@@ -85,6 +77,24 @@ timestamps:
   created:    just now
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: httpserver-rust175-tokio-6gxsp
+ ├───────── uuid: d5719f64-0653-42d7-b2de-aa6dee0ce467
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://empty-dawn-3coedrce.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-rust175-tokio@sha256:0ce75912711aa2329232a2ca6c3ccb7a244b6d546fafc081f815c2fde8224856
+ ├─────── memory: 256 MiB
+ ├────── service: empty-dawn-3coedrce
+ ├─ private fqdn: httpserver-rust175-tokio-6gxsp.internal
+ └─── private ip: 10.0.6.3
+```
+
 In this case, the instance name is `httpserver-rust175-tokio-6gxsp` and the address is `https://empty-dawn-3coedrce.fra.unikraft.app`.
 They're different for each run.
 
@@ -100,6 +110,7 @@ Hello, World!
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -111,6 +122,7 @@ fra    httpserver-rust175-tokio-6gxsp  running  <my-org>/httpserver-rust175-toki
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -122,12 +134,14 @@ httpserver-rust175-tokio-6gxsp  empty-dawn-3coedrce.fra.unikraft.app  running  1
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-rust175-tokio-6gxsp
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove httpserver-rust175-tokio-6gxsp
 ```
@@ -156,12 +170,14 @@ The following options are available for customizing the app:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

@@ -12,6 +12,10 @@ To run it, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/visual-studio-code-server` directory:
 
 ```bash
@@ -22,12 +26,14 @@ cd examples/visual-studio-code-server/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -37,6 +43,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume create --set metro=fra --set name=code-workspace --set size=1G
 
@@ -46,6 +53,7 @@ unikraft run --metro fra -p 443:8443/tls+http -m 2G --volume code-workspace:/wor
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud volume create --name code-workspace --size 1Gi
 
@@ -54,23 +62,7 @@ kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-c
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: code-server
- ├───────── uuid: c1a619a0-e222-4042-94b8-ba4b39353417
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://blue-shape-chmxf1g4.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/visual-studio-code-server@sha256:633ec8a8dcb342b093c6f055f84fc056ee1abe40ff56e98bd612c4b9d4ddffcb
- ├─────── memory: 2048 MiB
- ├────── service: blue-shape-chmxf1g4
- ├─ private fqdn: code-server.internal
- └─── private ip: 10.0.0.49
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         code-server
@@ -93,6 +85,24 @@ timestamps:
   created:    just now
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: code-server
+ ├───────── uuid: c1a619a0-e222-4042-94b8-ba4b39353417
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://blue-shape-chmxf1g4.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/visual-studio-code-server@sha256:633ec8a8dcb342b093c6f055f84fc056ee1abe40ff56e98bd612c4b9d4ddffcb
+ ├─────── memory: 2048 MiB
+ ├────── service: blue-shape-chmxf1g4
+ ├─ private fqdn: code-server.internal
+ └─── private ip: 10.0.0.49
+```
+
 This will create a volume for data persistence, and mount it at `/workspace` inside the VM.
 
 In this case, the instance name is `code-server` and the address is `https://blue-shape-chmxf1g4.fra.unikraft.app`.
@@ -101,10 +111,12 @@ Enter the provided address into your browser of choice to access the Code server
 
 You can list information about the volume by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volumes list
 ```
 
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 METRO  NAME            STATE    SIZE    CREATED
 fra    code-workspace  mounted  1.0GiB  13 minutes ago
@@ -112,10 +124,12 @@ fra    code-workspace  mounted  1.0GiB  13 minutes ago
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud volume list
 ```
 
+**Using the legacy kraft CLI**
 ```ansi title="kraft"
 NAME            CREATED AT      SIZE     ATTACHED TO  MOUNTED BY   STATE      PERSISTENT
 code-workspace  13 minutes ago  1.0 GiB  code-server  code-server  mounted    true
@@ -123,6 +137,7 @@ code-workspace  13 minutes ago  1.0 GiB  code-server  code-server  mounted    tr
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -134,6 +149,7 @@ fra    code-server  standby  <my-org>/visual-studio-code-server        2.0GiB  1
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -145,12 +161,14 @@ code-server  blue-shape-chmxf1g4.fra.unikraft.app  standby  standby  oci://unikr
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete code-server
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove code-server
 ```
@@ -158,12 +176,14 @@ kraft cloud instance remove code-server
 The volume isn't removed by default, so you can recreate the instance and still have access to your old data.
 Remove it using:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume delete code-workspace
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud volume remove code-workspace
 ```
@@ -172,12 +192,14 @@ kraft cloud volume remove code-workspace
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

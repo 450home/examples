@@ -8,6 +8,10 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-ruby3.2/` directory:
 
 ```bash
@@ -18,12 +22,14 @@ cd examples/httpserver-ruby3.2/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -33,6 +39,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-ruby32:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-ruby32:latest
@@ -40,29 +47,14 @@ unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:808
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-ruby32-s6l8n
- ├───────── uuid: b1ebbbc0-5efa-476c-adb6-99866773245c
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://silent-resonance-1jtz5c66.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-ruby32@sha256:4cf3b341898e6ebff18ff2b68353ef872dded650c9d16a6f005a8fbe8a7cbb3d
- ├─────── memory: 256 MiB
- ├────── service: silent-resonance-1jtz5c66
- ├─ private fqdn: httpserver-ruby32-s6l8n.internal
- └─── private ip: 10.0.3.3
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-ruby32-s6l8n
@@ -85,6 +77,24 @@ timestamps:
   created:    just now
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: httpserver-ruby32-s6l8n
+ ├───────── uuid: b1ebbbc0-5efa-476c-adb6-99866773245c
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://silent-resonance-1jtz5c66.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-ruby32@sha256:4cf3b341898e6ebff18ff2b68353ef872dded650c9d16a6f005a8fbe8a7cbb3d
+ ├─────── memory: 256 MiB
+ ├────── service: silent-resonance-1jtz5c66
+ ├─ private fqdn: httpserver-ruby32-s6l8n.internal
+ └─── private ip: 10.0.3.3
+```
+
 In this case, the instance name is `httpserver-ruby32-s6l8n` and the address is `https://silent-resonance-1jtz5c66.fra.unikraft.app`.
 They're different for each run.
 
@@ -100,6 +110,7 @@ Hello, World!
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -111,6 +122,7 @@ fra    httpserver-ruby32-s6l8n  running  <my-org>/httpserver-ruby32        256Mi
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -122,12 +134,14 @@ httpserver-ruby32-s6l8n  silent-resonance-1jtz5c66.fra.unikraft.app  running  12
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete httpserver-ruby32-s6l8n
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove httpserver-ruby32-s6l8n
 ```
@@ -152,12 +166,14 @@ The following options are available for customizing the app:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

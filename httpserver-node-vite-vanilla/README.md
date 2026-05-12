@@ -29,6 +29,10 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/httpserver-node-vite-vanilla/` directory:
 
 ```bash
@@ -39,12 +43,14 @@ cd examples/httpserver-node-vite-vanilla/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -54,6 +60,7 @@ export UKC_METRO=fra
 
 When done, run:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-node-vite-vanilla:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=2000,stateful=true --metro fra -p 443:8080/tls+http -m 4G -e PWD=/app --image <my-org>/httpserver-node-vite-vanilla:latest
@@ -61,29 +68,14 @@ unikraft run --scale-to-zero policy=on,cooldown-time=2000,stateful=true --metro 
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 2s -p 443:8080/tls+http -M 4Gi -e PWD=/app .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: httpserver-node-vite-vanilla-w9f3p
- ├───────── uuid: 4d5e6f7a-8b9c-0d1e-2f3a-d4e5f6a7b8c9
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://bold-rain-mv5tx8wy.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/httpserver-node-vite-vanilla@sha256:5a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b
- ├─────── memory: 4096 MiB
- ├────── service: bold-rain-mv5tx8wy
- ├─ private fqdn: httpserver-node-vite-vanilla-w9f3p.internal
- └─── private ip: 10.0.5.2
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         httpserver-node-vite-vanilla-w9f3p
@@ -106,6 +98,24 @@ timestamps:
   created:    just now
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: httpserver-node-vite-vanilla-w9f3p
+ ├───────── uuid: 4d5e6f7a-8b9c-0d1e-2f3a-d4e5f6a7b8c9
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://bold-rain-mv5tx8wy.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/httpserver-node-vite-vanilla@sha256:5a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b
+ ├─────── memory: 4096 MiB
+ ├────── service: bold-rain-mv5tx8wy
+ ├─ private fqdn: httpserver-node-vite-vanilla-w9f3p.internal
+ └─── private ip: 10.0.5.2
+```
+
 In this case, the instance name is `httpserver-node-vite-vanilla-w9f3p` and the address is `https://bold-rain-mv5tx8wy.fra.unikraft.app`.
 They're different for each run.
 
@@ -114,6 +124,7 @@ After deploying, you can query the service using the provided URL.
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -125,6 +136,7 @@ fra    httpserver-node-vite-vanilla-w9f3p  running  <my-org>/httpserver-node-vit
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -136,12 +148,14 @@ httpserver-node-vite-vanilla-w9f3p  bold-rain-mv5tx8wy.fra.unikraft.app  running
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete <instance-name>
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove <instance-name>
 ```
@@ -159,12 +173,14 @@ kraft cloud instance remove <instance-name>
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

@@ -8,6 +8,10 @@ To run it, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mariadb/` directory:
 
 ```bash
@@ -18,12 +22,14 @@ cd examples/mariadb
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -33,6 +39,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mariadb:latest
 unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 3306:3306/tls -m 1G -e MARIADB_ROOT_PASSWORD="unikraft" --image <my-org>/mariadb:latest
@@ -40,29 +47,14 @@ unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metr
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 3306:3306/tls -M 1Gi --env MARIADB_ROOT_PASSWORD="unikraft" .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: mariadb-w2g2z
- ├───────── uuid: ba696c22-adff-4fba-88b9-d1b790ca2357
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://twilight-sun-82lt4ddk.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/mariadb@sha256:6e31d28b351eb12a070e3074f0a500532d0a494332947e9d8dbfa093d2d551fd
- ├─────── memory: 1024 MiB
- ├────── service: twilight-sun-82lt4ddk
- ├─ private fqdn: mariadb-w2g2z.internal
- └─── private ip: 10.0.6.3
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         mariadb-w2g2z
@@ -83,6 +75,24 @@ networks:
   mac:        12:b0:ee:29:71:e4
 timestamps:
   created:    just now
+```
+
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: mariadb-w2g2z
+ ├───────── uuid: ba696c22-adff-4fba-88b9-d1b790ca2357
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://twilight-sun-82lt4ddk.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/mariadb@sha256:6e31d28b351eb12a070e3074f0a500532d0a494332947e9d8dbfa093d2d551fd
+ ├─────── memory: 1024 MiB
+ ├────── service: twilight-sun-82lt4ddk
+ ├─ private fqdn: mariadb-w2g2z.internal
+ └─── private ip: 10.0.6.3
 ```
 
 In this case, the instance name is `mariadb-w2g2z` which is different for each run.
@@ -122,6 +132,7 @@ To disconnect, kill the `socat` command using `Ctrl+c`.
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -133,6 +144,7 @@ fra    mariadb-w2g2z  running  <my-org>/mariadb        1024MiB  1      twilight-
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -144,12 +156,14 @@ mariadb-w2g2z  twilight-sun-82lt4ddk.fra.unikraft.app  running  1 minute ago  oc
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instance remove mariadb-w2g2z
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove mariadb-w2g2z
 ```
@@ -162,18 +176,21 @@ kraft cloud instance remove mariadb-w2g2z
 You can use [volumes](https://unikraft.com/docs/platform/volumes) for data persistence for your MariaDB instance.
 For that you would first create a volume:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft volume create --set metro=fra --set name=mariadb-store --set size=512M
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud volume create --name mariadb-store --size 512Mi
 ```
 
 Then start the MariaDB instance and mount that volume:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mariadb:latest
 unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 3306:3306/tls -m 1G -e MARIADB_ROOT_PASSWORD="unikraft" --volume mariadb-store:/var/lib --image <my-org>/mariadb:latest
@@ -181,6 +198,7 @@ unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metr
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 1Gi -p 3306:3306/tls --env MARIADB_ROOT_PASSWORD="unikraft" --volume mariadb-store:/var/lib .
 ```
@@ -196,12 +214,14 @@ To customize the app, update the files in the repository, listed below:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

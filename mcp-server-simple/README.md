@@ -13,6 +13,10 @@ To run this MCP server on Unikraft Cloud:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mcp-server-simple/` directory:
 
 ```bash
@@ -23,12 +27,14 @@ cd examples/mcp-server-simple/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -38,6 +44,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mcp-server-simple:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/mcp-server-simple:latest
@@ -45,29 +52,14 @@ unikraft run --scale-to-zero policy=on,cooldown-time=1000,stateful=true --metro 
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
 ```
 
 The output shows your instance details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: mcp-server-simple-bbdcb
- ├───────── uuid: e87d3591-3497-4f30-bd76-1dc886059647
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://cool-paper-b6mht7jv.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/mcp-server-simple@sha256:cbbfb441ee313a6c7c0de571e9002f0f6031312e203ffb6be3b8f4950df3bc20
- ├─────── memory: 512 MiB
- ├────── service: cool-paper-b6mht7jv
- ├─ private fqdn: mcp-server-simple-bbdcb.internal
- └─── private ip: 10.0.0.193
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         mcp-server-simple-bbdcb
@@ -88,6 +80,24 @@ networks:
   mac:        12:b0:39:2b:a3:15
 timestamps:
   created:    just now
+```
+
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: mcp-server-simple-bbdcb
+ ├───────── uuid: e87d3591-3497-4f30-bd76-1dc886059647
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://cool-paper-b6mht7jv.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/mcp-server-simple@sha256:cbbfb441ee313a6c7c0de571e9002f0f6031312e203ffb6be3b8f4950df3bc20
+ ├─────── memory: 512 MiB
+ ├────── service: cool-paper-b6mht7jv
+ ├─ private fqdn: mcp-server-simple-bbdcb.internal
+ └─── private ip: 10.0.0.193
 ```
 
 In this case, the instance name is `mcp-server-simple-bbdcb` and the service `cool-paper-b6mht7jv`.
@@ -121,6 +131,7 @@ Description: Get current time in a timezone.
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -132,6 +143,7 @@ fra    mcp-server-simple-bbdcb  standby  <my-org>/mcp-server-simple        512Mi
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -226,12 +238,14 @@ This provides:
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```

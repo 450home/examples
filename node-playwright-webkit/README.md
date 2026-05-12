@@ -9,6 +9,10 @@ To run this example, follow these steps:
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way to get one is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, you can also directly set up and use BuildKit, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
+> **Note**:
+> The unikraft CLI is the current standard, while kraft is the legacy version.
+> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/node-playwright-webkit/` directory:
 
 ```bash
@@ -19,12 +23,14 @@ cd examples/node-playwright-webkit/
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft login
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 # Set Unikraft Cloud access token
 export UKC_TOKEN=token
@@ -34,6 +40,7 @@ export UKC_METRO=fra
 
 When done, invoke the following command to deploy this app on Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/node-playwright-webkit:latest
 unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 443:8080/tls+http -m 4G --image <my-org>/node-playwright-webkit:latest
@@ -41,29 +48,14 @@ unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metr
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 4Gi .
 ```
 
 The output shows the instance address and other details:
 
-```ansi title="kraft"
-[●] Deployed successfully!
- │
- ├───────── name: node-playwright-webkit-t7r2j
- ├───────── uuid: a2b3c4d5-e6f7-8a9b-0c1d-a2b3c4d5e6f7
- ├──────── metro: https://api.fra.unikraft.cloud/v1
- ├──────── state: starting
- ├─────── domain: https://silent-fog-er8np3fb.fra.unikraft.app
- ├──────── image: oci://unikraft.io/<my-org>/node-playwright-webkit@sha256:9e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f
- ├─────── memory: 4096 MiB
- ├────── service: silent-fog-er8np3fb
- ├─ private fqdn: node-playwright-webkit-t7r2j.internal
- └─── private ip: 10.0.6.4
-```
-
-or
-
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         node-playwright-webkit-t7r2j
@@ -86,6 +78,24 @@ timestamps:
   created:    just now
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```ansi title="kraft"
+[●] Deployed successfully!
+ │
+ ├───────── name: node-playwright-webkit-t7r2j
+ ├───────── uuid: a2b3c4d5-e6f7-8a9b-0c1d-a2b3c4d5e6f7
+ ├──────── metro: https://api.fra.unikraft.cloud/v1
+ ├──────── state: starting
+ ├─────── domain: https://silent-fog-er8np3fb.fra.unikraft.app
+ ├──────── image: oci://unikraft.io/<my-org>/node-playwright-webkit@sha256:9e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f
+ ├─────── memory: 4096 MiB
+ ├────── service: silent-fog-er8np3fb
+ ├─ private fqdn: node-playwright-webkit-t7r2j.internal
+ └─── private ip: 10.0.6.4
+```
+
 In this case, the instance name is `node-playwright-webkit-t7r2j` and the address is `https://silent-fog-er8np3fb.fra.unikraft.app`.
 They're different for each run.
 
@@ -102,6 +112,7 @@ curl "https://<NAME>.<METRO>.unikraft.app/?page=https://bing.com" -o ss-bing.png
 
 You can list information about the instance by running:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances list
 ```
@@ -113,6 +124,7 @@ fra    node-playwright-webkit-t7r2j  running  <my-org>/node-playwright-webkit   
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance list
 ```
@@ -124,12 +136,14 @@ node-playwright-webkit-t7r2j  silent-fog-er8np3fb.fra.unikraft.app  running  1 m
 
 When done, you can remove the instance:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft instances delete <instance-name>
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud instance remove <instance-name>
 ```
@@ -144,12 +158,14 @@ kraft cloud instance remove <instance-name>
 
 Use the `--help` option for detailed information on using Unikraft Cloud:
 
+**Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft --help
 ```
 
 or
 
+**Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud --help
 ```
