@@ -4,12 +4,19 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const RateLimit = require("express-rate-limit");
 
 const { PROTECT_ROUTES, API_KEY } = process.env;
 
 const indexRouter = require("./routes/index");
 const app = express();
 
+const limiter = RateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // max 100 requests per windowMs
+});
+
+app.use(limiter);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
