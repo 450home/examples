@@ -20,5 +20,5 @@ async def screenshot_page(page: str | None = None):
         await playwright.stop()
 
         return Response(content=buffer, media_type="image/png")
-    except Exception as err:
-        return {"message": "An error occured: " + str(err)}
+    except Exception:
+        return {"message": "An internal error has occurred"}
