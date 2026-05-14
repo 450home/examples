@@ -105,7 +105,7 @@ curl https://red-dew-jtk6yxk1.fra.unikraft.app
 ```
 
 ```text
-hello, world!
+Hello, World!
 ```
 
 You can list information about the instance by running:

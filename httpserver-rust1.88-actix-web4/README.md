@@ -105,7 +105,7 @@ curl https://autumn-silence-wupu2nus.fra.unikraft.app/hey
 ```
 
 ```text
-Hello world!
+Hello, World!
 Hey there!
 ```
 
