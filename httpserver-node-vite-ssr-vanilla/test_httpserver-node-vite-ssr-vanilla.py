@@ -1,0 +1,33 @@
+"""End-to-end test for the ``httpserver-node-vite-ssr-vanilla`` example.
+
+Mirrors the manual steps from ``httpserver-node-vite-ssr-vanilla/README.md``:
+
+1. ``unikraft build . --output <prefix>/httpserver-node-vite-ssr-vanilla:<tag>``
+2. ``unikraft run --metro <metro> -p 443:8080/tls+http -m 1G --image ...``
+3. ``curl https://<instance-url>`` and assert the SSR page is served.
+"""
+
+from __future__ import annotations
+
+from _testlib.unikraft import extract_instance_url
+
+
+def test_node_vite_ssr_serves_page(build_image, run_instance, http):
+    image = build_image("httpserver-node-vite-ssr-vanilla", "httpserver-node-vite-ssr-vanilla")
+
+    instance = run_instance(
+        image,
+        publish=["443:8080/tls+http"],
+        memory="1G",
+        extra_args=[
+            "-e", "PWD=/app",
+            "-e", "NODE_ENV=production",
+        ],
+    )
+
+    url = extract_instance_url(instance)
+    assert url, f"could not determine instance URL from: {instance!r}"
+
+    resp = http(url)
+    assert resp.status_code == 200
+    assert "Hello Vite!" in resp.text
