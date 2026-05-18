@@ -1,0 +1,68 @@
+"""End-to-end test for the ``visual-studio-code-server`` example.
+
+Mirrors the manual steps from ``visual-studio-code-server/README.md`` and
+the existing CI workflow (example-visual-studio-code-server-stable.yaml):
+
+1. Create a volume for workspace persistence.
+2. ``unikraft build . --output <prefix>/visual-studio-code-server:<tag>``
+3. ``unikraft run --metro <metro> -p 443:8443/tls+http -m 2G
+   --volume <vol>:/workspace -e PASSWORD=unikraft ... --image ...``
+4. ``curl https://<instance-url>`` → HTTP 200 (Code Server login page).
+"""
+
+from __future__ import annotations
+
+import logging
+import uuid
+
+from _testlib.unikraft import extract_instance_url
+
+log = logging.getLogger(__name__)
+
+
+def test_visual_studio_code_server(
+    request, build_image, run_instance, unikraft, http
+):
+    """Build, deploy, and verify the VS Code Server login page loads."""
+    # Create a volume for workspace persistence, matching the old workflow.
+    vol_name = f"code-workspace-pytest-{uuid.uuid4().hex[:8]}"
+    unikraft.run([
+        "volume", "create",
+        "--set", f"name={vol_name}",
+        "--set", "size=1G",
+        "--set", f"metro={unikraft.metro}",
+    ])
+
+    # Register volume cleanup *before* run_instance so pytest's LIFO
+    # finalizer ordering deletes the instance first, then the volume.
+    def _delete_volume():
+        try:
+            unikraft.run(["volume", "delete", vol_name], check=False)
+        except Exception:
+            log.warning("failed to delete volume %s", vol_name)
+
+    request.addfinalizer(_delete_volume)
+
+    image = build_image(
+        "visual-studio-code-server", "visual-studio-code-server"
+    )
+
+    instance = run_instance(
+        image,
+        publish=["443:8443/tls+http"],
+        memory="2G",
+        extra_args=[
+            "--volume", f"{vol_name}:/workspace",
+            "-e", "PGUID=0",
+            "-e", "PGID=0",
+            "-e", "PASSWORD=unikraft",
+            "-e", "SUDO_PASSWORD=unikraft",
+            "-e", "DEFAULT_WORKSPACE=/workspace",
+        ],
+    )
+
+    url = extract_instance_url(instance)
+    assert url, f"could not determine instance URL from: {instance!r}"
+
+    resp = http(url)
+    assert resp.status_code == 200
