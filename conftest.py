@@ -29,6 +29,7 @@ from typing import Any
 import pytest
 
 from _testlib.http_client import http_get
+from _testlib.socat import SocatTunnel
 from _testlib.unikraft import (
     UnikraftCLI,
     extract_instance_url,
@@ -239,11 +240,42 @@ def http():
     return http_get
 
 
+# ---------------------------------------------------------------------------
+# TLS tunnel (socat) helper
+# ---------------------------------------------------------------------------
+
+
+SocatTunnelFactory = Callable[[str, int, int], SocatTunnel]
+
+
+@pytest.fixture
+def socat_tunnel(request: pytest.FixtureRequest) -> SocatTunnelFactory:
+    """Factory fixture that creates socat TLS tunnels with guaranteed teardown.
+
+    ``local_port`` is the TCP port socat will listen on locally.
+
+    Usage::
+
+        def test_mydb(socat_tunnel, ...):
+            tunnel = socat_tunnel(host, 3306, 3306)
+            conn = my_connect("127.0.0.1", tunnel.local_port)
+    """
+
+    def _create(host: str, port: int, local_port: int) -> SocatTunnel:
+        tunnel = SocatTunnel(host, port, local_port)
+        tunnel.open()
+        request.addfinalizer(tunnel.close)
+        return tunnel
+
+    return _create
+
+
 # Re-export for callers that import from conftest.
 __all__ = [
     "build_image",
     "extract_instance_url",
     "http",
     "run_instance",
+    "socat_tunnel",
     "unikraft",
 ]

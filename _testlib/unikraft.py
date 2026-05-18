@@ -248,3 +248,18 @@ def extract_instance_name(instance: dict[str, Any]) -> str:
         )
     
     return name
+
+
+def extract_instance_fqdn(instance: dict[str, Any]) -> str | None:
+    """Best-effort extraction of the bare FQDN (no scheme) for an instance.
+
+    Useful for non-HTTP clients (databases, caches, etc.) that need a
+    hostname to connect to over TLS.
+    """
+    from urllib.parse import urlparse
+
+    url = extract_instance_url(instance)
+    if url is None:
+        return None
+    parsed = urlparse(url)
+    return parsed.hostname
