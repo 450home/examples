@@ -1,5 +1,14 @@
-FROM rust:1.88.0-slim-bullseye AS builder
-RUN rustup target add wasm32-unknown-unknown && cargo install wasm-bindgen-cli && cargo install --locked trunk
+FROM --platform=linux/x86_64 rust:1.88.0-slim-bullseye AS builder
+
+# Install trunk from pre-built binary instead of compiling from source (~10min saved)
+ARG TRUNK_VERSION=0.21.14
+RUN apt-get update && apt-get install -y --no-install-recommends wget ca-certificates \
+    && wget -qO- "https://github.com/trunk-rs/trunk/releases/download/v${TRUNK_VERSION}/trunk-x86_64-unknown-linux-musl.tar.gz" \
+       | tar -xz -C /usr/local/bin \
+    && rm -rf /var/lib/apt/lists/*
+
+# Only need the wasm32 target; trunk auto-downloads the correct wasm-bindgen-cli
+RUN rustup target add wasm32-unknown-unknown
 
 # Set up the working directory in the container
 WORKDIR /usr/src/frontend
@@ -7,9 +16,6 @@ WORKDIR /usr/src/frontend
 # Copy both app and shared_lib directories to the working directory
 COPY ./frontend ./frontend
 COPY ./shared_lib ./shared_lib
-
-# Build the shared library first to cache dependencies
-RUN cargo build --manifest-path ./shared_lib/Cargo.toml
 
 # Build the main application
 ENV RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
