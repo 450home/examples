@@ -16,6 +16,14 @@ const generatePdf = async (type, payload) => {
   }
 
   if (type === 'base64') {
+    try {
+      if (Buffer.from(payload, 'base64').toString('base64') !== payload) {
+        throw new Error();
+      }
+    } catch {
+      await browser.close();
+      throw new Error("Invalid base64 content");
+    }
     const page = await browser.newPage();
     await page.goto(`data:text/html;base64,${payload}`);
     const pdf = await page.pdf();
