@@ -8,3 +8,4 @@ pymysql>=1.1
 redis>=5.0
 pymemcache>=4.0
 pymongo>=4.6
+websockets>=13.0
