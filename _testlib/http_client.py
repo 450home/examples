@@ -37,7 +37,8 @@ if allow_insecure():
     )
 
 
-def http_get(
+def _request_with_retries(
+    method: str,
     url: str,
     *,
     timeout: float = 10.0,
@@ -47,7 +48,7 @@ def http_get(
     verify: bool | str | None = None,
     **kwargs,
 ) -> requests.Response:
-    """GET ``url`` with retries while the instance warms up.
+    """Issue an HTTP request with retries while the instance warms up.
 
     Retries on connection errors and on non-matching status codes (when
     ``expected_status`` is provided). Raises the last exception if all
@@ -62,27 +63,64 @@ def http_get(
     last_exc: Exception | None = None
     for attempt in range(1, retries + 1):
         try:
-            log.info("GET %s (attempt %d/%d)", url, attempt, retries)
-            resp = requests.get(
-                url, timeout=timeout, verify=verify, **kwargs
+            log.info("%s %s (attempt %d/%d)", method, url, attempt, retries)
+            resp = requests.request(
+                method, url, timeout=timeout, verify=verify, **kwargs,
             )
 
             if expected_status is None or resp.status_code == expected_status:
                 return resp
-            
+
             log.warning(
                 "unexpected status %d from %s, retrying", resp.status_code, url
             )
+            resp.close()
 
             last_exc = AssertionError(
-                f"GET {url} returned {resp.status_code}, expected {expected_status}"
+                f"{method} {url} returned {resp.status_code}, expected {expected_status}"
             )
         except requests.RequestException as exc:
-            log.warning("GET %s failed: %s", url, exc)
+            log.warning("%s %s failed: %s", method, url, exc)
             last_exc = exc
-            
+
         if attempt < retries:
             time.sleep(backoff)
 
     assert last_exc is not None
     raise last_exc
+
+
+def http_get(
+    url: str,
+    *,
+    timeout: float = 10.0,
+    retries: int = 10,
+    backoff: float = 2.0,
+    expected_status: int | None = 200,
+    verify: bool | str | None = None,
+    **kwargs,
+) -> requests.Response:
+    """GET ``url`` with retries while the instance warms up."""
+    return _request_with_retries(
+        "GET", url,
+        timeout=timeout, retries=retries, backoff=backoff,
+        expected_status=expected_status, verify=verify, **kwargs,
+    )
+
+
+def http_post(
+    url: str,
+    *,
+    timeout: float = 10.0,
+    retries: int = 10,
+    backoff: float = 2.0,
+    expected_status: int | None = 200,
+    verify: bool | str | None = None,
+    **kwargs,
+) -> requests.Response:
+    """POST ``url`` with retries while the instance warms up."""
+    return _request_with_retries(
+        "POST", url,
+        timeout=timeout, retries=retries, backoff=backoff,
+        expected_status=expected_status, verify=verify, **kwargs,
+    )

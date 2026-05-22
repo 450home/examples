@@ -28,7 +28,7 @@ from typing import Any
 
 import pytest
 
-from _testlib.http_client import http_get
+from _testlib.http_client import http_get, http_post
 from _testlib.socat import SocatTunnel
 from _testlib.unikraft import (
     UnikraftCLI,
@@ -240,6 +240,12 @@ def http():
     return http_get
 
 
+@pytest.fixture(name="http_post")
+def http_post_fixture():
+    """Expose the shared HTTP POST helper as a fixture for convenience."""
+    return http_post
+
+
 # ---------------------------------------------------------------------------
 # TLS tunnel (socat) helper
 # ---------------------------------------------------------------------------
@@ -275,6 +281,7 @@ __all__ = [
     "build_image",
     "extract_instance_url",
     "http",
+    "http_post",
     "run_instance",
     "socat_tunnel",
     "unikraft",
