@@ -6,7 +6,7 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 
-client_host = os.environ.get("MONGO_SERVER_URL", "mongodb-nginx-flask-mongo-mongo.internal")
+client_host = os.environ.get("MONGO_SERVER_URL", "mongo.internal:27017")
 print(f"Connecting to MongoDB at {client_host}")
 
 try:
