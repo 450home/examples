@@ -39,11 +39,19 @@ export UKC_METRO=fra
 
 The `UKC_TOKEN` and `UKC_METRO` environment variables are only supported by the legacy CLI.
 
-When done, deploy this app on Unikraft Cloud.
-You can run the deploy script (which builds an erofs root filesystem and deploys it):
+When done, invoke the following command to deploy this app on Unikraft Cloud:
 
-```bash
-./deploy.sh
+**Using the unikraft CLI (Recommended)**
+```bash title="unikraft"
+unikraft build . --output <my-org>/chromium-cdp
+unikraft run --metro fra -m 4G -p 443:8080/tls+http --image <my-org>/chromium-cdp
+```
+
+or
+
+**Using the legacy kraft CLI**
+```bash title="kraft"
+kraft cloud deploy -p 443:8080/tls+http -M 4Gi .
 ```
 
 The output shows the instance address and other details.
@@ -56,7 +64,7 @@ uuid:         debe81b0-8418-4e01-b795-b3546e0e5aac
 state:        starting
 image:        <my-org>/chromium-cdp
 resources:
-  memory:     4096MiB
+  memory:     4GiB
   vcpus:      1
 service:
   uuid:       516e239b-2ab1-9fb9-599d-fb891cc39edb
