@@ -134,8 +134,7 @@ def build_image(
 
         # Register the image-delete finalizer *before* invoking the build
         # so a partial build is still cleaned up.
-        # TODO: enable once this is suppoerted by the CLI.
-        # request.addfinalizer(lambda: unikraft.delete_image(tag))
+        request.addfinalizer(lambda: unikraft.delete_image(tag))
 
         unikraft.build(context, tag)
 
