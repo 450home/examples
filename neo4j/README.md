@@ -31,10 +31,8 @@ unikraft run --metro fra --scale-to-zero policy=idle,cooldown-time=4000,stateful
 
 > **Note**:
 > You can also set a custom password for the default neo4j user by adding the
-> following env vars to the run command
+> following env var to the run command
 > `-e "NEO4J_AUTH_PASSWORD=..."`
-> `-e "PATH=/var/lib/neo4j/bin:/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"`
-> `-e "JAVA_HOME=/opt/java/openjdk"`
 
 The output shows the instance address and other details:
 
