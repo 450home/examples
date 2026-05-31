@@ -45,6 +45,6 @@ COPY --from=build /etc/ld.so.cache /etc/ld.so.cache
 # Distribution configuration
 COPY --from=build /etc/os-release /etc/os-release
 
-COPY --from=build /allkaraoke/build /wwwroot
+COPY --from=build /allkaraoke/build/client /wwwroot
 
 COPY ./entrypoint.sh /entrypoint.sh
