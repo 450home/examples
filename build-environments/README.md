@@ -13,9 +13,9 @@ This pattern is useful for build and test environments where runtime code change
    You need a [BuildKit](https://github.com/moby/buildkit) builder. The easiest way is via [Docker](https://docs.docker.com/engine/install/).
    Alternatively, set up and use BuildKit directly, see the [quick start](https://github.com/moby/buildkit#quick-start).
 
-> **Note**:
-> The unikraft CLI is the current standard, while kraft is the legacy version.
-> Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
+   > **Note**:
+   > The unikraft CLI is the current standard, while kraft is the legacy version.
+   > Choose one of the CLIs below and only run the commands associated with it for the rest of this guide.
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/build-environments` directory:
 
