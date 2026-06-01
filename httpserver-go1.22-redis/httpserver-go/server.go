@@ -44,6 +44,7 @@ func put(w http.ResponseWriter, req *http.Request) {
 	err := rdb.Set(ctx, key, val, 0).Err()
 	if err != nil {
 		fmt.Fprintf(w, "Error accessing key: %s\n", err.Error())
+		return
 	}
 
 	fmt.Printf("Setting key \"%s\" to value \"%s\"\n", key, val)
