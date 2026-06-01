@@ -1,0 +1,11 @@
+spec: v0.7
+
+name: phoenix
+
+runtime: base-compat:latest
+
+rootfs:
+  source: ./Dockerfile
+  format: erofs
+
+cmd: [ "/app/bin/server" ]
