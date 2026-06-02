@@ -12,6 +12,8 @@ and then tear the instance down.
   `unikraft login` (the tests rely on your existing CLI profile).
 * A working container runtime (Docker or compatible) — required by
   `unikraft build`.
+* System packages: `socat`, `ssh`, `lftp` — required by tests that exercise
+  non-HTTP services (SSH, FTP) behind TLS port mappings.
 
 ## Setup
 

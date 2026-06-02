@@ -105,7 +105,7 @@ class UnikraftCLI:
 
     def run_instance(
         self,
-        image: str,
+        image: str | None = None,
         *,
         publish: Sequence[str] = (),
         memory: str | None = None,
@@ -120,7 +120,8 @@ class UnikraftCLI:
             args += ["-m", memory]
         if name:
             args += ["-n", name]
-        args += ["--image", image]
+        if image:
+            args += ["--image", image]
         args += list(extra_args)
 
         log.info(

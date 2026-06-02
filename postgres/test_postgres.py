@@ -58,7 +58,7 @@ def test_postgres(build_image, run_instance):
     # extension cleans up the libpq connection on failure, so no leak.
     conn = None
     last_err = None
-    for attempt in range(10):
+    for _ in range(10):
         try:
             conn = _connect(host)
             break
