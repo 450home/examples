@@ -3,7 +3,7 @@ FROM debian:bookworm AS base
 ARG WORDPRESS_DB_NAME=wordpress
 ARG WORDPRESS_DB_USER=wordpress
 ARG WORDPRESS_DB_PASSWORD=wordpresspass
-ARG WORDPRESS_DB_HOST=wordpress-compose-mariadb.internal
+ARG WORDPRESS_DB_HOST=wordpress-mariadb.internal
 ARG WORDPRESS_VERSION=wordpress-6.5.5
 
 # General packages
