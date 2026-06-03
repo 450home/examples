@@ -16,10 +16,10 @@ To run this example, follow these steps:
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/nginx/` directory:
 
-```bash
-git clone https://github.com/unikraft-cloud/examples
-cd examples/nginx/
-```
+   ```bash
+   git clone https://github.com/unikraft-cloud/examples
+   cd examples/nginx/
+   ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):

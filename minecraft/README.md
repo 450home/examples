@@ -15,10 +15,16 @@ This example runs a Minecraft Java server on Unikraft Cloud with:
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/minecraft/` directory:
 
-```bash
-git clone https://github.com/unikraft-cloud/examples
-cd examples/minecraft/
-```
+   ```bash
+   git clone https://github.com/unikraft-cloud/examples
+   cd examples/minecraft/
+   ```
+
+3. Review and adjust the base server settings in [`base/.env`](./base/.env).
+   You can check out [this documentation](https://docker-minecraft-server.readthedocs.io/en/latest/) for available configuration options.
+   Make sure to also set your `PUBKEY` for SSH access, and optionally set `TEMPLATE_WITH_WORLD` if you want the template to include the world (see below).
+   Optionally, create per-config overrides in `<config>/.env` (for example [`bingo/.env`](./bingo/.env)).
+   All the `.env` files are packaged as [auxiliary ROMs](https://unikraft.com/docs/features/roms) and mounted at `/rom/<config>`.
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
@@ -26,12 +32,6 @@ This guide uses `fra` (Frankfurt, 🇩🇪):
 ```bash title="unikraft"
 unikraft login
 ```
-
-3. Review and adjust the base server settings in [`base/.env`](./base/.env).
-   You can check out [this documentation](https://docker-minecraft-server.readthedocs.io/en/latest/) for available configuration options.
-   Make sure to also set your `PUBKEY` for SSH access, and optionally set `TEMPLATE_WITH_WORLD` if you want the template to include the world (see below).
-   Optionally, create per-config overrides in `<config>/.env` (for example [`bingo/.env`](./bingo/.env)).
-   All the `.env` files are packaged as [auxiliary ROMs](https://unikraft.com/docs/features/roms) and mounted at `/rom/<config>`.
 
 ## Deployment Workflow
 

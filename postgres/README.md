@@ -15,10 +15,10 @@ To run it, follow these steps:
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/postgres/` directory:
 
-```bash
-git clone https://github.com/unikraft-cloud/examples
-cd examples/postgres/
-```
+   ```bash
+   git clone https://github.com/unikraft-cloud/examples
+   cd examples/postgres/
+   ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
@@ -121,18 +121,13 @@ postgres=#
 Use SQL and `psql` commands for your work.
 
 > **Tip:**
-> This example uses the [`idle` scale-to-zero policy](https://unikraft.com/docs/api/platform/v1/instances#scaletozero_policy) by default (see the `labels` section in the `Kraftfile`).
+> This example uses the [`idle` scale-to-zero policy](https://unikraft.com/docs/api/platform/v1/instances#scaletozero_policy) by default.
 > It means that the instance will scale-to-zero even in the presence of `psql` connections.
-> To ensure that the instance isn't put into standby even for long running queries
-> (during which the connections are also idle).
+>
 > The PostgreSQL example makes use of scale-to-zero app support.
+> This ensures that the instance isn't put into standby even for long running queries (during which the connections are also idle).
 > To this end, the example loads the [`pg_ukc_scaletozero`](https://github.com/unikraft-cloud/pg_ukc_scaletozero) module into PostgreSQL, which suspends scale-to-zero during query processing.
 > You can see this in action by running `SELECT pg_sleep(10);` and verifying that the instance keeps on running.
-
-> **Note:**
-> If you'd like to use a port other than `5432/tls` you'll need to use the `socat` command to connect to PostgreSQL.
-> See the [MariaDB](https://github.com/unikraft-cloud/examples/tree/main/mariadb) example for a guide on how to use it.
-> Additionally, you need to explicitly disable scale-to-zero by either changing the label in the `Kraftfile` or use `--scale-to-zero off` in the deploy command.
 
 You can list information about the instance by running:
 
@@ -212,13 +207,9 @@ Customizing the deployment means providing a different environment.
 An obvious one is to use a different database password when starting PostgreSQL.
 For that you use a different `POSTGRES_PASSWORD` environment variable when starting the PostgreSQL instance.
 
-You could also a different location to mount your volume or set extra configuration options.
+You could also use a different location to mount your volume or set extra configuration options.
 
 You can use the PostgreSQL instance in conjunction with a frontend service, [see the guide here](https://unikraft.com/docs/platform/services).
-But in that case make sure to disable scale-to-zero if you plan to use the DB internally.
-
-> **Note:**
-> Support for scale-to-zero for internal instances is coming soon.
 
 ## Learn more
 

@@ -27,10 +27,10 @@ To run this MCP server on Unikraft Cloud:
 
 1. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/mcp-server-arxiv/` directory:
 
-```bash
-git clone https://github.com/unikraft-cloud/examples
-cd examples/mcp-server-arxiv/
-```
+   ```bash
+   git clone https://github.com/unikraft-cloud/examples
+   cd examples/mcp-server-arxiv/
+   ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):

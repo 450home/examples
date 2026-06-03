@@ -17,10 +17,10 @@ To run this example, follow these steps:
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/spin-wagi-http/` directory:
 
-```bash
-git clone https://github.com/unikraft-cloud/examples
-cd examples/spin-wagi-http/
-```
+   ```bash
+   git clone https://github.com/unikraft-cloud/examples
+   cd examples/spin-wagi-http/
+   ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
