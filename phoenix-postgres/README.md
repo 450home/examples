@@ -41,6 +41,8 @@ export UKC_TOKEN=token
 export UKC_METRO=fra
 ```
 
+## PostgreSQL
+
 Create a volume for PostgreSQL data persistence:
 
 **Using the unikraft CLI (Recommended)**
@@ -48,33 +50,38 @@ Create a volume for PostgreSQL data persistence:
 unikraft volume create --metro fra --name db-data --size 512M
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```bash title="kraft"
+kraft cloud volume create --name db-data --size 512Mi
+```
+
+You can list the created volume by running:
+
+**Using the unikraft CLI (Recommended)**
+```bash title="unikraft"
+unikraft volume list
+```
+
 ```ansi title="unikraft"
-metro:        fra
-name:         db-data
-uuid:         0efda5f6-21d2-48c7-84f5-8efe87e33090
-state:        available
-size:         512MiB
-filesystem:   ext4
-quota-policy: static
-persistent:   true
-timestamps:
-  created:    just now
+METRO  NAME     STATE      SIZE    CREATED
+fra    db-data  available  512MiB  just now
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud volume create --name db-data --size 512
+kraft cloud volume list
 ```
 
 ```ansi title="kraft"
-[+] Created volume 'db-data' (512 MiB)
+NAME     CREATED AT  SIZE     ATTACHED TO  MOUNTED BY  STATE      PERSISTENT
+db-data  now         512 MiB                           available  true
 ```
 
-## Build and deploy the PostgreSQL instance.
-
-Update `POSTGRES_PASSWORD` with a secure password:
+Update `POSTGRES_PASSWORD` with a secure password and build and deploy the PostgreSQL instance:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
@@ -149,7 +156,7 @@ or
  └─── private ip: 10.0.14.117
 ```
 
-## Build and deploy the Phoenix instance.
+## Phoenix
 
 Generate a secret key for Phoenix:
 
@@ -157,7 +164,8 @@ Generate a secret key for Phoenix:
 openssl rand -base64 48
 ```
 
-Replace `<your-secret-key-base>` in the commands below with the generated value, and update the password in `DATABASE_URL` to match the one set for PostgreSQL:
+Replace `<your-secret-key-base>` in the commands below with the generated value, and update the password in `DATABASE_URL` to match the one set for PostgreSQL.
+Then, deploy the Phoenix instance:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
@@ -236,9 +244,9 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME             STATE   IMAGE              MEMORY  VCPUS  FQDN                                      CREATED
-fra    phoenix-hd29m    running <my-org>/phoenix   2GiB    1      wild-moon-pkwsqc49.fra.unikraft.app       just now
-fra    postgres-ik5at   standby <my-org>/postgres  2GiB    1      postgres.internal                         3 minutes ago
+METRO  NAME            STATE    IMAGE              MEMORY  VCPUS  FQDN                                 CREATED
+fra    phoenix-hd29m   running  <my-org>/phoenix   2GiB    1      wild-moon-pkwsqc49.fra.unikraft.app  just now
+fra    postgres-ik5at  standby  <my-org>/postgres  2GiB    1      postgres.internal                    3 minutes ago
 ```
 
 or
@@ -249,9 +257,9 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME             FQDN                                        STATE    STATUS      IMAGE                                              MEMORY    VCPUS  ARGS  BOOT TIME
-phoenix-hd29m    wild-moon-pkwsqc49.fra.unikraft.app         running  since now   oci://unikraft.io/<my-org>/phoenix@sha256:...      2048 MiB  1            158.32 ms
-postgres-ik5at   postgres.internal                           standby  since 3min  oci://unikraft.io/<my-org>/postgres@sha256:...     2048 MiB  1            1811.99 ms
+NAME            FQDN                                 STATE    STATUS      IMAGE                                           MEMORY    VCPUS  ARGS  BOOT TIME
+phoenix-hd29m   wild-moon-pkwsqc49.fra.unikraft.app  running  since now   oci://unikraft.io/<my-org>/phoenix@sha256:...   2048 MiB  1            158.32 ms
+postgres-ik5at  postgres.internal                    standby  since 3min  oci://unikraft.io/<my-org>/postgres@sha256:...  2048 MiB  1            1811.99 ms
 ```
 
 When done, you can remove the instances:

@@ -47,21 +47,6 @@ unikraft volume create --metro fra --name wordpress-wordpress-data --size 512M
 unikraft volume create --metro fra --name wordpress-db-data --size 512M
 ```
 
-The output for each volume shows its details:
-
-```ansi title="unikraft"
-metro:        fra
-name:         wordpress-wordpress-data
-uuid:         0bec8b93-0691-43b6-b188-4ac170a3d0c7
-state:        available
-size:         512MiB
-filesystem:   ext4
-quota-policy: static
-persistent:   true
-timestamps:
-  created:    just now
-```
-
 or
 
 **Using the legacy kraft CLI**
@@ -70,37 +55,31 @@ kraft cloud volume create --name wordpress-wordpress-data --size 512Mi
 kraft cloud volume create --name wordpress-db-data --size 512Mi
 ```
 
-The output for each volume shows its details:
-
-```ansi title="kraft"
-NAME                      CREATED AT  SIZE     ATTACHED TO  MOUNTED BY  STATE      PERSISTENT
-wordpress-wordpress-data  now         512 MiB                           available  true
-```
-
 You can list the created volumes by running:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
-unikraft volume ls
+unikraft volume list
 ```
 
 ```ansi title="unikraft"
-METRO         NAME                      STATE      SIZE    CREATED
-fra0-fe-test  wordpress-db-data         available  512MiB  just now
-fra0-fe-test  wordpress-wordpress-data  available  512MiB  just now
+METRO  NAME                      STATE      SIZE    CREATED
+fra    wordpress-db-data         available  512MiB  just now
+fra    wordpress-wordpress-data  available  512MiB  just now
 ```
 
 or
 
+
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud volume ls
+kraft cloud volume list
 ```
 
 ```ansi title="kraft"
-NAME                      CREATED AT      SIZE     ATTACHED TO  MOUNTED BY  STATE      PERSISTENT
-wordpress-db-data         36 seconds ago  512 MiB                           available  true
-wordpress-wordpress-data  52 seconds ago  512 MiB                           available  true
+NAME                      CREATED AT  SIZE     ATTACHED TO  MOUNTED BY  STATE      PERSISTENT
+wordpress-wordpress-data  now         512 MiB                           available  true
+wordpress-db-data         now         512 MiB                           available  true
 ```
 
 ## Deploy MariaDB
@@ -114,10 +93,18 @@ unikraft build ./mariadb --output <my-org>/mariadb:latest
 unikraft run --name mariadb --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -m 1G --volume wordpress-db-data:/var/lib/mysql --image <my-org>/mariadb:latest --domain wordpress-mariadb.internal --env MARIADB_ROOT_PASSWORD=unikraft
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```bash title="kraft"
+kraft cloud deploy --name mariadb --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 1Gi --volume wordpress-db-data:/var/lib/mysql --domain wordpress-mariadb.internal --env MARIADB_ROOT_PASSWORD=unikraft ./mariadb/
+```
+
 Make sure to replace `<my-org>` with your username / org-name.
 
 The output shows the instance details:
 
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:                     fra
 name:                      mariadb
@@ -155,27 +142,19 @@ scale-to-zero:
 or
 
 **Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy --name mariadb --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 1Gi --volume wordpress-db-data:/var/lib/mysql --domain wordpress-mariadb.internal --env MARIADB_ROOT_PASSWORD=unikraft ./mariadb/
-```
-
-Make sure to replace `<my-org>` with your username / org-name.
-
-The output shows the instance details:
-
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
  ├───────── name: mariadb
- ├───────── uuid: cbf0dab4-238f-49cc-8bad-e6ebb7f5e9d2
+ ├───────── uuid: 3af0eefb-29a8-4634-9b94-abf62d2fb90a
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: wordpress-mariadb.internal
  ├──────── image: oci://unikraft.io/<my-org>/mariadb@sha256:cf1...
  ├─────── memory: 1024 MiB
- ├────── service: fragrant-bonobo-u5j0ddw1
+ ├────── service: snowy-glitter-3uylzbqk
  ├─ private fqdn: mariadb.internal
- └─── private ip: 10.0.0.17
+ └─── private ip: 10.0.0.73
 ```
 
 ## Deploy Wordpress
@@ -188,8 +167,16 @@ unikraft build ./wordpress --output <my-org>/wordpress:latest
 unikraft run --name wordpress --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 2G --volume wordpress-wordpress-data:/var/www/html --image <my-org>/wordpress:latest --env WORDPRESS_DB_HOST=wordpress-mariadb.internal
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```bash title="kraft"
+kraft cloud deploy --name wordpress --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 2Gi --volume wordpress-wordpress-data:/var/www/html --env WORDPRESS_DB_HOST=wordpress-mariadb.internal ./wordpress/
+```
+
 The output shows the instance address and other details:
 
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:                     fra
 name:                      wordpress
@@ -226,25 +213,19 @@ scale-to-zero:
 or
 
 **Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy --name wordpress --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 2Gi --volume wordpress-wordpress-data:/var/www/html --env WORDPRESS_DB_HOST=wordpress-mariadb.internal ./wordpress/
-```
-
-The output shows the instance address and other details:
-
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
  ├───────── name: wordpress
- ├───────── uuid: aa8b6bad-f30a-4231-b6ea-e8afd4df43b8
+ ├───────── uuid: ee9f5599-b33b-44f1-ab57-3871b440e810
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
- ├─────── domain: https://floral-sound-2i6zurr6.fra.unikraft.app
+ ├─────── domain: https://damp-lake-n09gzguc.fra.unikraft.app
  ├──────── image: oci://unikraft.io/<my-org>/wordpress@sha256:b43...
  ├─────── memory: 2048 MiB
- ├────── service: floral-sound-2i6zurr6
+ ├────── service: damp-lake-n09gzguc
  ├─ private fqdn: wordpress.internal
- └─── private ip: 10.0.0.29
+ └─── private ip: 10.0.0.33
 ```
 
 Use a browser to access the install page of Wordpress using the URL from the `fqdn` field in the output.
@@ -254,13 +235,13 @@ You can list information about the instances by running:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
-unikraft instance ls
+unikraft instance list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME       STATE    IMAGE               ARGS  MEMORY  VCPUS  FQDN                                  CREATED
-fra    mariadb    standby  <my-org>/mariadb          1GiB    1      wordpress-mariadb.internal            5 minutes ago
-fra    wordpress  running  <my-org>/wordpress        2GiB    1      damp-lake-n09gzguc.fra.unikraft.app   1 minute ago
+METRO  NAME       STATE    IMAGE               ARGS  MEMORY  VCPUS  FQDN                                 CREATED
+fra    mariadb    standby  <my-org>/mariadb          1GiB    1      wordpress-mariadb.internal           5 minutes ago
+fra    wordpress  running  <my-org>/wordpress        2GiB    1      damp-lake-n09gzguc.fra.unikraft.app  1 minute ago
 ```
 
 or
@@ -271,9 +252,9 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME       FQDN                                        STATE    STATUS       IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
-wordpress  floral-sound-2i6zurr6.fra.unikraft.app      running  since 1min   oci://unikraft.io/<my-org>/wordpress@sha256:b...  2.0 GiB  1            6873.49 ms
-mariadb    wordpress-mariadb.internal                  running  since 7mins  oci://unikraft.io/<my-org>/mariadb@sha256:cf1...  1.0 GiB  1            2505.65 ms
+NAME       FQDN                                 STATE    STATUS       IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
+wordpress  damp-lake-n09gzguc.fra.unikraft.app  running  since 1min   oci://unikraft.io/<my-org>/wordpress@sha256:b...  2.0 GiB  1            6873.49 ms
+mariadb    wordpress-mariadb.internal           running  since 7mins  oci://unikraft.io/<my-org>/mariadb@sha256:cf1...  1.0 GiB  1            2505.65 ms
 ```
 
 When done, you can remove the instances and volumes:
