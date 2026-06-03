@@ -19,10 +19,10 @@ This pattern is useful for build and test environments where runtime code change
 
 2. Clone the [`examples` repository](https://github.com/unikraft-cloud/examples) and `cd` into the `examples/build-environments` directory:
 
-```bash
-git clone https://github.com/unikraft-cloud/examples
-cd examples/build-environments/
-```
+   ```bash
+   git clone https://github.com/unikraft-cloud/examples
+   cd examples/build-environments/
+   ```
 
 Make sure to log into Unikraft Cloud and pick a [metro](https://unikraft.com/docs/platform/metros) close to you.
 This guide uses `fra` (Frankfurt, 🇩🇪):
