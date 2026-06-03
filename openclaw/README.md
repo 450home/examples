@@ -26,7 +26,7 @@ When done, you may create the OpenClaw Unikraft Cloud image and deploy an instan
 
 ```bash
 unikraft build . --output <my-org>/openclaw:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=10000 --metro fra -p 18789:18789/tls -p 2222:2222/tls -m 4G -e PUBKEY="...." --image <my-org>/openclaw:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=10000,stateful=true --metro fra -p 18789:18789/tls -p 2222:2222/tls -m 4G -e PUBKEY="...." --image <my-org>/openclaw:latest
 ```
 
 Make sure to replace `<my-org>` with your username / org-name and to set your SSH public key as the `PUBKEY` environment variable above.
@@ -38,7 +38,7 @@ metro:        fra
 name:         openclaw-8tosm
 uuid:         e2a6183a-721b-4145-bfaf-37a5f859bbc1
 state:        running
-image:        demo/openclaw
+image:        <my-org>/openclaw
 runtime:
   env:
     PUBKEY:   *
@@ -49,7 +49,7 @@ service:
   uuid:       7ab20338-b04d-4869-947b-9433e21677b1
   name:       divine-flower-bxsaapup
   domains:
-  - fqdn:     divine-flower-bxsaapup.fra0-demo.unikraft.app
+  - fqdn:     divine-flower-bxsaapup.fra.unikraft.app
 networks:
 - uuid:       2b0b120b-6ce5-4b19-ac4c-04ee8f11526e
   private-ip: 10.0.12.97
@@ -58,7 +58,7 @@ timestamps:
   created:    just now
 ```
 
-In this case, the instance name is `openclaw-8tosm` and the address is `divine-flower-bxsaapup.fra0-demo.unikraft.app`.
+In this case, the instance name is `openclaw-8tosm` and the address is `divine-flower-bxsaapup.fra.unikraft.app`.
 These will be different for each run.
 
 You can now SSH into this instance and run the OpenClaw onboarding process.
@@ -67,7 +67,7 @@ In order to SSH, you need to set up a tunnel that handles the TLS connection to 
 This way, you have a non-TLS port that your SSH client can connect to:
 
 ```bash
-socat TCP-LISTEN:2222,reuseaddr,fork OPENSSL:divine-flower-bxsaapup.fra0-demo.unikraft.app:2222,verify=0
+socat TCP-LISTEN:2222,reuseaddr,fork OPENSSL:divine-flower-bxsaapup.fra.unikraft.app:2222,verify=0
 ```
 
 Then connect to the instance via SSH using:
@@ -83,8 +83,8 @@ unikraft instances list
 ```
 
 ```ansi
-METRO NAME           STATE   IMAGE                              ARGS MEMORY VCPUS FQDN                               CREATED
-demo  openclaw-8tosm running demo/sriprad-openclaw-example-tes…      4GiB   1     divine-flower-bxsaapup.fra0-demo.… 2 minutes ago
+METRO  NAME            STATE    IMAGE                     ARGS  MEMORY  VCPUS  FQDN                                     CREATED
+fra    openclaw-8tosm  running  <my-org>/openclaw:latest        4GiB    1      divine-flower-bxsaapup.fra.unikraft.app  2 minutes ago
 ```
 
 When done, you can remove the instance using:
@@ -126,7 +126,7 @@ Set `gateway.controlUi.allowedOrigins` in `~/.openclaw/openclaw.json`:
     ...
     "controlUi": {
       "allowedOrigins": [
-        "https://proud-smoke-cjf0wro8.fra0-demo.unikraft.app:18789"
+        "https://proud-smoke-cjf0wro8.fra.unikraft.app:18789"
       ]
     },
     ...
