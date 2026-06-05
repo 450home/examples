@@ -58,25 +58,29 @@ The output shows the instance address and other details:
 
 **Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
-metro:        fra
-name:         nginx-67zbu
-uuid:         8a8bc1b9-0af6-420e-a426-190dc2da9eaa
-state:        starting
-image:        <my-org>/nginx
+metro:           fra
+name:            nginx-67zbu
+uuid:            8a8bc1b9-0af6-420e-a426-190dc2da9eaa
+state:           starting
+image:           <my-org>/nginx
 resources:
-  memory:     256MiB
-  vcpus:      1
+  memory:        256MiB
+  vcpus:         1
 service:
-  uuid:       a942b9b5-ad17-3ffe-dcd2-ef4331f9087a
-  name:       nameless-fog-0tvh1uov
+  uuid:          a942b9b5-ad17-3ffe-dcd2-ef4331f9087a
+  name:          nameless-fog-0tvh1uov
   domains:
-  - fqdn:     nameless-fog-0tvh1uov.fra.unikraft.app
+  - fqdn:        nameless-fog-0tvh1uov.fra.unikraft.app
 networks:
-- uuid:       62d9bbf0-aec8-61f6-7bdb-86edf63dd068
-  private-ip: 10.0.3.3
-  mac:        12:b0:c6:23:ed:15
+- uuid:          62d9bbf0-aec8-61f6-7bdb-86edf63dd068
+  private-ip:    10.0.3.3
+  mac:           12:b0:c6:23:ed:15
 timestamps:
-  created:    just now
+  created:       just now
+scale-to-zero:
+  enabled:       true
+  policy:        on
+  cooldown-time: 1s
 ```
 
 or
