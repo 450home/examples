@@ -115,14 +115,14 @@ Build and deploy the Tyk instance:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./tyk --output <my-org>/tyk:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/tyk:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/tyk:latest -e TYK_GW_STORAGE_PASSWORD=unikraft
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi ./tyk/
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi --env TYK_GW_STORAGE_PASSWORD=unikraft ./tyk/
 ```
 
 Make sure to replace `<my-org>` with your username / org-name in the unikraft CLI commands above.
