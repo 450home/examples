@@ -37,7 +37,7 @@ export UKC_TOKEN=token
 export UKC_METRO=fra
 ```
 
-## Deploy Redis
+## Redis
 
 First, deploy the Redis instance.
 Redis is an internal service (not publicly accessible), reached via the `go122-redis.internal` domain.
@@ -106,7 +106,7 @@ or
  └─── private ip: 10.0.0.85
 ```
 
-## Deploy Go HTTP Server
+## Go HTTP Server
 
 Next, deploy the Go HTTP server.
 It connects to Redis using the `REDIS_ADDR` and `REDIS_PASS` environment variables:
@@ -206,9 +206,9 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME                               STATE    IMAGE                                 ARGS  MEMORY  VCPUS  FQDN                                         CREATED
-fra    httpserver-go-122-redis-app-bnnnc  standby  <my-org>/httpserver-go-122-redis-app        256MiB  1      frosty-cherry-32qs6na2.fra.unikraft.app      4 minutes ago
-fra    httpserver-go-122-redis-db-2xc9u   standby  <my-org>/httpserver-go-122-redis-db         256MiB  1      go122-redis.internal                         5 minutes ago
+METRO  NAME                               STATE    IMAGE                                 ARGS  MEMORY  VCPUS  FQDN                                     CREATED
+fra    httpserver-go-122-redis-app-bnnnc  standby  <my-org>/httpserver-go-122-redis-app        256MiB  1      frosty-cherry-32qs6na2.fra.unikraft.app  4 minutes ago
+fra    httpserver-go-122-redis-db-2xc9u   standby  <my-org>/httpserver-go-122-redis-db         256MiB  1      go122-redis.internal                     5 minutes ago
 ```
 
 or
@@ -219,9 +219,9 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME                                FQDN                                         STATE    STATUS        IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
-httpserver-go-122-redis-app-bnnnc   frosty-cherry-32qs6na2.fra.unikraft.app      running  since 3secs   oci://unikraft.io/<my-org>/httpserver-go-122-redis-a...  256 MiB  1            968.01 ms
-httpserver-go-122-redis-db-2xc9u    go122-redis.internal                         running  since 35secs  oci://unikraft.io/<my-org>/httpserver-go-122-redis-...   256 MiB  1            1707.20 ms
+NAME                               FQDN                                     STATE    STATUS        IMAGE                                                    MEMORY   VCPUS  ARGS  BOOT TIME
+httpserver-go-122-redis-app-bnnnc  frosty-cherry-32qs6na2.fra.unikraft.app  running  since 3secs   oci://unikraft.io/<my-org>/httpserver-go-122-redis-a...  256 MiB  1            968.01 ms
+httpserver-go-122-redis-db-2xc9u   go122-redis.internal                     running  since 35secs  oci://unikraft.io/<my-org>/httpserver-go-122-redis-...   256 MiB  1            1707.20 ms
 ```
 
 ## Clean up
@@ -237,8 +237,7 @@ or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud instance remove httpserver-go-122-redis-db-2xc9u
-kraft cloud instance remove httpserver-go-122-redis-app-bnnnc
+kraft cloud instance remove httpserver-go-122-redis-db-2xc9u httpserver-go-122-redis-app-bnnnc
 ```
 
 ## Learn more

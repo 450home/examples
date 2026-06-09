@@ -1,7 +1,7 @@
 # Flask with MongoDB
 
 [Flask](https://flask.palletsprojects.com/en/stable/) is a lightweight WSGI web application framework in Python, and [MongoDB](https://www.mongodb.com/) is a NoSQL database that stores data in JSON-like documents.
-This example deploys three services on Unikraft Cloud: Nginx (reverse proxy), Flask (backend), and MongoDB (database).
+This example deploys three services on Unikraft Cloud: NGINX (reverse proxy), Flask (backend), and MongoDB (database).
 
 **Credits**: This example is based on this [Awesome Compose example](https://github.com/docker/awesome-compose/tree/master/nginx-flask-mongo).
 
@@ -43,13 +43,13 @@ export UKC_TOKEN=token
 export UKC_METRO=fra
 ```
 
-## Create the volume
+## MongoDB
 
 Create a volume for MongoDB data persistence:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
-unikraft volume create --metro=fra --name=mongo-data --size=1G
+unikraft volume create --metro fra --name mongo-data --size 1G
 ```
 
 or
@@ -59,31 +59,29 @@ or
 kraft cloud volume create --name mongo-data --size 1Gi
 ```
 
-The output shows the volume details:
+You can list the created volume by running:
 
 **Using the unikraft CLI (Recommended)**
-```text title="unikraft"
-metro:        fra
-name:         mongo-data
-uuid:         9c7723f3-7e1f-4e06-afe6-c811240faf5a
-state:        available
-size:         1GiB
-filesystem:   ext4
-quota-policy: static
-persistent:   true
-timestamps:
-  created:    just now
+```bash title="unikraft"
+unikraft volume list
+```
+
+```ansi title="unikraft"
+METRO  NAME        STATE      SIZE  CREATED
+fra    mongo-data  available  1GiB  just now
 ```
 
 or
 
 **Using the legacy kraft CLI**
+```bash title="kraft"
+kraft cloud volume list
+```
+
 ```ansi title="kraft"
 NAME        CREATED AT  SIZE     ATTACHED TO  MOUNTED BY  STATE      PERSISTENT
 mongo-data  now         1.0 GiB                           available  true
 ```
-
-## Deploy MongoDB
 
 First, deploy the MongoDB instance.
 MongoDB is an internal service (not publicly accessible), reached via the `mongo.internal` domain:
@@ -141,19 +139,19 @@ or
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: mongo-hwoaz
- ├───────── uuid: 56d43696-af3e-4ccb-aa81-9ae872b7bf43
+ ├───────── name: mongo-o3qhq
+ ├───────── uuid: 90158c53-6654-4e73-bad1-1d6ab4452001
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: mongo.internal
  ├──────── image: oci://unikraft.io/<my-org>/mongo@sha256:68894454735e0e5b07d61aad19b1c03355f415ec33c050daeaa419d931962657
  ├─────── memory: 1024 MiB
- ├────── service: shy-field-y89vrq32
- ├─ private fqdn: mongo-hwoaz.internal
- └─── private ip: 10.0.0.29
+ ├────── service: restless-glade-l8pu2mf0
+ ├─ private fqdn: mongo-o3qhq.internal
+ └─── private ip: 10.0.15.21
 ```
 
-## Deploy Flask
+## Flask
 
 Next, deploy the Flask backend.
 It connects to MongoDB using the `MONGO_SERVER_URL` environment variable and is reached internally via `backend.internal`:
@@ -210,21 +208,21 @@ or
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: flask-1xnsj
- ├───────── uuid: edc8e61d-ef6c-4c05-9de3-6983539a47d2
+ ├───────── name: flask-9a68z
+ ├───────── uuid: bb6d91f7-0714-45e5-b14a-ec82a5dac36e
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
  ├─────── domain: backend.internal
  ├──────── image: oci://unikraft.io/<my-org>/flask@sha256:f23b3368cd777acae68ad8f35713a4cf55f901d6c266017bf6f0679ffc7a8172
  ├─────── memory: 1024 MiB
- ├────── service: falling-mountain-pcx804jx
- ├─ private fqdn: flask-1xnsj.internal
- └─── private ip: 10.0.0.17
+ ├────── service: broken-bird-8isa6q21
+ ├─ private fqdn: flask-9a68z.internal
+ └─── private ip: 10.0.17.97
 ```
 
-## Deploy Nginx
+## NGINX
 
-Finally, deploy Nginx as the public-facing reverse proxy.
+Finally, deploy NGINX as the public-facing reverse proxy.
 It forwards requests to the Flask backend at `backend.internal:9091`:
 
 **Using the unikraft CLI (Recommended)**
@@ -240,7 +238,7 @@ or
 kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 512Mi ./nginx
 ```
 
-The output shows the Nginx instance details including its public FQDN:
+The output shows the NGINX instance details including its public FQDN:
 
 **Using the unikraft CLI (Recommended)**
 ```text title="unikraft"
@@ -275,16 +273,16 @@ or
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
- ├───────── name: nginx-psndr
- ├───────── uuid: 5ca29c9b-24de-4fa7-800e-a13175a909b1
+ ├───────── name: nginx-jnpwi
+ ├───────── uuid: 57f64e99-bd06-46fd-98f4-26b64751623e
  ├──────── metro: https://api.fra.unikraft.cloud/v1
  ├──────── state: starting
- ├─────── domain: https://nameless-shadow-f7ywg1l4.fra.unikraft.app
+ ├─────── domain: https://snowy-river-gotjeojl.fra.unikraft.app
  ├──────── image: oci://unikraft.io/<my-org>/nginx@sha256:8cff54392eeead80bafe33538866b04bfd076f2052d65cb3751a938a22368bc0
  ├─────── memory: 512 MiB
- ├────── service: nameless-shadow-f7ywg1l4
- ├─ private fqdn: nginx-psndr.internal
- └─── private ip: 10.0.0.1
+ ├────── service: snowy-river-gotjeojl
+ ├─ private fqdn: nginx-jnpwi.internal
+ └─── private ip: 10.0.14.201
 ```
 
 You can list all deployed instances with:
@@ -295,10 +293,10 @@ unikraft instances list
 ```
 
 ```text title="unikraft"
-METRO  NAME           STATE    IMAGE            MEMORY  VCPUS  FQDN                                       CREATED
-fra    nginx-jnpwi    standby  <my-org>/nginx   512MiB  1      snowy-river-gotjeojl.fra.unikraft.app      11 minutes ago
-fra    flask-9a68z    standby  <my-org>/flask   1GiB    1      backend.internal                           12 minutes ago
-fra    mongo-o3qhq    standby  <my-org>/mongo   1GiB    1      mongo.internal                             14 minutes ago
+METRO  NAME         STATE    IMAGE           MEMORY  VCPUS  FQDN                                   CREATED
+fra    nginx-jnpwi  standby  <my-org>/nginx  512MiB  1      snowy-river-gotjeojl.fra.unikraft.app  11 minutes ago
+fra    flask-9a68z  standby  <my-org>/flask  1GiB    1      backend.internal                       12 minutes ago
+fra    mongo-o3qhq  standby  <my-org>/mongo  1GiB    1      mongo.internal                         14 minutes ago
 ```
 
 or
@@ -309,15 +307,15 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME         FQDN                                          STATE    STATUS       IMAGE                                        MEMORY   VCPUS  ARGS  BOOT TIME
-nginx-psndr  nameless-shadow-f7ywg1l4.fra.unikraft.app     standby  standby      oci://unikraft.io/<my-org>/nginx@sha256:...   512 MiB  1            83.87 ms
-flask-1xnsj  backend.internal                              running  since 2mins  oci://unikraft.io/<my-org>/flask@sha256:...   1.0 GiB  1            1916.54 ms
-mongo-hwoaz  mongo.internal                                running  since 5mins  oci://unikraft.io/<my-org>/mongo@sha256:...   1.0 GiB  1            2776.86 ms
+NAME         FQDN                                   STATE    STATUS       IMAGE                                         MEMORY   VCPUS  ARGS  BOOT TIME
+nginx-jnpwi  snowy-river-gotjeojl.fra.unikraft.app  standby  standby      oci://unikraft.io/<my-org>/nginx@sha256:...   512 MiB  1            83.87 ms
+flask-9a68z  backend.internal                       running  since 2mins  oci://unikraft.io/<my-org>/flask@sha256:...   1.0 GiB  1            1916.54 ms
+mongo-o3qhq  mongo.internal                         running  since 5mins  oci://unikraft.io/<my-org>/mongo@sha256:...   1.0 GiB  1            2776.86 ms
 ```
 
 ## Test the deployment
 
-The FQDN of the Nginx instance can be found in the `FQDN` column of the `unikraft instances list` output above.
+The FQDN of the NGINX instance can be found in the `FQDN` column of the `unikraft instances list` output above.
 Use `curl` to query it (replace with your actual FQDN):
 
 ```bash
@@ -342,7 +340,7 @@ or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud instance remove mongo-hwoaz flask-1xnsj nginx-psndr
+kraft cloud instance remove mongo-o3qhq flask-9a68z nginx-jnpwi
 kraft cloud volume remove mongo-data
 ```
 

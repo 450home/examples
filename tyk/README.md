@@ -39,10 +39,11 @@ export UKC_TOKEN=token
 export UKC_METRO=fra
 ```
 
-## Build and deploy the Redis instance (used internally by Tyk):
+## Redis
 
 The `REDIS_PASSWORD` environment variable sets the Redis `requirepass` directive.
 If not provided, it defaults to `unikraft`.
+Build and deploy the Redis instance (used internally by Tyk):
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
@@ -50,10 +51,18 @@ unikraft build ./redis --output <my-org>/redis:latest
 unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -m 256M --image <my-org>/redis:latest --domain tyk-redis.internal -e REDIS_PASSWORD=unikraft
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```bash title="kraft"
+kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 256Mi --domain tyk-redis.internal --env REDIS_PASSWORD=unikraft ./redis/
+```
+
 Make sure to replace `<my-org>` with your username / org-name in the unikraft CLI commands above.
 
 The output shows the Redis instance details:
 
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:           fra
 name:            redis-6vgvc
@@ -84,12 +93,6 @@ scale-to-zero:
 or
 
 **Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 256Mi --domain tyk-redis.internal --env REDIS_PASSWORD=unikraft ./redis/
-```
-
-The output shows the Redis instance details:
-
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
@@ -105,7 +108,9 @@ The output shows the Redis instance details:
  └─── private ip: 10.0.0.29
 ```
 
-## Build and deploy the Tyk instance:
+## Tyk
+
+Build and deploy the Tyk instance:
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
@@ -113,10 +118,18 @@ unikraft build ./tyk --output <my-org>/tyk:latest
 unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/tyk:latest
 ```
 
+or
+
+**Using the legacy kraft CLI**
+```bash title="kraft"
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi ./tyk/
+```
+
 Make sure to replace `<my-org>` with your username / org-name in the unikraft CLI commands above.
 
 The output shows the Tyk instance details:
 
+**Using the unikraft CLI (Recommended)**
 ```ansi title="unikraft"
 metro:        fra
 name:         tyk-s9ixd
@@ -142,12 +155,6 @@ timestamps:
 or
 
 **Using the legacy kraft CLI**
-```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi ./tyk/
-```
-
-The output shows the Tyk instance details:
-
 ```ansi title="kraft"
 [●] Deployed successfully!
  │
@@ -184,9 +191,9 @@ unikraft instances list
 ```
 
 ```ansi title="unikraft"
-METRO  NAME         STATE   IMAGE           MEMORY  VCPUS  FQDN                                  CREATED
-fra    tyk-s9ixd    standby <my-org>/tyk    256MiB  1      icy-haze-8ph4u8cz.fra.unikraft.app    just now
-fra    redis-6vgvc  running <my-org>/redis  256MiB  1      tyk-redis.internal                    1 minute ago
+METRO  NAME         STATE   IMAGE           MEMORY  VCPUS  FQDN                                CREATED
+fra    tyk-s9ixd    standby <my-org>/tyk    256MiB  1      icy-haze-8ph4u8cz.fra.unikraft.app  just now
+fra    redis-6vgvc  running <my-org>/redis  256MiB  1      tyk-redis.internal                  1 minute ago
 ```
 
 or
@@ -197,9 +204,9 @@ kraft cloud instance list
 ```
 
 ```ansi title="kraft"
-NAME         FQDN                                        STATE    STATUS      IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
-tyk-s9ixd    icy-haze-8ph4u8cz.fra.unikraft.app          standby  standby     oci://unikraft.io/<my-org>/tyk@sha256:4954033...  256 MiB  1            158.32 ms
-redis-6vgvc  tyk-redis.internal                          running  since 1min  oci://unikraft.io/<my-org>/redis@sha256:933b8...  256 MiB  1            1811.99 ms
+NAME         FQDN                                STATE    STATUS      IMAGE                                             MEMORY   VCPUS  ARGS  BOOT TIME
+tyk-s9ixd    icy-haze-8ph4u8cz.fra.unikraft.app  standby  standby     oci://unikraft.io/<my-org>/tyk@sha256:4954033...  256 MiB  1            158.32 ms
+redis-6vgvc  tyk-redis.internal                  running  since 1min  oci://unikraft.io/<my-org>/redis@sha256:933b8...  256 MiB  1            1811.99 ms
 ```
 
 When done, you can remove the instances:
