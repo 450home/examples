@@ -49,7 +49,7 @@ service:
   name:          fragrant-fog-pj1gi4jl
   uuid:          a3d29dfa-650b-4e8c-a8e6-055f59dd4c92
   domains:
-  - fqdn:        fragrant-fog-pj1gi4jl.fra0-fe-test.unikraft.app
+  - fqdn:        fragrant-fog-pj1gi4jl.fra.unikraft.app
 networks:
 - uuid:          1a65f2c3-cbfd-48bf-b8db-5cb90ed62a7c
   private-ip:    10.0.1.73
@@ -73,7 +73,7 @@ curl https://fragrant-fog-pj1gi4jl.fra.unikraft.app
 ```
 
 ```text
-{"bolt_routing":"neo4j://fragrant-fog-pj1gi4jl.fra.unikraft.app:7678","query":"https://fragrant-fog-pj1gi4jl.fra.unikraft.app:7678/db/{databaseName}/query/v2","transaction":"https://fragrant-fog-pj1gi4jl.fra.unikraft.app/db/{databaseName}/tx","bolt_direct":"bolt://fragrant-fog-pj1gi4jl.fra.unikraft.app:7687","neo4j_version":"2026.04.0","neo4j_edition":"community"}
+{"bolt_routing":"neo4j://fragrant-fog-pj1gi4jl.fra.unikraft.app:7687","query":"https://fragrant-fog-pj1gi4jl.fra.unikraft.app:7687/db/{databaseName}/query/v2","transaction":"https://fragrant-fog-pj1gi4jl.fra.unikraft.app/db/{databaseName}/tx","bolt_direct":"bolt://fragrant-fog-pj1gi4jl.fra.unikraft.app:7687","neo4j_version":"2026.04.0","neo4j_edition":"community"}
 ```
 
 Or even better, point a browser at it 😀. Make sure you have the protocol set
@@ -92,7 +92,7 @@ unikraft instances list
 
 ```ansi title="unikraft"
 METRO         NAME         STATE    IMAGE           ARGS  MEMORY  VCPUS  FQDN                                              CREATED
-fra           neo4j-t117i  standby  <my-org>/neo4j        2GiB    1      fragrant-fog-pj1gi4jl.fra0-fe-test.unikraft.app   just now
+fra           neo4j-t117i  standby  <my-org>/neo4j        2GiB    1      fragrant-fog-pj1gi4jl.fra.unikraft.app   just now
 ```
 
 When done, you can remove the instance:
