@@ -12,10 +12,10 @@ server is reachable by issuing an MCP ``initialize`` request.
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
-def test_mcp_server_arxiv_responds(build_image, run_instance, http_post):
+def test_mcp_server_arxiv_responds(build_image, run_instance, http_post, wait_instance):
     image = build_image("mcp-server-arxiv", "mcp-server-arxiv")
 
     instance = run_instance(
@@ -26,6 +26,8 @@ def test_mcp_server_arxiv_responds(build_image, run_instance, http_post):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     # Send an MCP initialize request to the server's HTTP transport endpoint.
     resp = http_post(

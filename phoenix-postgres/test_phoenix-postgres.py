@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 import uuid
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ PG_USER = "postgres"
 PG_DB = "myapp_prod"
 
 
-def test_phoenix_postgres(build_image, run_instance, http, unikraft, request, test_run_id):
+def test_phoenix_postgres(build_image, run_instance, http, unikraft, request, test_run_id, wait_instance):
     volume_name = f"phoenix-pytest-db-data-{test_run_id}"
 
     def _cleanup_volume():
@@ -80,6 +80,8 @@ def test_phoenix_postgres(build_image, run_instance, http, unikraft, request, te
 
     url = extract_instance_url(phoenix_instance)
     assert url, f"could not determine instance URL from: {phoenix_instance!r}"
+
+    wait_instance(extract_instance_name(phoenix_instance), "running")
 
     # 4. Verify Phoenix is serving.
     resp = http(url)

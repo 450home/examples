@@ -10,10 +10,10 @@ Mirrors the manual steps from ``spin-wagi-http/README.md``:
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
-def test_spin_wagi_serves_hello_and_goodbye(build_image, run_instance, http):
+def test_spin_wagi_serves_hello_and_goodbye(build_image, run_instance, http, wait_instance):
     image = build_image("spin-wagi-http", "spin-wagi-http")
 
     instance = run_instance(
@@ -24,6 +24,8 @@ def test_spin_wagi_serves_hello_and_goodbye(build_image, run_instance, http):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     resp_hello = http(f"{url}/hello")
     assert resp_hello.status_code == 200

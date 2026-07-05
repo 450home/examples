@@ -12,12 +12,11 @@ Mirrors the manual steps from ``debian-ssh/README.md``:
 from __future__ import annotations
 
 import subprocess
-import time
 from pathlib import Path
 
 import pytest
 
-from _testlib.unikraft import extract_instance_fqdn
+from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 SSH_PORT = 2222
 
@@ -36,7 +35,7 @@ def _generate_test_keypair(tmp_path: Path) -> tuple[Path, str]:
     return key_path, pub_key
 
 
-def test_debian_ssh(build_image, run_instance, socat_tunnel, tmp_path):
+def test_debian_ssh(build_image, run_instance, socat_tunnel, wait_instance, tmp_path):
     """Build, deploy, and SSH into a Debian instance."""
     private_key, public_key = _generate_test_keypair(tmp_path)
 
@@ -58,37 +57,24 @@ def test_debian_ssh(build_image, run_instance, socat_tunnel, tmp_path):
     # Set up a socat TLS tunnel to the SSH port.
     tunnel = socat_tunnel(host, SSH_PORT, SSH_PORT)
 
-    # Retry SSH connection with back-off while the instance boots.
-    last_err = None
-    for _ in range(10):
-        try:
-            result = subprocess.run(
-                [
-                    "ssh",
-                    "-o", "StrictHostKeyChecking=no",
-                    "-o", "UserKnownHostsFile=/dev/null",
-                    "-o", "ConnectTimeout=10",
-                    "-i", str(private_key),
-                    "-p", str(tunnel.local_port),
-                    "-l", "root",
-                    "127.0.0.1",
-                    "echo hello-from-pytest",
-                ],
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-            if result.returncode == 0:
-                assert "hello-from-pytest" in result.stdout
-                return
-            last_err = RuntimeError(
-                f"ssh exited {result.returncode}: {result.stderr}"
-            )
-        except (subprocess.TimeoutExpired, OSError) as exc:
-            last_err = exc
-
-        time.sleep(5)
-
-    raise AssertionError(
-        f"could not connect via SSH after retries: {last_err}"
-    ) from last_err
+    wait_instance(extract_instance_name(instance), "running")
+    result = subprocess.run(
+        [
+            "ssh",
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-o", "ConnectTimeout=10",
+            "-i", str(private_key),
+            "-p", str(tunnel.local_port),
+            "-l", "root",
+            "127.0.0.1",
+            "echo hello-from-pytest",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, (
+        f"ssh failed (exit={result.returncode})\nstdout: {result.stdout}\nstderr: {result.stderr}"
+    )
+    assert "hello-from-pytest" in result.stdout

@@ -150,6 +150,29 @@ class UnikraftCLI:
 
         return _parse_json(proc.stdout)
 
+    def wait_instance(
+        self, target: str, state: str, *, timeout: float | None = 150
+    ) -> dict[str, Any]:
+        """Wait until ``target`` reaches the given ``state``.
+
+        Wraps ``unikraft instances wait <target> --until state==<state>``.
+        Returns the parsed JSON description of the instance once it reaches
+        the desired state.
+        """
+        proc = self.run(
+            [
+                "instances",
+                "wait",
+                target,
+                "--until",
+                f"state=={state}",
+                "--output",
+                "json",
+            ],
+            timeout=timeout,
+        )
+        return _parse_json(proc.stdout)
+
     def delete_instance(self, target: str) -> None:
         try:
             proc =self.run(["instances", "delete", target], check=False)

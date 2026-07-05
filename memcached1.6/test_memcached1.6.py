@@ -19,12 +19,11 @@ We replicate the same set/get/incr flow using ``pymemcache``.
 from __future__ import annotations
 
 import ssl
-import time
 
 from pymemcache.client.base import Client as MemcacheClient
 from pymemcache.exceptions import MemcacheUnexpectedCloseError
 
-from _testlib.unikraft import extract_instance_fqdn
+from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 MEMCACHED_PORT = 11211
 
@@ -41,7 +40,7 @@ def _connect(host: str) -> MemcacheClient:
     )
 
 
-def test_memcached(build_image, run_instance):
+def test_memcached(build_image, run_instance, wait_instance):
     """Build, deploy, and exercise a Memcached instance."""
     image = build_image("memcached1.6", "memcached16")
 
@@ -54,30 +53,8 @@ def test_memcached(build_image, run_instance):
     host = extract_instance_fqdn(instance)
     assert host, f"could not determine instance FQDN from: {instance!r}"
 
-    # Retry the connection with back-off while the instance starts up.
-    # pymemcache's base Client has no built-in retry, so we loop manually.
-    # The constructor is lazy — connections are made on first command.
-    client = None
-    last_err = None
-    for _ in range(10):
-        try:
-            client = _connect(host)
-            client.version()  # probe connectivity
-            break
-        except (
-            ConnectionRefusedError,
-            ConnectionResetError,
-            TimeoutError,
-            ssl.SSLError,
-            MemcacheUnexpectedCloseError,
-        ) as exc:
-            last_err = exc
-            client = None
-            time.sleep(3)
-    if client is None:
-        raise AssertionError(
-            f"could not connect to Memcached after retries: {last_err}"
-        ) from last_err
+    wait_instance(extract_instance_name(instance), "running")
+    client = _connect(host)
     try:
         # ------------------------------------------------------------------
         # 1. set / get — basic key-value round-trip.

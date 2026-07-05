@@ -136,7 +136,6 @@ def _minecraft_template(request, unikraft, repo_root, ukc_image_prefix, test_run
 
     # 1. Build the base image.
     unikraft.build(context, base_tag)
-    time.sleep(3)
 
     # 2. Run the base image with the base ROM; it auto-converts into a template.
     unikraft.run_instance(
@@ -165,7 +164,7 @@ def _minecraft_template(request, unikraft, repo_root, ukc_image_prefix, test_run
 
 
 def test_minecraft_server_responds(
-    _minecraft_template, request, unikraft, test_run_id, socat_tunnel
+    _minecraft_template, request, unikraft, test_run_id, socat_tunnel, wait_instance
 ):
     """Run a Minecraft instance from template and verify SLP response."""
     template_name = _minecraft_template
@@ -188,21 +187,8 @@ def test_minecraft_server_responds(
     # Set up a socat TLS tunnel to the Minecraft port.
     tunnel = socat_tunnel(host, MINECRAFT_PORT, MINECRAFT_PORT)
 
-    # Retry the SLP query with back-off while the server finishes starting.
-    status = None
-    last_err = None
-    for _ in range(20):
-        try:
-            status = _minecraft_slp("127.0.0.1", tunnel.local_port)
-            break
-        except (ConnectionError, OSError, AssertionError, ValueError) as exc:
-            last_err = exc
-            time.sleep(10)
-
-    if status is None:
-        raise AssertionError(
-            f"could not get Minecraft SLP status after retries: {last_err}"
-        ) from last_err
+    wait_instance(instance_name, "standby")
+    status = _minecraft_slp("127.0.0.1", tunnel.local_port)
 
     # Verify the response contains expected fields.
     assert "version" in status, f"missing 'version' in SLP response: {status}"

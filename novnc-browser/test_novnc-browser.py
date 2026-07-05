@@ -11,11 +11,11 @@ from __future__ import annotations
 
 import pytest
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
 @pytest.mark.timeout(900)
-def test_novnc_serves_page(build_image, run_instance, http):
+def test_novnc_serves_page(build_image, run_instance, http, wait_instance):
     image = build_image("novnc-browser", "novnc-browser")
 
     instance = run_instance(
@@ -26,6 +26,8 @@ def test_novnc_serves_page(build_image, run_instance, http):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     # noVNC has a heavy startup (Xvfb, mutter, tint2, x11vnc, then noVNC
     # proxy) so allow plenty of time for the HTTP endpoint to become ready.

@@ -9,10 +9,10 @@ Mirrors the manual steps from ``httpserver-node-vite-vanilla/README.md``:
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
-def test_node_vite_vanilla_serves_page(build_image, run_instance, http):
+def test_node_vite_vanilla_serves_page(build_image, run_instance, http, wait_instance):
     image = build_image("httpserver-node-vite-vanilla", "httpserver-node-vite-vanilla")
 
     instance = run_instance(
@@ -26,6 +26,8 @@ def test_node_vite_vanilla_serves_page(build_image, run_instance, http):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     resp = http(url)
     assert resp.status_code == 200

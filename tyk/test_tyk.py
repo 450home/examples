@@ -11,13 +11,13 @@ Mirrors the manual steps from ``tyk/README.md``:
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
 REDIS_PASSWORD = "unikraft"
 
 
-def test_tyk_hello(build_image, run_instance, http):
+def test_tyk_hello(build_image, run_instance, http, wait_instance):
     # 1. Build and deploy internal Redis instance.
     # NOTE: domain must be "tyk-redis.internal" — hardcoded in tyk/rootfs/etc/tyk.conf.
     redis_image = build_image("tyk/redis", "tyk-redis")
@@ -46,6 +46,8 @@ def test_tyk_hello(build_image, run_instance, http):
 
     url = extract_instance_url(tyk_instance)
     assert url, f"could not determine instance URL from: {tyk_instance!r}"
+
+    wait_instance(extract_instance_name(tyk_instance), "running")
 
     # 3. Query the /hello endpoint — Tyk returns a health-check JSON
     # with status "pass".

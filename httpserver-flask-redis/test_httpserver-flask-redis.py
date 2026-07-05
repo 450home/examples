@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import re
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
 def _extract_count(text: str) -> int:
@@ -24,7 +24,7 @@ def _extract_count(text: str) -> int:
     return int(match.group(1))
 
 
-def test_flask_redis_counter(build_image, run_instance, http, test_run_id):
+def test_flask_redis_counter(build_image, run_instance, http, test_run_id, wait_instance):
     redis_domain = f"redis-{test_run_id}.internal"
 
     # 1. Build and deploy internal Redis instance.
@@ -54,6 +54,8 @@ def test_flask_redis_counter(build_image, run_instance, http, test_run_id):
 
     url = extract_instance_url(flask_instance)
     assert url, f"could not determine instance URL from: {flask_instance!r}"
+
+    wait_instance(extract_instance_name(flask_instance), "running")
 
     # 3. First request — counter should be at least 1.
     resp = http(url)

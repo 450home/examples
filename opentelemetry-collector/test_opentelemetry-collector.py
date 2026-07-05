@@ -11,10 +11,10 @@ Port 13133 is the OpenTelemetry Collector's health_check extension endpoint.
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
-def test_opentelemetry_collector(build_image, run_instance, http):
+def test_opentelemetry_collector(build_image, run_instance, http, wait_instance):
     """Build, deploy, and verify the OTel Collector health check responds."""
     image = build_image("opentelemetry-collector", "opentelemetry-collector")
 
@@ -26,6 +26,8 @@ def test_opentelemetry_collector(build_image, run_instance, http):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     resp = http(url)
     assert resp.status_code == 200
