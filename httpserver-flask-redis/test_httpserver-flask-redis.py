@@ -33,10 +33,8 @@ def test_flask_redis_counter(build_image, run_instance, http, test_run_id):
     run_instance(
         redis_image,
         memory="256M",
-        extra_args=[
-            "--domain", redis_domain,
-            "--scale-to-zero", "policy=idle,cooldown-time=1000,stateful=true",
-        ],
+        domain=redis_domain,
+        scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
     )
 
     # 2. Build and deploy the Flask app.
@@ -46,10 +44,7 @@ def test_flask_redis_counter(build_image, run_instance, http, test_run_id):
         flask_image,
         publish=["443:8000/tls+http"],
         memory="512M",
-        extra_args=[
-            "--env", f"REDIS_HOST={redis_domain}",
-            "--env", "REDIS_PORT=6379",
-        ],
+        env={"REDIS_HOST": redis_domain, "REDIS_PORT": "6379"},
     )
 
     url = extract_instance_url(flask_instance)

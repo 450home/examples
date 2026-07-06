@@ -19,9 +19,7 @@ def test_node_vite_vanilla_serves_page(build_image, run_instance, http):
         image,
         publish=["443:8080/tls+http"],
         memory="4G",
-        extra_args=[
-            "-e", "PWD=/app",
-        ],
+        env={"PWD": "/app"},
     )
 
     url = extract_instance_url(instance)

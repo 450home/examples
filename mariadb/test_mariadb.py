@@ -47,7 +47,7 @@ def test_mariadb(build_image, run_instance, socat_tunnel):
         image,
         publish=["3306:3306/tls"],
         memory="1G",
-        extra_args=["-e", f"MARIADB_ROOT_PASSWORD={MARIA_PASSWORD}"],
+        env={"MARIADB_ROOT_PASSWORD": MARIA_PASSWORD},
     )
 
     host = extract_instance_fqdn(instance)

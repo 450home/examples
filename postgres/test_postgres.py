@@ -46,7 +46,7 @@ def test_postgres(build_image, run_instance):
         image,
         publish=["5432:5432/tls"],
         memory="1G",
-        extra_args=["-e", f"POSTGRES_PASSWORD={PG_PASSWORD}"],
+        env={"POSTGRES_PASSWORD": PG_PASSWORD},
     )
 
     host = extract_instance_fqdn(instance)

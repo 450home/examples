@@ -19,10 +19,7 @@ def test_ruby_rails_serves_hello(build_image, run_instance, http):
         image,
         publish=["443:3000/tls+http"],
         memory="1G",
-        extra_args=[
-            "-e", "GEM_HOME=/usr/local/bundle",
-            "-e", "BUNDLE_APP_CONFIG=/usr/local/bundle",
-        ],
+        env={"GEM_HOME": "/usr/local/bundle", "BUNDLE_APP_CONFIG": "/usr/local/bundle"},
     )
 
     url = extract_instance_url(instance)
