@@ -22,7 +22,7 @@ import logging
 import os
 import time
 import uuid
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -170,7 +170,8 @@ def run_instance(
     executed by pytest unconditionally after the test completes, whether it
     passed, failed, or errored.
 
-    Parameters passed through to the CLI:
+    Parameters passed through to the CLI (see
+    :meth:`_testlib.unikraft.UnikraftCLI.run_instance` for full details):
 
     * ``image`` (positional) – image tag to run.
     * ``publish`` – iterable of ``-p`` port mappings, e.g.
@@ -179,6 +180,16 @@ def run_instance(
       the CLI default.
     * ``name`` – explicit instance name. If omitted, a unique name is
       generated so parallel runs don't collide.
+    * ``metro`` – per-call metro override.
+    * ``scale_to_zero`` – ``--scale-to-zero`` spec string, e.g.
+      ``"policy=on,cooldown-time=1000"``.
+    * ``template`` – ``--template`` name.
+    * ``env`` – ``--env`` entries (``"K=V"`` strings or a mapping).
+    * ``domain`` / ``volume`` / ``rom`` – single value or sequence for the
+      corresponding repeatable flags.
+    * ``vcpus`` – ``--vcpus``.
+    * ``command`` – instance command placed after ``--`` (string or
+      sequence of arguments).
     * ``extra_args`` – extra positional CLI flags for escape-hatch needs.
     """
 
@@ -188,6 +199,15 @@ def run_instance(
         publish: Sequence[str] = (),
         memory: str | None = None,
         name: str | None = None,
+        metro: str | None = None,
+        scale_to_zero: str | Mapping[str, Any] | None = None,
+        template: str | None = None,
+        env: Sequence[str] | Mapping[str, Any] = (),
+        domain: str | Sequence[str] | None = None,
+        volume: str | Sequence[str] | None = None,
+        rom: str | Mapping[str, Any] | Sequence[str | Mapping[str, Any]] | None = None,
+        vcpus: int | str | None = None,
+        command: str | Sequence[str] | None = None,
         extra_args: Sequence[str] = (),
     ) -> dict[str, Any]:
         instance_name = name or f"examples-pytest-{test_run_id}-{uuid.uuid4().hex[:6]}"
@@ -212,6 +232,15 @@ def run_instance(
             publish=publish,
             memory=memory,
             name=instance_name,
+            metro=metro,
+            scale_to_zero=scale_to_zero,
+            template=template,
+            env=env,
+            domain=domain,
+            volume=volume,
+            rom=rom,
+            vcpus=vcpus,
+            command=command,
             extra_args=extra_args,
         )
 

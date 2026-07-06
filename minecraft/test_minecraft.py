@@ -143,10 +143,8 @@ def _minecraft_template(request, unikraft, repo_root, ukc_image_prefix, test_run
         base_tag,
         memory="4096M",
         name=template_name,
-        extra_args=[
-            "--vcpus", "4",
-            "--rom", f"dir={context / 'base'},at=/rom/base",
-        ],
+        vcpus=4,
+        rom={"dir": context / "base", "at": "/rom/base"},
     )
 
     # 3. Wait for the template to be ready (Minecraft init can be slow).
@@ -176,10 +174,8 @@ def test_minecraft_server_responds(
     instance = unikraft.run_instance(
         publish=["25565:25565/tls", "2222:2222/tls"],
         name=instance_name,
-        extra_args=[
-            "--template", template_name,
-            "--scale-to-zero", "policy=on,cooldown-time=5000,stateful=true",
-        ],
+        template=template_name,
+        scale_to_zero={"policy": "on", "cooldown-time": "5000", "stateful": "true"},
     )
 
     host = extract_instance_fqdn(instance)

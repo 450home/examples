@@ -46,10 +46,8 @@ def test_debian_ssh(build_image, run_instance, socat_tunnel, tmp_path):
         image,
         publish=["2222:2222/tls"],
         memory="1G",
-        extra_args=[
-            "--scale-to-zero", "policy=off",
-            "-e", f"PUBKEY={public_key}",
-        ],
+        scale_to_zero={"policy": "off"},
+        env={"PUBKEY": public_key},
     )
 
     host = extract_instance_fqdn(instance)

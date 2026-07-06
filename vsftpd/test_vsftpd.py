@@ -59,9 +59,7 @@ def test_vsftpd(build_image, run_instance):
             "10100:10100/tls",
         ],
         memory="1G",
-        extra_args=[
-            "--scale-to-zero", "policy=on,cooldown-time=40000,stateful=true",
-        ],
+        scale_to_zero={"policy": "on", "cooldown-time": "40000", "stateful": "true"},
     )
 
     host = extract_instance_fqdn(instance)

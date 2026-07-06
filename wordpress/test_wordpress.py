@@ -50,11 +50,9 @@ def test_wordpress_serves_page(build_image, run_instance, http, unikraft, reques
     run_instance(
         mariadb_image,
         memory="1G",
-        extra_args=[
-            "--domain", "wordpress-mariadb.internal",
-            "--volume", f"{db_volume}:/var/lib/mysql",
-            "--env", f"MARIADB_ROOT_PASSWORD={MARIADB_ROOT_PASSWORD}",
-        ],
+        domain="wordpress-mariadb.internal",
+        volume=f"{db_volume}:/var/lib/mysql",
+        env={"MARIADB_ROOT_PASSWORD": MARIADB_ROOT_PASSWORD},
     )
 
     # 3. Build and deploy the WordPress instance.
@@ -64,10 +62,8 @@ def test_wordpress_serves_page(build_image, run_instance, http, unikraft, reques
         wp_image,
         publish=["443:8080/tls+http"],
         memory="2G",
-        extra_args=[
-            "--volume", f"{wp_volume}:/var/www/html",
-            "--env", "WORDPRESS_DB_HOST=wordpress-mariadb.internal",
-        ],
+        volume=f"{wp_volume}:/var/www/html",
+        env={"WORDPRESS_DB_HOST": "wordpress-mariadb.internal"},
     )
 
     url = extract_instance_url(wp_instance)

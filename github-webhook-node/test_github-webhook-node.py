@@ -19,9 +19,7 @@ def test_github_webhook_health(build_image, run_instance, http):
         image,
         publish=["443:3000/tls+http"],
         memory="1G",
-        extra_args=[
-            "-e", "GITHUB_WEBHOOK_SECRET=test_secret",
-        ],
+        env={"GITHUB_WEBHOOK_SECRET": "test_secret"},
     )
 
     url = extract_instance_url(instance)

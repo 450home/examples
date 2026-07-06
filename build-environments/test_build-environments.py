@@ -102,11 +102,9 @@ def test_build_environments_rom1(
     instance = unikraft.run_instance(
         publish=["443:8080/tls+http"],
         name=instance_name,
-        extra_args=[
-            "--template", template_name,
-            "--rom", f"image={rom1_tag},at=/rom",
-            "--scale-to-zero", "policy=on,cooldown-time=1000,stateful=true",
-        ],
+        template=template_name,
+        rom={"image": rom1_tag, "at": "/rom"},
+        scale_to_zero={"policy": "on", "cooldown-time": "1000", "stateful": "true"},
     )
 
     url = extract_instance_url(instance)
@@ -129,11 +127,9 @@ def test_build_environments_rom2(
     instance = unikraft.run_instance(
         publish=["443:8080/tls+http"],
         name=instance_name,
-        extra_args=[
-            "--template", template_name,
-            "--rom", f"image={rom2_tag},at=/rom",
-            "--scale-to-zero", "policy=on,cooldown-time=1000,stateful=true",
-        ],
+        template=template_name,
+        rom={"image": rom2_tag, "at": "/rom"},
+        scale_to_zero={"policy": "on", "cooldown-time": "1000", "stateful": "true"},
     )
 
     url = extract_instance_url(instance)

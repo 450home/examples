@@ -51,14 +51,14 @@ def test_visual_studio_code_server(
         image,
         publish=["443:8443/tls+http"],
         memory="2G",
-        extra_args=[
-            "--volume", f"{vol_name}:/workspace",
-            "-e", "PGUID=0",
-            "-e", "PGID=0",
-            "-e", "PASSWORD=unikraft",
-            "-e", "SUDO_PASSWORD=unikraft",
-            "-e", "DEFAULT_WORKSPACE=/workspace",
-        ],
+        volume=f"{vol_name}:/workspace",
+        env={
+            "PGUID": "0",
+            "PGID": "0",
+            "PASSWORD": "unikraft",
+            "SUDO_PASSWORD": "unikraft",
+            "DEFAULT_WORKSPACE": "/workspace",
+        },
     )
 
     url = extract_instance_url(instance)

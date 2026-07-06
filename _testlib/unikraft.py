@@ -13,11 +13,42 @@ import os
 import shutil
 import subprocess
 from dataclasses import dataclass
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 log = logging.getLogger(__name__)
 
 UNIKRAFT_BIN = os.environ.get("UNIKRAFT_BIN", "unikraft")
+
+
+def _as_tuple(value: str | Sequence[str] | None) -> tuple[str, ...]:
+    """Accept a single value or a sequence for repeatable flags."""
+    if value is None:
+        return ()
+    if isinstance(value, str):
+        return (value,)
+    return tuple(value)
+
+
+def _as_spec(value: str | Mapping[str, Any]) -> str:
+    """Render a mapping as a comma-separated ``key=value`` spec string.
+
+    Accepts a ready-made string and returns it unchanged, so callers can
+    mix the two forms freely.
+    """
+    if isinstance(value, Mapping):
+        return ",".join(f"{k}={v}" for k, v in value.items())
+    return value
+
+
+def _as_spec_tuple(
+    value: str | Mapping[str, Any] | Sequence[str | Mapping[str, Any]] | None,
+) -> tuple[str, ...]:
+    """Like ``_as_tuple`` but each element may also be a mapping."""
+    if value is None:
+        return ()
+    if isinstance(value, (str, Mapping)):
+        return (_as_spec(value),)
+    return tuple(_as_spec(v) for v in value)
 
 
 class UnikraftError(RuntimeError):
@@ -110,19 +141,80 @@ class UnikraftCLI:
         publish: Sequence[str] = (),
         memory: str | None = None,
         name: str | None = None,
+        metro: str | None = None,
+        scale_to_zero: str | Mapping[str, Any] | None = None,
+        template: str | None = None,
+        env: Sequence[str] | Mapping[str, Any] = (),
+        domain: str | Sequence[str] | None = None,
+        volume: str | Sequence[str] | None = None,
+        rom: str | Mapping[str, Any] | Sequence[str | Mapping[str, Any]] | None = None,
+        vcpus: int | str | None = None,
+        command: str | Sequence[str] | None = None,
         extra_args: Sequence[str] = (),
     ) -> dict[str, Any]:
-        """Start an instance and return its parsed JSON description."""
-        args: list[str] = ["run", "--metro", self.metro, "--output", "json"]
+        """Start an instance and return its parsed JSON description.
+
+        Parameters mirror the ``unikraft run`` flags shown in the example
+        READMEs, so tests can express exactly what the docs tell users to
+        run without falling back to ``extra_args``:
+
+        * ``publish`` – ``-p`` port mappings, e.g. ``["443:8080/tls+http"]``.
+        * ``memory`` – ``-m``, e.g. ``"256M"``.
+        * ``name`` – ``-n``; tests usually let the fixture generate one.
+        * ``metro`` – per-call override of the CLI's default metro.
+        * ``scale_to_zero`` – ``--scale-to-zero`` spec; either a verbatim
+          string (``"policy=on,cooldown-time=1000,stateful=true"``) or a
+          mapping (``{"policy": "on", "cooldown-time": "1000", ...}``).
+        * ``template`` – ``--template`` name.
+        * ``env`` – ``--env`` entries; either ``"KEY=VALUE"`` strings or a
+          mapping (rendered in iteration order).
+        * ``domain`` – one or more ``--domain`` values.
+        * ``volume`` – one or more ``--volume`` mounts, ``"name:/path"``.
+        * ``rom`` – one or more ``--rom`` specs; each may be a verbatim
+          string (``"image=...,at=/rom"``) or a mapping
+          (``{"image": "...", "at": "/rom"}``).
+        * ``vcpus`` – ``--vcpus``.
+        * ``command`` – the command override placed after ``--``. A string
+          is passed as the single quoted argument shown in READMEs
+          (``-- "/usr/local/bin/python /src/server.py"``); a sequence is
+          passed as separate arguments. Always emitted last.
+        * ``extra_args`` – escape hatch for flags not modelled above.
+        """
+        args: list[str] = ["run", "--metro", metro or self.metro,
+                           "--output", "json"]
+        if scale_to_zero:
+            args += ["--scale-to-zero", _as_spec(scale_to_zero)]
+        for v in _as_tuple(volume):
+            args += ["--volume", v]
         for p in publish:
             args += ["-p", p]
         if memory:
             args += ["-m", memory]
+        if vcpus is not None:
+            args += ["--vcpus", str(vcpus)]
         if name:
             args += ["-n", name]
         if image:
             args += ["--image", image]
+        for d in _as_tuple(domain):
+            args += ["--domain", d]
+        if isinstance(env, Mapping):
+            env = [f"{k}={v}" for k, v in env.items()]
+        for e in env:
+            args += ["--env", e]
+        for r in _as_spec_tuple(rom):
+            args += ["--rom", r]
+        if template:
+            args += ["--template", template]
         args += list(extra_args)
+        # `--` terminates option parsing; everything after it is the
+        # instance command, so it must come last — after extra_args too.
+        if command is not None:
+            args.append("--")
+            if isinstance(command, str):
+                args.append(command)
+            else:
+                args.extend(command)
 
         log.info(
             "running instance with image %s (publish=%s, memory=%s, name=%s)",

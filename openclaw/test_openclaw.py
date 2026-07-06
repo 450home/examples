@@ -44,10 +44,8 @@ def test_openclaw_ssh_and_binary(build_image, run_instance, socat_tunnel, tmp_pa
         image,
         publish=["18789:18789/tls", "2222:2222/tls"],
         memory="4G",
-        extra_args=[
-            "--scale-to-zero", "policy=on,cooldown-time=10000",
-            "-e", f"PUBKEY={public_key}",
-        ],
+        scale_to_zero={"policy": "on", "cooldown-time": "10000"},
+        env={"PUBKEY": public_key},
     )
 
     host = extract_instance_fqdn(instance)

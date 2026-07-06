@@ -50,15 +50,15 @@ def test_phoenix_postgres(build_image, run_instance, http, unikraft, request, te
     run_instance(
         pg_image,
         memory="2G",
-        extra_args=[
-            "--domain", pg_domain,
-            "--scale-to-zero", "policy=idle,cooldown-time=1000,stateful=true",
-            "--volume", f"{volume_name}:/var/lib/postgresql/data",
-            "--env", f"POSTGRES_USER={PG_USER}",
-            "--env", f"POSTGRES_PASSWORD={PG_PASSWORD}",
-            "--env", f"POSTGRES_DB={PG_DB}",
-            "--env", "PGDATA=/var/lib/postgresql/data/pgdata",
-        ],
+        domain=pg_domain,
+        scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
+        volume=f"{volume_name}:/var/lib/postgresql/data",
+        env={
+            "POSTGRES_USER": PG_USER,
+            "POSTGRES_PASSWORD": PG_PASSWORD,
+            "POSTGRES_DB": PG_DB,
+            "PGDATA": "/var/lib/postgresql/data/pgdata",
+        },
     )
 
     # 3. Build and deploy the Phoenix app.
@@ -72,10 +72,10 @@ def test_phoenix_postgres(build_image, run_instance, http, unikraft, request, te
         phoenix_image,
         publish=["443:4000/tls+http"],
         memory="2G",
-        extra_args=[
-            "--env", f"SECRET_KEY_BASE={secret_key}",
-            "--env", f"DATABASE_URL={database_url}",
-        ],
+        env={
+            "SECRET_KEY_BASE": secret_key,
+            "DATABASE_URL": database_url,
+        },
     )
 
     url = extract_instance_url(phoenix_instance)
