@@ -14,14 +14,14 @@ from __future__ import annotations
 
 import logging
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 log = logging.getLogger(__name__)
 
 MARIADB_ROOT_PASSWORD = "unikraft"
 
 
-def test_wordpress_serves_page(build_image, run_instance, http, unikraft, request, test_run_id):
+def test_wordpress_serves_page(build_image, run_instance, http, unikraft, request, test_run_id, wait_instance):
     wp_volume = f"wordpress-wp-data-{test_run_id}"
     db_volume = f"wordpress-db-data-{test_run_id}"
 
@@ -68,6 +68,8 @@ def test_wordpress_serves_page(build_image, run_instance, http, unikraft, reques
 
     url = extract_instance_url(wp_instance)
     assert url, f"could not determine instance URL from: {wp_instance!r}"
+
+    wait_instance(extract_instance_name(wp_instance), "running")
 
     # 4. Verify WordPress is served (install page or homepage).
     resp = http(url)

@@ -9,10 +9,10 @@ Mirrors the manual steps from ``chromium-cdp/README.md``:
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
-def test_chromium_version(build_image, run_instance, http):
+def test_chromium_version(build_image, run_instance, http, wait_instance):
     image = build_image("chromium-cdp", "chromium-cdp")
 
     instance = run_instance(
@@ -23,6 +23,8 @@ def test_chromium_version(build_image, run_instance, http):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     resp = http(f"{url}/json/version")
     assert resp.status_code == 200

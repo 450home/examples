@@ -10,25 +10,26 @@ Mirrors the manual steps from ``httpserver-go1.22-redis/README.md``:
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
 REDIS_PASSWORD = "unikraft"
 
 
-def test_go_redis_set_get(build_image, run_instance, http, http_post, test_run_id):
+def test_go_redis_set_get(build_image, run_instance, http, http_post, wait_instance, test_run_id):
     redis_domain = f"go122-redis-{test_run_id}.internal"
 
     # 1. Build and deploy internal Redis instance.
     redis_image = build_image("httpserver-go1.22-redis/redis", "go122-redis-db")
 
-    run_instance(
+    redis_instance = run_instance(
         redis_image,
         memory="256M",
         domain=redis_domain,
         scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
         env={"REDIS_PASSWORD": REDIS_PASSWORD},
     )
+    wait_instance(extract_instance_name(redis_instance), "standby")
 
     # 2. Build and deploy the Go HTTP server.
     app_image = build_image("httpserver-go1.22-redis/httpserver-go", "go122-redis-app")
@@ -42,6 +43,8 @@ def test_go_redis_set_get(build_image, run_instance, http, http_post, test_run_i
 
     url = extract_instance_url(app_instance)
     assert url, f"could not determine instance URL from: {app_instance!r}"
+
+    wait_instance(extract_instance_name(app_instance), "running")
 
     # 3. POST a key-value pair.
     resp = http_post(url, data={"key": "pytest-key", "value": "pytest-value"})

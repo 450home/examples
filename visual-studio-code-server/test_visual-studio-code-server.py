@@ -15,14 +15,14 @@ from __future__ import annotations
 import logging
 import uuid
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 log = logging.getLogger(__name__)
 
 
 def test_visual_studio_code_server(
     request, build_image, run_instance, unikraft, http
-):
+, wait_instance):
     """Build, deploy, and verify the VS Code Server login page loads."""
     # Create a volume for workspace persistence, matching the old workflow.
     vol_name = f"code-workspace-pytest-{uuid.uuid4().hex[:8]}"
@@ -63,6 +63,8 @@ def test_visual_studio_code_server(
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     resp = http(url)
     assert resp.status_code == 200

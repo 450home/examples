@@ -9,10 +9,10 @@ Mirrors the manual steps from ``wazero-import-go/README.md``:
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
-def test_wazero_serves_age_output(build_image, run_instance, http):
+def test_wazero_serves_age_output(build_image, run_instance, http, wait_instance):
     image = build_image("wazero-import-go", "wazero-import-go")
 
     instance = run_instance(
@@ -23,6 +23,8 @@ def test_wazero_serves_age_output(build_image, run_instance, http):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     resp = http(url)
     assert resp.status_code == 200

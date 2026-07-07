@@ -13,10 +13,10 @@ from __future__ import annotations
 
 from urllib.parse import urlparse
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
-def test_traefik_dashboard(build_image, run_instance, http):
+def test_traefik_dashboard(build_image, run_instance, http, wait_instance):
     """Build, deploy, and verify the Traefik dashboard is accessible."""
     image = build_image("traefik", "traefik")
 
@@ -28,6 +28,8 @@ def test_traefik_dashboard(build_image, run_instance, http):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     # The old workflow and README test the dashboard on port 8080.
     parsed = urlparse(url)

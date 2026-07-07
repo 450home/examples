@@ -32,6 +32,7 @@ from _testlib.http_client import http_get, http_post
 from _testlib.socat import SocatTunnel
 from _testlib.unikraft import (
     UnikraftCLI,
+    extract_instance_name,
     extract_instance_url,
 )
 
@@ -137,10 +138,6 @@ def build_image(
         request.addfinalizer(lambda: unikraft.delete_image(tag))
 
         unikraft.build(context, tag)
-
-        # TODO: drop this once the platform exposes a way to wait until a
-        # freshly-built image is fully available for `unikraft run`.
-        time.sleep(3)
 
         return tag
 
@@ -258,6 +255,31 @@ def run_instance(
 
 
 # ---------------------------------------------------------------------------
+# Instance wait fixture
+# ---------------------------------------------------------------------------
+
+
+WaitInstance = Callable[[str, str], dict[str, Any]]
+
+
+@pytest.fixture
+def wait_instance(unikraft: UnikraftCLI) -> WaitInstance:
+    """Wait until a named instance reaches the given state.
+
+    Usage::
+
+        def test_foo(run_instance, wait_instance):
+            instance = run_instance(image, ...)
+            wait_instance(extract_instance_name(instance), "running")
+    """
+
+    def _wait(target: str, state: str) -> dict[str, Any]:
+        return unikraft.wait_instance(target, state)
+
+    return _wait
+
+
+# ---------------------------------------------------------------------------
 # HTTP helper
 # ---------------------------------------------------------------------------
 
@@ -313,4 +335,5 @@ __all__ = [
     "run_instance",
     "socat_tunnel",
     "unikraft",
+    "wait_instance",
 ]

@@ -14,11 +14,10 @@ from __future__ import annotations
 import shutil
 import subprocess
 import tempfile
-import time
 
 import pytest
 
-from _testlib.unikraft import extract_instance_fqdn
+from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 FTP_USER = "root"
 FTP_PASSWORD = "rootpass"
@@ -45,7 +44,7 @@ def _lftp(host: str, commands: str, timeout: float = 30) -> subprocess.Completed
     )
 
 
-def test_vsftpd(build_image, run_instance):
+def test_vsftpd(build_image, run_instance, wait_instance):
     """Build, deploy, and exercise a vsftpd instance."""
     image = build_image("vsftpd", "vsftpd")
 
@@ -65,17 +64,13 @@ def test_vsftpd(build_image, run_instance):
     host = extract_instance_fqdn(instance)
     assert host, f"could not determine instance FQDN from: {instance!r}"
 
-    # Retry with back-off while the instance starts.
-    last_err = None
-    for _ in range(10):
-        result = _lftp(host, "ls")
-        if result.returncode == 0:
-            break
-        last_err = result.stderr
-        time.sleep(5)
-    else:
+    name = extract_instance_name(instance)
+    wait_instance(name, "standby")
+
+    result = _lftp(host, "ls")
+    if result.returncode != 0:
         raise AssertionError(
-            f"could not connect to vsftpd after retries: {last_err}"
+            f"could not connect to vsftpd (exit={result.returncode})\nstdout: {result.stdout}\nstderr: {result.stderr}"
         )
 
     # ls succeeded — matches the README demonstration.

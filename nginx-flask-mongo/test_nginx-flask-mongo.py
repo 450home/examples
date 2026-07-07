@@ -13,12 +13,12 @@ from __future__ import annotations
 
 import logging
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 log = logging.getLogger(__name__)
 
 
-def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, test_run_id):
+def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, test_run_id, wait_instance):
     volume_name = f"nginx-flask-mongo-data-{test_run_id}"
 
     def _cleanup_volume():
@@ -73,6 +73,8 @@ def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, t
 
     url = extract_instance_url(nginx_instance)
     assert url, f"could not determine instance URL from: {nginx_instance!r}"
+
+    wait_instance(extract_instance_name(nginx_instance), "running")
 
     # 5. Verify the response from the full stack.
     resp = http(url)

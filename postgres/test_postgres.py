@@ -12,11 +12,9 @@ CI workflow (example-postgres-stable.yaml):
 
 from __future__ import annotations
 
-import time
-
 import psycopg2
 
-from _testlib.unikraft import extract_instance_fqdn
+from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 # The README deploys with POSTGRES_PASSWORD=unikraft.
 PG_USER = "postgres"
@@ -38,7 +36,7 @@ def _connect(host: str):
     )
 
 
-def test_postgres(build_image, run_instance):
+def test_postgres(build_image, run_instance, wait_instance):
     """Build, deploy, and exercise a PostgreSQL instance."""
     image = build_image("postgres", "postgres")
 
@@ -52,23 +50,9 @@ def test_postgres(build_image, run_instance):
     host = extract_instance_fqdn(instance)
     assert host, f"could not determine instance FQDN from: {instance!r}"
 
-    # Retry the connection with back-off while PostgreSQL finishes
-    # first-boot initialisation.
-    # psycopg2 has no built-in retry; connect() is eager and the C
-    # extension cleans up the libpq connection on failure, so no leak.
-    conn = None
-    last_err = None
-    for _ in range(10):
-        try:
-            conn = _connect(host)
-            break
-        except psycopg2.OperationalError as exc:
-            last_err = exc
-            time.sleep(5)
-    if conn is None:
-        raise AssertionError(
-            f"could not connect to PostgreSQL after retries: {last_err}"
-        ) from last_err
+    wait_instance(extract_instance_name(instance), "running")
+
+    conn = _connect(host)
     try:
         conn.autocommit = True
         cur = conn.cursor()

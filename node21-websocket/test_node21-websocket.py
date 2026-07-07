@@ -17,32 +17,17 @@ import asyncio
 
 import websockets
 
-from _testlib.unikraft import extract_instance_fqdn
+from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 
 async def _websocket_test(host: str) -> None:
     """Connect to the WebSocket server and exercise its echo behaviour."""
     uri = f"wss://{host}"
 
-    # Retry connection with back-off while the instance starts up.
-    conn = None
-    last_err = None
-    for attempt in range(10):
-        try:
-            conn = await asyncio.wait_for(
-                websockets.connect(uri),
-                timeout=10,
-            )
-            break
-        except Exception as exc:
-            last_err = exc
-            if attempt < 9:
-                await asyncio.sleep(3)
-    if conn is None:
-        raise AssertionError(
-            f"could not connect to WebSocket server after retries: {last_err}"
-        ) from last_err
-
+    conn = await asyncio.wait_for(
+        websockets.connect(uri),
+        timeout=10,
+    )
     async with conn:
         # ------------------------------------------------------------------
         # 1. Greeting — server sends a welcome message on connect.
@@ -67,7 +52,7 @@ async def _websocket_test(host: str) -> None:
             assert reply.decode() == msg, f"expected {msg!r}, got {reply!r}"
 
 
-def test_node21_websocket(build_image, run_instance):
+def test_node21_websocket(build_image, run_instance, wait_instance):
     """Build, deploy, and exercise a Node.js WebSocket echo server."""
     image = build_image("node21-websocket", "node21-websocket")
 
@@ -80,4 +65,5 @@ def test_node21_websocket(build_image, run_instance):
     host = extract_instance_fqdn(instance)
     assert host, f"could not determine instance FQDN from: {instance!r}"
 
+    wait_instance(extract_instance_name(instance), "running")
     asyncio.run(_websocket_test(host))

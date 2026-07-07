@@ -15,10 +15,10 @@ README and CI workflow).
 
 from __future__ import annotations
 
-from _testlib.unikraft import extract_instance_url
+from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
-def test_dragonflydb(build_image, run_instance, http):
+def test_dragonflydb(build_image, run_instance, http, wait_instance):
     """Build, deploy, and exercise a DragonflyDB instance."""
     image = build_image("dragonflydb", "dragonflydb")
 
@@ -30,6 +30,8 @@ def test_dragonflydb(build_image, run_instance, http):
 
     url = extract_instance_url(instance)
     assert url, f"could not determine instance URL from: {instance!r}"
+
+    wait_instance(extract_instance_name(instance), "running")
 
     # http() already retries with back-off, so no manual sleep needed.
     # ------------------------------------------------------------------

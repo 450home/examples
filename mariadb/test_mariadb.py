@@ -15,11 +15,9 @@ We replicate that query and add a round-trip table test.
 
 from __future__ import annotations
 
-import time
-
 import pymysql
 
-from _testlib.unikraft import extract_instance_fqdn
+from _testlib.unikraft import extract_instance_fqdn, extract_instance_name
 
 MARIA_USER = "root"
 MARIA_PASSWORD = "unikraft"
@@ -39,7 +37,7 @@ def _connect(port: int):
     )
 
 
-def test_mariadb(build_image, run_instance, socat_tunnel):
+def test_mariadb(build_image, run_instance, socat_tunnel, wait_instance):
     """Build, deploy, and exercise a MariaDB instance."""
     image = build_image("mariadb", "mariadb")
 
@@ -58,23 +56,8 @@ def test_mariadb(build_image, run_instance, socat_tunnel):
     # while MariaDB inside speaks plain MySQL protocol.
     tunnel = socat_tunnel(host, MARIA_PORT, MARIA_PORT)
 
-    # Retry the connection with back-off while MariaDB finishes
-    # first-boot initialisation (system tables, timezone import, etc.).
-    # pymysql has no built-in retry; connect() is eager and cleans up
-    # its socket on failure, so no leak on the except path.
-    conn = None
-    last_err = None
-    for _ in range(6):
-        try:
-            conn = _connect(tunnel.local_port)
-            break
-        except pymysql.err.OperationalError as exc:
-            last_err = exc
-            time.sleep(10)
-    if conn is None:
-        raise AssertionError(
-            f"could not connect to MariaDB after retries: {last_err}"
-        ) from last_err
+    wait_instance(extract_instance_name(instance), "running")
+    conn = _connect(tunnel.local_port)
     try:
         cur = conn.cursor()
 
