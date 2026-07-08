@@ -29,7 +29,6 @@ def test_go_redis_set_get(build_image, run_instance, http, http_post, wait_insta
         scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
         env={"REDIS_PASSWORD": REDIS_PASSWORD},
     )
-    wait_instance(extract_instance_name(redis_instance), "standby")
 
     # 2. Build and deploy the Go HTTP server.
     app_image = build_image("httpserver-go1.22-redis/httpserver-go", "go122-redis-app")
@@ -44,6 +43,7 @@ def test_go_redis_set_get(build_image, run_instance, http, http_post, wait_insta
     url = extract_instance_url(app_instance)
     assert url, f"could not determine instance URL from: {app_instance!r}"
 
+    wait_instance(extract_instance_name(redis_instance), "standby")
     wait_instance(extract_instance_name(app_instance), "running")
 
     # 3. POST a key-value pair.
