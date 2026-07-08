@@ -203,4 +203,12 @@ jobs:
         PY
 
     - name: Run tests
-      run: pytest --log-cli-level=INFO "${{ matrix.example }}"
+      env:
+        UKC_TEST_ID: ${{ github.run_id }}
+      run: exec pytest --log-cli-level=INFO "${{ matrix.example }}"
+
+    - name: Cleanup test resources
+      if: always()
+      env:
+        UKC_TEST_ID: ${{ github.run_id }}
+      run: bash scripts/cleanup-test-resources.sh

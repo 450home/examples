@@ -13,7 +13,6 @@ the existing CI workflow (example-visual-studio-code-server-stable.yaml):
 from __future__ import annotations
 
 import logging
-import uuid
 
 from _testlib.unikraft import extract_instance_name, extract_instance_url
 
@@ -21,11 +20,11 @@ log = logging.getLogger(__name__)
 
 
 def test_visual_studio_code_server(
-    request, build_image, run_instance, unikraft, http
-, wait_instance):
+    request, build_image, run_instance, unikraft, http, wait_instance, test_run_id
+):
     """Build, deploy, and verify the VS Code Server login page loads."""
     # Create a volume for workspace persistence, matching the old workflow.
-    vol_name = f"code-workspace-pytest-{uuid.uuid4().hex[:8]}"
+    vol_name = f"code-workspace-pytest-{test_run_id}"
     unikraft.run([
         "volume", "create",
         "--set", f"name={vol_name}",
