@@ -6,4 +6,4 @@ rootfs:
   source: ./Dockerfile
   format: erofs
 
-cmd: ["/usr/local/bin/php /usr/src/server.php"]
+cmd: ["/usr/local/bin/php", "/usr/src/server.php"]
