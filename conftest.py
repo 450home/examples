@@ -75,12 +75,12 @@ def repo_root() -> Path:
 
 @pytest.fixture(scope="session")
 def test_run_id() -> str:
-    """Short random identifier unique to this pytest session.
+    """Identifier unique to this pytest session, taken from ``UKC_TEST_ID``.
 
-    Used to avoid collisions between concurrent CI runs when naming images
-    and instances.
+    Set ``UKC_TEST_ID`` to the CI run ID (e.g. ``${{ github.run_id }}``) so
+    that resources can be correlated and cleaned up after the run.
     """
-    return uuid.uuid4().hex[:8]
+    return _require_env("UKC_TEST_ID")
 
 
 # ---------------------------------------------------------------------------
