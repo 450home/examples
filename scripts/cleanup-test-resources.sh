@@ -18,26 +18,22 @@ echo "==> Cleaning up test resources for run ID: ${UKC_TEST_ID} (metro: ${UKC_ME
 
 echo "--> Deleting instances..."
 unikraft instances delete \
-    --metro "${UKC_METRO}" \
     --filter "${FILTER}" \
     --force || echo "Warning: instance deletion failed or nothing to delete"
 
 echo "--> Deleting instance templates..."
 unikraft instances templates delete \
-    --metro "${UKC_METRO}" \
     --filter "${FILTER}" \
     --force || echo "Warning: instance template deletion failed or nothing to delete"
 
 echo "--> Deleting volumes..."
 unikraft volumes delete \
-    --metro "${UKC_METRO}" \
     --filter "${FILTER}" \
     --force || echo "Warning: volume deletion failed or nothing to delete"
 
 echo "--> Deleting images..."
 IMAGE_FILTER="ref~=\"^.*${UKC_TEST_ID}\""
 IMAGES=$(unikraft images list \
-    --metro "${UKC_METRO}" \
     --filter "${IMAGE_FILTER}" \
     --field ref \
     --output raw 2>/dev/null \
