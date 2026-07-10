@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Deletes all Unikraft Cloud resources created during a test run.
 #
-# Usage:  UKC_TEST_ID=<run-id> UKC_METRO=<metro> ./scripts/cleanup-test-resources.sh
+# Usage:  UKC_TEST_ID=<run-id> ./scripts/cleanup-test-resources.sh
 #
 # The script is intentionally lenient: each deletion is attempted with --force
 # and failures are logged but do not abort the script, so a partial cleanup
@@ -10,11 +10,10 @@
 set -euo pipefail
 
 : "${UKC_TEST_ID:?UKC_TEST_ID must be set}"
-: "${UKC_METRO:?UKC_METRO must be set}"
 
 FILTER="name~=\"^.*${UKC_TEST_ID}\""
 
-echo "==> Cleaning up test resources for run ID: ${UKC_TEST_ID} (metro: ${UKC_METRO})"
+echo "==> Cleaning up test resources for run ID: ${UKC_TEST_ID}"
 
 echo "--> Deleting instances..."
 unikraft instances delete \
@@ -45,7 +44,7 @@ else
     while IFS= read -r image; do
         echo "    Deleting image: ${image}"
         unikraft images delete "${image}" \
-            --metro "${UKC_METRO}" || echo "Warning: failed to delete image ${image}"
+            || echo "Warning: failed to delete image ${image}"
     done <<< "${IMAGES}"
 fi
 
