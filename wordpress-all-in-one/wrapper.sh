@@ -3,6 +3,8 @@
 echo " * Starting MariaDB server ..."
 chown -R mysql:mysql /var/lib/mysql
 chmod 1777 /tmp
+mkdir -p /run/mysqld
+chown mysql:mysql /run/mysqld
 /etc/init.d/mariadb start
 mysql -u root -punikraft < /init.sql
 
