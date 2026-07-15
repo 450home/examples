@@ -53,6 +53,7 @@ def test_wordpress_serves_page(build_image, run_instance, http, unikraft, reques
         domain="wordpress-mariadb.internal",
         volume=f"{db_volume}:/var/lib/mysql",
         env={"MARIADB_ROOT_PASSWORD": MARIADB_ROOT_PASSWORD},
+        name=f"mariadb-{test_run_id}"
     )
 
     # 3. Build and deploy the WordPress instance.
@@ -64,6 +65,7 @@ def test_wordpress_serves_page(build_image, run_instance, http, unikraft, reques
         memory="2G",
         volume=f"{wp_volume}:/var/www/html",
         env={"WORDPRESS_DB_HOST": "wordpress-mariadb.internal"},
+        name=f"wordpress-{test_run_id}"
     )
 
     url = extract_instance_url(wp_instance)
