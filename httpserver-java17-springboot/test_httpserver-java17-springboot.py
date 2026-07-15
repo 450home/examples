@@ -1,8 +1,8 @@
-"""End-to-end test for the ``httpserver-java17-springboot3.5.x`` example.
+"""End-to-end test for the ``httpserver-java17-springboot`` example.
 
-Mirrors the manual steps from ``httpserver-java17-springboot3.5.x/README.md``:
+Mirrors the manual steps from ``httpserver-java17-springboot/README.md``:
 
-1. ``unikraft build . --output <prefix>/httpserver-java17-springboot35x:<tag>``
+1. ``unikraft build . --output <prefix>/httpserver-java17-springboot:<tag>``
 2. ``unikraft run --metro <metro> -p 443:8080/tls+http -m 1G --image ...``
 3. ``curl https://<instance-url>/hello`` and assert "Hello, World!".
 """
@@ -13,7 +13,7 @@ from _testlib.unikraft import extract_instance_name, extract_instance_url
 
 
 def test_springboot_serves_hello(build_image, run_instance, http, wait_instance):
-    image = build_image("httpserver-java17-springboot3.5.x", "httpserver-java17-springboot3.5.x")
+    image = build_image("httpserver-java17-springboot", "httpserver-java17-springboot")
 
     instance = run_instance(
         image,

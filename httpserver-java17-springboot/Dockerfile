@@ -11,7 +11,7 @@ RUN ldconfig /usr/lib/jvm/java-17-openjdk-amd64/lib/
 
 WORKDIR /src
 
-ARG BOOT_VERSION=3.5.13
+ARG BOOT_VERSION=4.1.0
 
 RUN set -xe ; \
     curl -G https://start.spring.io/starter.zip \
