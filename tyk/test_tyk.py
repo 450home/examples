@@ -17,7 +17,7 @@ from _testlib.unikraft import extract_instance_name, extract_instance_url
 REDIS_PASSWORD = "unikraft"
 
 
-def test_tyk_hello(build_image, run_instance, http, wait_instance):
+def test_tyk_hello(build_image, run_instance, http, wait_instance, test_run_id):
     # 1. Build and deploy internal Redis instance.
     # NOTE: domain must be "tyk-redis.internal" — hardcoded in tyk/rootfs/etc/tyk.conf.
     redis_image = build_image("tyk/redis", "tyk-redis")
@@ -28,6 +28,7 @@ def test_tyk_hello(build_image, run_instance, http, wait_instance):
         domain="tyk-redis.internal",
         scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
         env={"REDIS_PASSWORD": REDIS_PASSWORD},
+        name=f"redis-{test_run_id}",
     )
 
     # 2. Build and deploy the Tyk gateway.
@@ -38,6 +39,7 @@ def test_tyk_hello(build_image, run_instance, http, wait_instance):
         publish=["443:8080/tls+http"],
         memory="256M",
         env={"TYK_GW_STORAGE_PASSWORD": REDIS_PASSWORD},
+        name=f"tyk-{test_run_id}",
     )
 
     url = extract_instance_url(tyk_instance)

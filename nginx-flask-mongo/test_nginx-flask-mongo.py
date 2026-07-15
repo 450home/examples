@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 
 def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, test_run_id, wait_instance):
-    volume_name = f"nginx-flask-mongo-data-{test_run_id}"
+    volume_name = f"data-{test_run_id}"
 
     def _cleanup_volume():
         try:
@@ -38,7 +38,7 @@ def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, t
         "--size=1G",
     ])
 
-    mongo_domain = f"mongo-{test_run_id}.internal"
+    mongo_domain = f"{test_run_id}-mongo.internal"
 
     # 2. Build and deploy MongoDB.
     mongo_image = build_image("nginx-flask-mongo/mongo", "nfm-mongo")
@@ -49,6 +49,7 @@ def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, t
         domain=mongo_domain,
         scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
         volume=f"{volume_name}:/data/db",
+        name=f"mongo-{test_run_id}",
     )
 
     # 3. Build and deploy Flask backend.
@@ -60,6 +61,7 @@ def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, t
         memory="1024M",
         domain="backend.internal",
         env={"FLASK_SERVER_PORT": "9091", "MONGO_SERVER_URL": f"{mongo_domain}:27017"},
+        name=f"flask-{test_run_id}",
     )
 
     # 4. Build and deploy Nginx reverse proxy.
@@ -69,6 +71,7 @@ def test_nginx_flask_mongo(build_image, run_instance, http, unikraft, request, t
         nginx_image,
         publish=["443:80/tls+http"],
         memory="512M",
+        name=f"nginx-{test_run_id}",
     )
 
     url = extract_instance_url(nginx_instance)

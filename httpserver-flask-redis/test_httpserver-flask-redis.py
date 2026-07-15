@@ -25,7 +25,7 @@ def _extract_count(text: str) -> int:
 
 
 def test_flask_redis_counter(build_image, run_instance, http, test_run_id, wait_instance):
-    redis_domain = f"redis-{test_run_id}.internal"
+    redis_domain = f"{test_run_id}-redis.internal"
 
     # 1. Build and deploy internal Redis instance.
     redis_image = build_image("httpserver-flask-redis/redis", "flask-redis-db")
@@ -35,6 +35,7 @@ def test_flask_redis_counter(build_image, run_instance, http, test_run_id, wait_
         memory="256M",
         domain=redis_domain,
         scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
+        name=f"redis-{test_run_id}",
     )
 
     # 2. Build and deploy the Flask app.
@@ -45,6 +46,7 @@ def test_flask_redis_counter(build_image, run_instance, http, test_run_id, wait_
         publish=["443:8000/tls+http"],
         memory="512M",
         env={"REDIS_HOST": redis_domain, "REDIS_PORT": "6379"},
+        name=f"flask-{test_run_id}",
     )
 
     url = extract_instance_url(flask_instance)
