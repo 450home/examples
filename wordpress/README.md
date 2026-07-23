@@ -159,7 +159,8 @@ or
 
 ## Deploy Wordpress
 
-Build and deploy the Wordpress instance:
+Build and deploy the Wordpress instance.
+Set `WORDPRESS_DB_HOST` to the same internal domain you assigned to the MariaDB instance (`wordpress-mariadb.internal` in this guide).
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
