@@ -2,7 +2,7 @@
 
 Mirrors the manual steps from ``tyk/README.md``:
 
-1. Build and deploy the Redis instance (internal, on ``tyk-redis.internal``,
+1. Build and deploy the Redis instance (internal, on a configurable domain,
    with REDIS_PASSWORD=unikraft).
 2. Build and deploy the Tyk API gateway (public, on port 443:8080/tls+http).
 3. ``curl https://<instance-url>/hello`` and assert Tyk health response with
@@ -18,14 +18,15 @@ REDIS_PASSWORD = "unikraft"
 
 
 def test_tyk_hello(build_image, run_instance, http, wait_instance, test_run_id):
+    redis_domain = f"tyk-redis-{test_run_id}.internal"
+
     # 1. Build and deploy internal Redis instance.
-    # NOTE: domain must be "tyk-redis.internal" — hardcoded in tyk/rootfs/etc/tyk.conf.
     redis_image = build_image("tyk/redis", "tyk-redis")
 
     run_instance(
         redis_image,
         memory="256M",
-        domain="tyk-redis.internal",
+        domain=redis_domain,
         scale_to_zero={"policy": "idle", "cooldown-time": "1000", "stateful": "true"},
         env={"REDIS_PASSWORD": REDIS_PASSWORD},
         name=f"redis-{test_run_id}",
@@ -38,8 +39,11 @@ def test_tyk_hello(build_image, run_instance, http, wait_instance, test_run_id):
         tyk_image,
         publish=["443:8080/tls+http"],
         memory="256M",
-        env={"TYK_GW_STORAGE_PASSWORD": REDIS_PASSWORD},
         name=f"tyk-{test_run_id}",
+        env={
+            "TYK_GW_STORAGE_PASSWORD": REDIS_PASSWORD,
+            "TYK_GW_STORAGE_HOST": redis_domain,
+        },
     )
 
     url = extract_instance_url(tyk_instance)

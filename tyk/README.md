@@ -110,19 +110,21 @@ or
 
 ## Tyk
 
-Build and deploy the Tyk instance:
+Build and deploy the Tyk instance.
+Set `TYK_GW_STORAGE_HOST` to the same internal domain you assigned to the Redis instance (`tyk-redis.internal` in this guide).
+If `TYK_GW_STORAGE_HOST` is unset, Tyk tries to connect to a Redis instance at `tyk-redis.internal` by default.
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./tyk --output <my-org>/tyk:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/tyk:latest -e TYK_GW_STORAGE_PASSWORD=unikraft
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/tyk:latest -e TYK_GW_STORAGE_PASSWORD=unikraft -e TYK_GW_STORAGE_HOST=tyk-redis.internal
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi --env TYK_GW_STORAGE_PASSWORD=unikraft ./tyk/
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi --env TYK_GW_STORAGE_PASSWORD=unikraft --env TYK_GW_STORAGE_HOST=tyk-redis.internal ./tyk/
 ```
 
 Make sure to replace `<my-org>` with your username / org-name in the unikraft CLI commands above.

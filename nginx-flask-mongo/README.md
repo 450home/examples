@@ -223,19 +223,20 @@ or
 ## NGINX
 
 Finally, deploy NGINX as the public-facing reverse proxy.
-It forwards requests to the Flask backend at `backend.internal:9091`:
+It forwards requests to the Flask backend at `backend.internal:9091` by default.
+To use a different backend domain, set the `BACKEND_HOST` environment variable to the same value you pass as the Flask domain.
 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./nginx --output <my-org>/nginx:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:80/tls+http -m 512M --image <my-org>/nginx:latest
+unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:80/tls+http -m 512M --image <my-org>/nginx:latest -e BACKEND_HOST=backend.internal
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 512Mi ./nginx
+kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 512Mi --env BACKEND_HOST=backend.internal ./nginx
 ```
 
 The output shows the NGINX instance details including its public FQDN:
