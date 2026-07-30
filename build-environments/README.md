@@ -57,12 +57,12 @@ or
 **Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft pkg \
-   --name index.unikraft.io/<my-org>/go-build-env:latest \
-   --plat kraftcloud \
-   --arch x86_64 \
-   --rootfs-type erofs \
-   --push \
-   .
+  --name index.unikraft.io/<my-org>/go-build-env:latest \
+  --plat kraftcloud \
+  --arch x86_64 \
+  --rootfs-type erofs \
+  --push \
+  .
 ```
 
 The server in [`server.go`](./server.go) loads `/rom/rom.go`, compiles it to `/run/rom.so` using `go build -buildmode=plugin`, and invokes `Handler()` from the plugin.
@@ -181,21 +181,21 @@ or
 **Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft pkg \
-   --rom ./fs \
-   --rom-type erofs \
-   --plat kraftcloud \
-   --arch x86_64 \
-   --name index.unikraft.io/<my-org>/go-rom1:latest \
-   --push \
-   rom1/
+  --name index.unikraft.io/<my-org>/go-rom1:latest \
+  --rom ./fs \
+  --rom-type erofs \
+  --plat kraftcloud \
+  --arch x86_64 \
+  --push \
+  rom1/
 kraft pkg \
-   --rom ./fs \
-   --rom-type erofs \
-   --plat kraftcloud \
-   --arch x86_64 \
-   --name index.unikraft.io/<my-org>/go-rom2:latest \
-   --push \
-   rom2/
+  --name index.unikraft.io/<my-org>/go-rom2:latest \
+  --rom ./fs \
+  --rom-type erofs \
+  --plat kraftcloud \
+  --arch x86_64 \
+  --push \
+  rom2/
 ```
 
 ### Create instances from the template with different ROMs attached

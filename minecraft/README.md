@@ -59,11 +59,11 @@ If you only customized the server using the base [`.env`](./base/.env) file, cre
 
 ```bash title="unikraft"
 unikraft run --metro fra \
-    --name minecraft-tpl \
-    -m 4096M \
-    --vcpus 4 \
-    --image <my-org>/minecraft:latest \
-    --rom dir=base,at=/rom/base
+  --name minecraft-tpl \
+  -m 4096M \
+  --vcpus 4 \
+  --rom dir=base,at=/rom/base \
+  --image <my-org>/minecraft:latest
 ```
 
 The output shows the instance details:
@@ -93,12 +93,12 @@ If you also have per-config overrides (for example in [`bingo/.env`](./bingo/.en
 
 ```bash title="unikraft"
 unikraft run --metro fra \
-    --name minecraft-tpl \
-    -m 4096M \
-    --vcpus 4 \
-    --image <my-org>/minecraft:latest \
-    --rom dir=base,at=/rom/base \
-    --rom dir=bingo,at=/rom/bingo
+  --name minecraft-tpl \
+  -m 4096M \
+  --vcpus 4 \
+  --rom dir=base,at=/rom/base \
+  --rom dir=bingo,at=/rom/bingo \
+  --image <my-org>/minecraft:latest
 ```
 
 The instance will run until initialization is complete, then it will be snapshotted as a template and immediately deleted.
@@ -130,11 +130,11 @@ You can now create new instances from the template, which will boot much faster 
 
 ```bash title="unikraft"
 unikraft run --metro fra \
-    --name minecraft \
-    -p 2222:2222/tls \
-    -p 25565:25565/tls \
-    --scale-to-zero policy=on,cooldown-time=5000,stateful=true \
-    --template minecraft-tpl
+  --name minecraft \
+  -p 2222:2222/tls \
+  -p 25565:25565/tls \
+  --scale-to-zero policy=on,cooldown-time=5000,stateful=true \
+  --template minecraft-tpl
 ```
 
 The output shows the instance address and other details:

@@ -46,14 +46,26 @@ The Redis password is set at runtime via the `REDIS_PASSWORD` environment variab
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./redis --output <my-org>/httpserver-go-122-redis-db:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -m 256M --image <my-org>/httpserver-go-122-redis-db:latest --domain go122-redis.internal -e REDIS_PASSWORD=unikraft
+unikraft run --metro fra \
+  -m 256M \
+  --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
+  --domain go122-redis.internal \
+  -e REDIS_PASSWORD=unikraft \
+  --image <my-org>/httpserver-go-122-redis-db:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 256Mi --domain go122-redis.internal --env REDIS_PASSWORD=unikraft ./redis/
+kraft cloud deploy \
+  -M 256Mi \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 1s \
+  --domain go122-redis.internal \
+  --env REDIS_PASSWORD=unikraft \
+  ./redis/
 ```
 
 Make sure to replace `<my-org>` with your username / org-name.
@@ -114,14 +126,27 @@ It connects to Redis using the `REDIS_ADDR` and `REDIS_PASS` environment variabl
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./httpserver-go --output <my-org>/httpserver-go-122-redis-app:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/httpserver-go-122-redis-app:latest --env REDIS_ADDR=go122-redis.internal:6379 --env REDIS_PASS=unikraft
+unikraft run --metro fra \
+  -m 256M \
+  -p 443:8080/tls+http \
+  --scale-to-zero policy=on,cooldown-time=1000 \
+  --env REDIS_ADDR=go122-redis.internal:6379 \
+  --env REDIS_PASS=unikraft \
+  --image <my-org>/httpserver-go-122-redis-app:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi ./httpserver-go/ --env REDIS_ADDR=go122-redis.internal:6379 --env REDIS_PASS=unikraft
+kraft cloud deploy \
+  -M 256Mi \
+  -p 443:8080/tls+http \
+  --scale-to-zero on \
+  --scale-to-zero-cooldown 1s \
+  --env REDIS_ADDR=go122-redis.internal:6379 \
+  --env REDIS_PASS=unikraft \
+  ./httpserver-go/
 ```
 
 The output shows the instance address and other details:

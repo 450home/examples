@@ -43,14 +43,26 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/postgres:latest
-unikraft run --metro fra --scale-to-zero policy=idle,cooldown-time=1000,stateful=true -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=unikraft --image <my-org>/postgres:latest
+unikraft run --metro fra \
+  -m 1G \
+  -p 5432:5432/tls \
+  --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
+  -e POSTGRES_PASSWORD=unikraft \
+  --image <my-org>/postgres:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 5432:5432/tls -M 1Gi -e POSTGRES_PASSWORD=unikraft .
+kraft cloud deploy \
+  -M 1Gi \
+  -p 5432:5432/tls \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 1s \
+  -e POSTGRES_PASSWORD=unikraft \
+  .
 ```
 
 The output shows the instance address and other details:
@@ -189,14 +201,30 @@ Then start the PostgreSQL instance and mount that volume:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/postgres:latest
-unikraft run --metro fra --scale-to-zero policy=idle,cooldown-time=1000,stateful=true -p 5432:5432/tls -m 1G -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres --volume postgres:/volume --image <my-org>/postgres:latest
+unikraft run --metro fra \
+  -m 1G \
+  -p 5432:5432/tls \
+  --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
+  -e POSTGRES_PASSWORD=unikraft \
+  -e PGDATA=/volume/postgres \
+  --volume postgres:/volume \
+  --image <my-org>/postgres:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 5432:5432/tls -M 1Gi -e POSTGRES_PASSWORD=unikraft -e PGDATA=/volume/postgres -v postgres:/volume .
+kraft cloud deploy \
+  -M 1Gi \
+  -p 5432:5432/tls \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 1s \
+  -e POSTGRES_PASSWORD=unikraft \
+  -e PGDATA=/volume/postgres \
+  -v postgres:/volume \
+  .
 ```
 
 ## Customize your deployment

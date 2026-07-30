@@ -42,14 +42,24 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-elixir116:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=3000,stateful=true --metro fra -p 443:3000/tls+http -m 1G --image <my-org>/httpserver-elixir116:latest
+unikraft run --metro fra \
+  -m 1G \
+  -p 443:3000/tls+http \
+  --scale-to-zero policy=idle,cooldown-time=3000,stateful=true \
+  --image <my-org>/httpserver-elixir116:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 3s -p 443:3000/tls+http -M 1Gi .
+kraft cloud deploy \
+  -M 1Gi \
+  -p 443:3000/tls+http \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 3s \
+  .
 ```
 
 The output shows the instance address and other details:

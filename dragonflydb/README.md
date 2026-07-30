@@ -43,14 +43,22 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/dragonflydb:latest
-unikraft run --scale-to-zero policy=off --metro fra -p 443:6379/http+tls -m 512M --image <my-org>/dragonflydb:latest
+unikraft run --metro fra \
+  -m 512M \
+  -p 443:6379/http+tls \
+  --scale-to-zero policy=off \
+  --image <my-org>/dragonflydb:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero off -p 443:6379/http+tls -M 512Mi .
+kraft cloud deploy \
+  -M 512Mi \
+  -p 443:6379/http+tls \
+  --scale-to-zero off \
+  .
 ```
 
 The output shows the instance address and other details:

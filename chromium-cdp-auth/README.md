@@ -73,14 +73,28 @@ When done, invoke the following command to deploy this app on Unikraft Cloud, mo
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/chromium-cdp-auth
-unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -m 4G -p 443:8080/tls+http -e BOOTSTRAP_ADMIN_TOKEN="$BOOTSTRAP_ADMIN_TOKEN" --volume chromium-cdp-auth-data:/app/data --image <my-org>/chromium-cdp-auth
+unikraft run --metro fra \
+  -m 4G \
+  -p 443:8080/tls+http \
+  --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
+  -e BOOTSTRAP_ADMIN_TOKEN="$BOOTSTRAP_ADMIN_TOKEN" \
+  --volume chromium-cdp-auth-data:/app/data \
+  --image <my-org>/chromium-cdp-auth
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 4Gi --env BOOTSTRAP_ADMIN_TOKEN="$BOOTSTRAP_ADMIN_TOKEN" --volume chromium-cdp-auth-data:/app/data .
+kraft cloud deploy \
+  -M 4Gi \
+  -p 443:8080/tls+http \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 1s \
+  --env BOOTSTRAP_ADMIN_TOKEN="$BOOTSTRAP_ADMIN_TOKEN" \
+  --volume chromium-cdp-auth-data:/app/data \
+  .
 ```
 
 The output shows the instance address and other details.

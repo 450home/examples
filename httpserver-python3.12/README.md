@@ -42,14 +42,23 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python312:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python312:latest
+unikraft run --metro fra \
+  -m 512M \
+  -p 443:8080/tls+http \
+  --scale-to-zero policy=on,cooldown-time=1000 \
+  --image <my-org>/httpserver-python312:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
+kraft cloud deploy \
+  -M 512Mi \
+  -p 443:8080/tls+http \
+  --scale-to-zero on \
+  --scale-to-zero-cooldown 1s \
+  .
 ```
 
 The output shows the instance address and other details:
@@ -194,14 +203,23 @@ Run the command below to deploy the app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-python312-flask30:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 512M --image <my-org>/httpserver-python312-flask30:latest
+unikraft run --metro fra \
+  -m 512M \
+  -p 443:8080/tls+http \
+  --scale-to-zero policy=on,cooldown-time=1000 \
+  --image <my-org>/httpserver-python312-flask30:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 512Mi .
+kraft cloud deploy \
+  -M 512Mi \
+  -p 443:8080/tls+http \
+  --scale-to-zero on \
+  --scale-to-zero-cooldown 1s \
+  .
 ```
 
 Differences from the `httpserver-python3.12-flask3.0` app are also the steps required to create an `pip`-based app:

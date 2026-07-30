@@ -48,14 +48,26 @@ Build and deploy the Redis instance (used internally by Tyk):
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./redis --output <my-org>/redis:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -m 256M --image <my-org>/redis:latest --domain tyk-redis.internal -e REDIS_PASSWORD=unikraft
+unikraft run --metro fra \
+  -m 256M \
+  --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
+  --domain tyk-redis.internal \
+  -e REDIS_PASSWORD=unikraft \
+  --image <my-org>/redis:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 256Mi --domain tyk-redis.internal --env REDIS_PASSWORD=unikraft ./redis/
+kraft cloud deploy \
+  -M 256Mi \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 1s \
+  --domain tyk-redis.internal \
+  --env REDIS_PASSWORD=unikraft \
+  ./redis/
 ```
 
 Make sure to replace `<my-org>` with your username / org-name in the unikraft CLI commands above.
@@ -117,14 +129,27 @@ If `TYK_GW_STORAGE_HOST` is unset, Tyk tries to connect to a Redis instance at `
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./tyk --output <my-org>/tyk:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8080/tls+http -m 256M --image <my-org>/tyk:latest -e TYK_GW_STORAGE_PASSWORD=unikraft -e TYK_GW_STORAGE_HOST=tyk-redis.internal
+unikraft run --metro fra \
+  -m 256M \
+  -p 443:8080/tls+http \
+  --scale-to-zero policy=on,cooldown-time=1000 \
+  -e TYK_GW_STORAGE_PASSWORD=unikraft \
+  -e TYK_GW_STORAGE_HOST=tyk-redis.internal \
+  --image <my-org>/tyk:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8080/tls+http -M 256Mi --env TYK_GW_STORAGE_PASSWORD=unikraft --env TYK_GW_STORAGE_HOST=tyk-redis.internal ./tyk/
+kraft cloud deploy \
+  -M 256Mi \
+  -p 443:8080/tls+http \
+  --scale-to-zero on \
+  --scale-to-zero-cooldown 1s \
+  --env TYK_GW_STORAGE_PASSWORD=unikraft \
+  --env TYK_GW_STORAGE_HOST=tyk-redis.internal \
+  ./tyk/
 ```
 
 Make sure to replace `<my-org>` with your username / org-name in the unikraft CLI commands above.

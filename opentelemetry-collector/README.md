@@ -45,14 +45,18 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/opentelemetry-collector:latest
-unikraft run --metro fra -m 1536M --image <my-org>/opentelemetry-collector:latest
+unikraft run --metro fra \
+  -m 1536M \
+  --image <my-org>/opentelemetry-collector:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy -M 1536Mi .
+kraft cloud deploy \
+  -M 1536Mi \
+  .
 ```
 
 The output shows the instance details:

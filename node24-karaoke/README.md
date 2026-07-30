@@ -43,14 +43,24 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/node24-karaoke:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=2000,stateful=true --metro fra -p 443:8080/tls+http -m 2G --image <my-org>/node24-karaoke:latest
+unikraft run --metro fra \
+  -m 2G \
+  -p 443:8080/tls+http \
+  --scale-to-zero policy=on,cooldown-time=2000,stateful=true \
+  --image <my-org>/node24-karaoke:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 2s -p 443:8080/tls+http -M 2Gi .
+kraft cloud deploy \
+  -M 2Gi \
+  -p 443:8080/tls+http \
+  --scale-to-zero on \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 2s \
+  .
 ```
 
 The output shows the instance address and other details:
