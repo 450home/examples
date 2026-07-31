@@ -1,0 +1,52 @@
+# Starter alerting rules for Unikraft Cloud instance metrics.
+#
+# Thresholds are conservative defaults — tune them to your workload.
+
+groups:
+  - name: targets
+    rules:
+      - alert: ScrapeTargetDown
+        expr: up{job="instances"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Scrape target {{ $labels.instance }} is down"
+          description: "Prometheus has failed to scrape the instance metrics endpoint for 5m."
+
+  - name: instances
+    rules:
+      - alert: InstanceQueueSaturation
+        expr: instance_nqueued{job="instances"} > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance_uuid }} has a persistent request queue"
+          description: "Queued connections or requests for 10m — the instance is saturated."
+
+      - alert: InstanceFrequentRestarts
+        expr: increase(instance_restart_count{job="instances"}[1h]) > 3
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance_uuid }} restarting frequently"
+          description: "More than 3 restarts in the last hour."
+
+      - alert: InstanceHighWakeupLatency
+        expr: histogram_quantile(0.99, sum by (instance_uuid, le) (rate(instance_wakeup_latency_seconds_bucket{job="instances"}[5m]))) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance_uuid }} slow to wake"
+          description: "p99 wakeup latency above 1s for 10m."
+
+      - alert: InstanceStuckDraining
+        expr: instance_state{job="instances"} == 3
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Instance {{ $labels.instance_uuid }} stuck draining"
+          description: "Instance has been draining for over 30 minutes."
