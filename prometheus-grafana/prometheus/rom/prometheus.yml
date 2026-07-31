@@ -1,0 +1,43 @@
+# Prometheus scrape configuration for Unikraft Cloud instance metrics.
+#
+# Before deploying, replace:
+#   <metro>       your metro, e.g. fra
+#   <UKC_TOKEN>   your Unikraft Cloud API token
+#
+# The job name `instances` MUST match the `job=` selector baked into the
+# Grafana dashboard. If you rename the job, update the dashboard queries too.
+#
+# NOTE: the token below is a full-privilege credential — it can delete
+# instances and volumes, not just read metrics. This file ships to the
+# instance as a read-only ROM, so never commit it with a real token filled in.
+
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    region: <metro>
+    cloud: unikraft
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+# Uncomment once you run an Alertmanager, to route firing alerts to
+# Slack/email/PagerDuty. Without it, rules still evaluate, but this instance
+# has no public port, so its "Alerts" tab is out of reach.
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ["alertmanager.internal:9093"]
+
+scrape_configs:
+  # Per-instance metrics, labelled by instance_uuid.
+  - job_name: instances
+    scheme: https
+    metrics_path: /v1/instances/metrics
+    authorization:
+      type: Bearer
+      credentials: <UKC_TOKEN>
+    static_configs:
+      - targets: ["api.<metro>.unikraft.cloud"]
+        labels:
+          region: <metro>
