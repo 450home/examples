@@ -89,14 +89,26 @@ MongoDB is an internal service (not publicly accessible), reached via the `mongo
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./mongo --output <my-org>/mongo:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -m 1024M --image <my-org>/mongo:latest --domain mongo.internal --volume mongo-data:/data/db
+unikraft run --metro fra \
+  -m 1024M \
+  --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
+  --domain mongo.internal \
+  --volume mongo-data:/data/db \
+  --image <my-org>/mongo:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 1024Mi --domain mongo.internal --volume mongo-data:/data/db ./mongo
+kraft cloud deploy \
+  -M 1024Mi \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 1s \
+  --domain mongo.internal \
+  --volume mongo-data:/data/db \
+  ./mongo
 ```
 
 The output shows the MongoDB instance details:
@@ -159,14 +171,27 @@ It connects to MongoDB using the `MONGO_SERVER_URL` environment variable and is 
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./flask --output <my-org>/flask:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -m 1024M --image <my-org>/flask:latest --domain backend.internal --env FLASK_SERVER_PORT=9091 --env MONGO_SERVER_URL=mongo.internal:27017
+unikraft run --metro fra \
+  -m 1024M \
+  --scale-to-zero policy=on,cooldown-time=1000 \
+  --domain backend.internal \
+  --env FLASK_SERVER_PORT=9091 \
+  --env MONGO_SERVER_URL=mongo.internal:27017 \
+  --image <my-org>/flask:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -M 1024Mi --domain backend.internal --env FLASK_SERVER_PORT=9091 --env MONGO_SERVER_URL=mongo.internal:27017 ./flask
+kraft cloud deploy \
+  -M 1024Mi \
+  --scale-to-zero on \
+  --scale-to-zero-cooldown 1s \
+  --domain backend.internal \
+  --env FLASK_SERVER_PORT=9091 \
+  --env MONGO_SERVER_URL=mongo.internal:27017 \
+  ./flask
 ```
 
 The output shows the Flask instance details:
@@ -229,14 +254,25 @@ To use a different backend domain, set the `BACKEND_HOST` environment variable t
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build ./nginx --output <my-org>/nginx:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:80/tls+http -m 512M --image <my-org>/nginx:latest -e BACKEND_HOST=backend.internal
+unikraft run --metro fra \
+  -m 512M \
+  -p 443:80/tls+http \
+  --scale-to-zero policy=on,cooldown-time=1000 \
+  -e BACKEND_HOST=backend.internal \
+  --image <my-org>/nginx:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:80/tls+http -M 512Mi --env BACKEND_HOST=backend.internal ./nginx
+kraft cloud deploy \
+  -M 512Mi \
+  -p 443:80/tls+http \
+  --scale-to-zero on \
+  --scale-to-zero-cooldown 1s \
+  --env BACKEND_HOST=backend.internal \
+  ./nginx
 ```
 
 The output shows the NGINX instance details including its public FQDN:

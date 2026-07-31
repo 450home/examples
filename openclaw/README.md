@@ -26,7 +26,13 @@ When done, you may create the OpenClaw Unikraft Cloud image and deploy an instan
 
 ```bash
 unikraft build . --output <my-org>/openclaw:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=10000,stateful=true --metro fra -p 18789:18789/tls -p 2222:2222/tls -m 4G -e PUBKEY="...." --image <my-org>/openclaw:latest
+unikraft run --metro fra \
+  -m 4G \
+  -p 18789:18789/tls \
+  -p 2222:2222/tls \
+  --scale-to-zero policy=on,cooldown-time=10000,stateful=true \
+  -e PUBKEY="...." \
+  --image <my-org>/openclaw:latest
 ```
 
 Make sure to replace `<my-org>` with your username / org-name and to set your SSH public key as the `PUBKEY` environment variable above.

@@ -44,14 +44,23 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/haproxy:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=1000 --metro fra -p 443:8404/tls+http -m 256M --image <my-org>/haproxy:latest
+unikraft run --metro fra \
+  -m 256M \
+  -p 443:8404/tls+http \
+  --scale-to-zero policy=on,cooldown-time=1000 \
+  --image <my-org>/haproxy:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-cooldown 1s -p 443:8404/tls+http -M 256Mi .
+kraft cloud deploy \
+  -M 256Mi \
+  -p 443:8404/tls+http \
+  --scale-to-zero on \
+  --scale-to-zero-cooldown 1s \
+  .
 ```
 
 The output shows the instance address and other details:

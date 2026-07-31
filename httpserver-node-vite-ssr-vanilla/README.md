@@ -59,14 +59,28 @@ When done, run:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/httpserver-node-vite-ssr-vanilla:latest
-unikraft run --scale-to-zero policy=on,cooldown-time=2000,stateful=true --metro fra -p 443:8080/tls+http -m 1G -e PWD=/app -e NODE_ENV=production --image <my-org>/httpserver-node-vite-ssr-vanilla:latest
+unikraft run --metro fra \
+  -m 1G \
+  -p 443:8080/tls+http \
+  --scale-to-zero policy=on,cooldown-time=2000,stateful=true \
+  -e PWD=/app \
+  -e NODE_ENV=production \
+  --image <my-org>/httpserver-node-vite-ssr-vanilla:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero on --scale-to-zero-stateful --scale-to-zero-cooldown 2s -p 443:8080/tls+http -M 1Gi -e PWD=/app -e NODE_ENV=production .
+kraft cloud deploy \
+  -M 1Gi \
+  -p 443:8080/tls+http \
+  --scale-to-zero on \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 2s \
+  -e PWD=/app \
+  -e NODE_ENV=production \
+  .
 ```
 
 The output shows the instance address and other details:

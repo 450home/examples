@@ -44,14 +44,20 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/chromium-cdp
-unikraft run --metro fra -m 4G -p 443:8080/tls+http --image <my-org>/chromium-cdp
+unikraft run --metro fra \
+  -m 4G \
+  -p 443:8080/tls+http \
+  --image <my-org>/chromium-cdp
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy -p 443:8080/tls+http -M 4Gi .
+kraft cloud deploy \
+  -M 4Gi \
+  -p 443:8080/tls+http \
+  .
 ```
 
 The output shows the instance address and other details.

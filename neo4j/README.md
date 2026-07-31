@@ -42,12 +42,11 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/neo4j:latest
-unikraft run \
-  --metro fra \
-  --scale-to-zero policy=idle,cooldown-time=4000,stateful=true \
+unikraft run --metro fra \
   -m 2G \
   -p 443:7474/tls+http \
   -p 7687:7687/tls \
+  --scale-to-zero policy=idle,cooldown-time=4000,stateful=true \
   -e "NEO4J_HOME=/var/lib/neo4j" \
   -e "JAVA_HOME=/opt/java/openjdk" \
   -e "LANG=C.UTF-8" \
@@ -61,12 +60,12 @@ or
 **Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy \
+  -M 2Gi \
+  -p 443:7474/tls+http \
+  -p 7687:7687/tls \
   --scale-to-zero idle \
   --scale-to-zero-stateful \
   --scale-to-zero-cooldown 4s \
-  -p 443:7474/tls+http \
-  -p 7687:7687/tls \
-  -M 2Gi \
   --env NEO4J_HOME=/var/lib/neo4j \
   --env JAVA_HOME=/opt/java/openjdk \
   --env LANG=C.UTF-8 \
@@ -209,12 +208,11 @@ Then start the neo4j instance and mount that volume:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/neo4j:latest
-unikraft run \
-  --metro fra \
-  --scale-to-zero policy=idle,cooldown-time=4000,stateful=true \
+unikraft run --metro fra \
   -m 2G \
   -p 443:7474/tls+http \
   -p 7687:7687/tls \
+  --scale-to-zero policy=idle,cooldown-time=4000,stateful=true \
   -e "NEO4J_HOME=/var/lib/neo4j" \
   -e "JAVA_HOME=/opt/java/openjdk" \
   -e "LANG=C.UTF-8" \
@@ -229,12 +227,12 @@ or
 **Using the legacy kraft CLI**
 ```bash title="kraft"
 kraft cloud deploy \
+  -M 2Gi \
+  -p 443:7474/tls+http \
+  -p 7687:7687/tls \
   --scale-to-zero idle \
   --scale-to-zero-stateful \
   --scale-to-zero-cooldown 4s \
-  -p 443:7474/tls+http \
-  -p 7687:7687/tls \
-  -M 2Gi \
   --env NEO4J_HOME=/var/lib/neo4j \
   --env JAVA_HOME=/opt/java/openjdk \
   --env LANG=C.UTF-8 \

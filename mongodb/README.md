@@ -43,14 +43,24 @@ When done, invoke the following command to deploy this app on Unikraft Cloud:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mongodb:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 27017:27017/tls -m 1G --image <my-org>/mongodb:latest
+unikraft run --metro fra \
+  -m 1G \
+  -p 27017:27017/tls \
+  --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
+  --image <my-org>/mongodb:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -p 27017:27017/tls -M 1Gi .
+kraft cloud deploy \
+  -M 1Gi \
+  -p 27017:27017/tls \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 1s \
+  .
 ```
 
 The output shows the instance address and other details:
@@ -180,14 +190,26 @@ Then start the MongoDB instance and mount that volume:
 **Using the unikraft CLI (Recommended)**
 ```bash title="unikraft"
 unikraft build . --output <my-org>/mongodb:latest
-unikraft run --scale-to-zero policy=idle,cooldown-time=1000,stateful=true --metro fra -p 27017:27017/tls -m 1G --volume mongodb-store:/data/db --image <my-org>/mongodb:latest
+unikraft run --metro fra \
+  -m 1G \
+  -p 27017:27017/tls \
+  --scale-to-zero policy=idle,cooldown-time=1000,stateful=true \
+  --volume mongodb-store:/data/db \
+  --image <my-org>/mongodb:latest
 ```
 
 or
 
 **Using the legacy kraft CLI**
 ```bash title="kraft"
-kraft cloud deploy --scale-to-zero idle --scale-to-zero-stateful --scale-to-zero-cooldown 1s -M 1Gi -p 27017:27017/tls --volume mongodb-store:/data/db .
+kraft cloud deploy \
+  -M 1Gi \
+  -p 27017:27017/tls \
+  --scale-to-zero idle \
+  --scale-to-zero-stateful \
+  --scale-to-zero-cooldown 1s \
+  --volume mongodb-store:/data/db \
+  .
 ```
 
 ## Customize your app
