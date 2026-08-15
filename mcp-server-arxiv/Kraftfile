@@ -4,6 +4,9 @@ name: mcp-arxiv
 
 runtime: base-compat:latest
 
+targets:
+  - kraftcloud/x86_64
+
 rootfs:
   source: ./Dockerfile
   format: erofs
