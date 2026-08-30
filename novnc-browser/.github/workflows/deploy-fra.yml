@@ -1,0 +1,22 @@
+name: deploy-novnc-fra
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: unikraft/install-unikraft-cli@vlatest
+      - name: unikraft login
+        run: |
+          echo "${{ secrets.UKC_TOKEN }}" | unikraft auth login --stdin -y
+          unikraft ctx use ${{ secrets.UKC_ORG }}
+          unikraft ctx set --metro fra
+      - name: build
+        run: |
+          unikraft build -t ${{ secrets.UKC_ORG }}/novnc-browser:latest --arch x86_64
+      - name: deploy
+        run: |
+          unikraft run --metro fra -n vnc-browser -m 4G -p 443:6080/tls+http --scale-to-zero policy=on,cooldown-time=4000,stateful=true ${{ secrets.UKC_ORG }}/novnc-browser:latest
