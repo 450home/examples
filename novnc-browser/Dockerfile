@@ -4,22 +4,18 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBIAN_PRIORITY=high
 
 RUN apt-get update && \
-    apt-get -y upgrade && \
-    apt-get -y install \
+    apt-get -y install --no-install-recommends \
     xvfb \
     xterm \
     xdotool \
     scrot \
-    imagemagick \
     mutter \
     x11vnc \
     tint2 \
     git \
-    net-tools \
-    gedit \
-    x11-apps \
-    xpaint \
-    software-properties-common
+    software-properties-common && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Firefox ESR
 RUN add-apt-repository ppa:mozillateam/ppa && \
