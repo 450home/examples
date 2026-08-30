@@ -36,12 +36,17 @@ jobs:
         run: |
           unikraft build . --output iudd/ubuntu-web-terminal:latest
 
+      - name: Create persistent data volume
+        run: |
+          unikraft volumes get ubuntu-web-terminal-data --metro fra >/dev/null 2>&1 || \
+            unikraft volumes create --metro fra --name ubuntu-web-terminal-data --size 1GiB
+
       - name: Deploy to Frankfurt
         working-directory: ubuntu-web-terminal
         run: |
           unikraft run --metro fra \
             -n ubuntu-web-terminal \
             -m 1G \
-            -v ubuntu-web-terminal-data:/data:size=1GiB \
+            -v ubuntu-web-terminal-data:/data \
             -p 443:6080/tls+http \
             --image iudd/ubuntu-web-terminal:latest
