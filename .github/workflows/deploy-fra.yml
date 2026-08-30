@@ -7,23 +7,36 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Install KraftKit CLI
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Unikraft CLI
         run: |
-          curl -fsSL https://github.com/unikraft/kraftkit/releases/download/v0.12.15/kraft_0.12.15_linux_amd64.tar.gz -o "$HOME/kraft.tar.gz"
-          tar -xzf "$HOME/kraft.tar.gz" -C "$HOME"
-          chmod +x "$HOME/kraft"
-          echo "$HOME" >> "$GITHUB_PATH"
-      - name: Configure Unikraft Cloud
+          mkdir -p "$HOME/.local/bin" "$HOME/ukc-build"
+          curl -fsSL "https://github.com/unikraft-cloud/cli/releases/download/v0.4.2/unikraft-cli_0.4.2_linux_amd64.tar.gz" -o "$HOME/ukc-build/unikraft-cli.tar.gz"
+          tar -xzf "$HOME/ukc-build/unikraft-cli.tar.gz" -C "$HOME/ukc-build"
+          find "$HOME/ukc-build" -type f -name unikraft -exec cp {} "$HOME/.local/bin/unikraft" \;
+          chmod +x "$HOME/.local/bin/unikraft"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/unikraft" --version
+
+      - name: Log in to Unikraft Cloud
+        env:
+          UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
         run: |
-          echo "UKC_TOKEN=${{ secrets.UKC_TOKEN }}" >> "$GITHUB_ENV"
-          echo "UKC_METRO=fra" >> "$GITHUB_ENV"
-      - name: Build and package noVNC
+          printf '%s' "$UKC_TOKEN" | unikraft login -
+
+      - name: Build and publish noVNC image
         working-directory: novnc-browser
         run: |
-          kraft build --arch x86_64
-          kraft pkg --as oci --name ${{ secrets.UKC_ORG }}/novnc-browser:latest
-      - name: Deploy noVNC to FRA
+          unikraft build . --output iudd/novnc-browser:latest
+
+      - name: Deploy noVNC to Frankfurt
         working-directory: novnc-browser
         run: |
-          kraft cloud deploy --metro fra --name vnc-browser --memory 4G --port 443:6080/tls+http ${{ secrets.UKC_ORG }}/novnc-browser:latest
+          unikraft run --metro fra \
+            -n vnc-browser \
+            -m 4G \
+            -p 443:6080/tls+http \
+            --scale-to-zero policy=on,cooldown-time=4000,stateful=true \
+            --image iudd/novnc-browser:latest
