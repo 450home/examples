@@ -18,7 +18,7 @@ jobs:
           find "$HOME/ukc-build" -type f -name unikraft -exec cp {} "$HOME/.local/bin/unikraft" \;
           chmod +x "$HOME/.local/bin/unikraft"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          "$HOME/.local/bin/unikraft" --version
+          "$HOME/.local/bin/unikraft" version
 
       - name: Log in to Unikraft Cloud
         env:
