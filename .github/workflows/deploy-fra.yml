@@ -24,7 +24,7 @@ jobs:
         env:
           UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
         run: |
-          printf '%s' "$UKC_TOKEN" | unikraft login -
+          printf '%s' "$UKC_TOKEN" | unikraft login --token - --organization iudd
 
       - name: Build and publish noVNC image
         working-directory: novnc-browser
