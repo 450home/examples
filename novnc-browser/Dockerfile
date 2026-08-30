@@ -5,6 +5,7 @@ ENV DEBIAN_PRIORITY=high
 
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
+    ca-certificates \
     xvfb \
     xterm \
     xdotool \
@@ -14,12 +15,13 @@ RUN apt-get update && \
     tint2 \
     git \
     firefox-esr && \
+    update-ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install noVNC
-RUN git clone --branch v1.5.0 https://github.com/novnc/noVNC.git /opt/noVNC && \
-    git clone --branch v0.12.0 https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
+RUN git clone --depth 1 --branch v1.5.0 https://github.com/novnc/noVNC.git /opt/noVNC && \
+    git clone --depth 1 --branch v0.12.0 https://github.com/novnc/websockify /opt/noVNC/utils/websockify && \
     ln -s /opt/noVNC/vnc.html /opt/noVNC/index.html
 
 COPY ./image /
