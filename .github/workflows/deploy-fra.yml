@@ -8,10 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Unikraft CLI
+      - name: Install KraftKit CLI
         run: |
-          curl -L https://github.com/unikraft/unikraft/releases/download/0.4.2/unikraft-linux-amd64 -o "$HOME/unikraft"
-          chmod +x "$HOME/unikraft"
+          curl -fsSL https://github.com/unikraft/kraftkit/releases/download/v0.12.15/kraft_0.12.15_linux_amd64.tar.gz -o "$HOME/kraft.tar.gz"
+          tar -xzf "$HOME/kraft.tar.gz" -C "$HOME"
+          chmod +x "$HOME/kraft"
           echo "$HOME" >> "$GITHUB_PATH"
       - name: unikraft login
         run: |
