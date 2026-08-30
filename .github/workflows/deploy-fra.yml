@@ -14,14 +14,16 @@ jobs:
           tar -xzf "$HOME/kraft.tar.gz" -C "$HOME"
           chmod +x "$HOME/kraft"
           echo "$HOME" >> "$GITHUB_PATH"
-      - name: unikraft login
+      - name: Configure Unikraft Cloud
         run: |
-          echo "${{ secrets.UKC_TOKEN }}" | unikraft auth login --stdin -y
-          unikraft ctx use ${{ secrets.UKC_ORG }}
-          unikraft ctx set --metro fra
-      - name: build
+          echo "UKC_TOKEN=${{ secrets.UKC_TOKEN }}" >> "$GITHUB_ENV"
+          echo "UKC_METRO=fra" >> "$GITHUB_ENV"
+      - name: Build and package noVNC
+        working-directory: novnc-browser
         run: |
-          unikraft build -t ${{ secrets.UKC_ORG }}/novnc-browser:latest --arch x86_64
-      - name: deploy
+          kraft build --arch x86_64
+          kraft pkg --as oci --name ${{ secrets.UKC_ORG }}/novnc-browser:latest
+      - name: Deploy noVNC to FRA
+        working-directory: novnc-browser
         run: |
-          unikraft run --metro fra -n vnc-browser -m 4G -p 443:6080/tls+http --scale-to-zero policy=on,cooldown-time=4000,stateful=true ${{ secrets.UKC_ORG }}/novnc-browser:latest
+          kraft cloud deploy --metro fra --name vnc-browser --memory 4G --port 443:6080/tls+http ${{ secrets.UKC_ORG }}/novnc-browser:latest
