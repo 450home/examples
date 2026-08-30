@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBIAN_PRIORITY=high
@@ -13,14 +13,9 @@ RUN apt-get update && \
     x11vnc \
     tint2 \
     git \
-    software-properties-common && \
+    firefox-esr && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Install Firefox ESR
-RUN add-apt-repository ppa:mozillateam/ppa && \
-    apt-get install -y --no-install-recommends \
-    firefox-esr
 
 # Install noVNC
 RUN git clone --branch v1.5.0 https://github.com/novnc/noVNC.git /opt/noVNC && \
