@@ -9,6 +9,8 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      UKC_METRO: fra
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -40,5 +42,6 @@ jobs:
           unikraft run --metro fra \
             -n ubuntu-web-terminal \
             -m 1G \
+            -v ubuntu-web-terminal-data:/data:size=1GiB \
             -p 443:6080/tls+http \
             --image iudd/ubuntu-web-terminal:latest
