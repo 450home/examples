@@ -8,7 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: unikraft/install-unikraft-cli@vlatest
+      - name: Install Unikraft CLI
+        run: |
+          curl -L https://github.com/unikraft/unikraft/releases/download/0.4.2/unikraft-linux-amd64 -o "$HOME/unikraft"
+          chmod +x "$HOME/unikraft"
+          echo "$HOME" >> "$GITHUB_PATH"
       - name: unikraft login
         run: |
           echo "${{ secrets.UKC_TOKEN }}" | unikraft auth login --stdin -y
