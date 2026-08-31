@@ -1,0 +1,58 @@
+name: deploy-txt-vless-web
+
+on:
+  workflow_dispatch:
+    inputs:
+      metro:
+        description: Unikraft Cloud metro
+        required: true
+        default: fra
+        type: choice
+        options:
+          - fra
+          - sin
+          - dal
+          - sfo
+          - was
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      UKC_METRO: ${{ inputs.metro }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Unikraft CLI
+        run: |
+          mkdir -p "$HOME/.local/bin" "$HOME/ukc-build"
+          curl -fsSL "https://github.com/unikraft-cloud/cli/releases/download/v0.4.2/unikraft-cli_0.4.2_linux_amd64.tar.gz" -o "$HOME/ukc-build/unikraft-cli.tar.gz"
+          tar -xzf "$HOME/ukc-build/unikraft-cli.tar.gz" -C "$HOME/ukc-build"
+          find "$HOME/ukc-build" -type f -name unikraft -exec cp {} "$HOME/.local/bin/unikraft" \;
+          chmod +x "$HOME/.local/bin/unikraft"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/unikraft" version
+
+      - name: Log in to Unikraft Cloud
+        env:
+          UKC_TOKEN: ${{ secrets.UKC_TOKEN_2 }}
+        run: |
+          printf '%s' "$UKC_TOKEN" | unikraft login --token - --organization susanlee
+
+      - name: Build and publish image
+        working-directory: txt-vless-web
+        run: |
+          unikraft build . --output susanlee/txt-vless-web:latest
+
+      - name: Deploy static website
+        working-directory: txt-vless-web
+        run: |
+          unikraft run --metro "$UKC_METRO" \
+            -n txt-vless-web \
+            -m 64MiB \
+            -p 443:80/tls+http \
+            --image susanlee/txt-vless-web:latest
