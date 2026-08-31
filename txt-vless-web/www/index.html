@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>TXT → VLESS 智能节点处理工作台</title>
+<style>
+    :root {
+        --primary-color: #0066cc;
+        --hover-color: #0056b3;
+        --success-color: #28a745;
+        --border-radius-md: 8px;
+        --border-radius-lg: 12px;
+        --glass-bg: rgba(255, 255, 255, 0.85);
+        --glass-border: rgba(255, 255, 255, 0.4);
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        margin: 0; padding: 20px; min-height: 100vh; box-sizing: border-box; background-color: #f0f2f5;
+    }
+    #bgCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
+
+    .container {
+        max-width: 900px; margin: auto; background: var(--glass-bg); backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px); padding: 30px; border-radius: var(--border-radius-lg);
+        box-shadow: 0 8px 32px rgba(0,0,0,.08); border: 1px solid var(--glass-border);
+    }
+
+    h1 { color: #1a1a1a; margin-top: 0; margin-bottom: 20px; font-size: 24px; font-weight: 600; text-align: center;}
+
+    .config-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
+    .form-item { display: flex; flex-direction: column; gap: 5px; }
+    .form-item label { font-weight: 600; color: #444; font-size: 13px; margin-left: 2px; }
+
+    input, select, textarea {
+        padding: 10px 12px; font-size: 14px; border: 1px solid #ddd;
+        border-radius: var(--border-radius-md); box-sizing: border-box;
+        background: rgba(255,255,255,0.9); transition: all 0.2s ease;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary-color); outline: none; box-shadow: 0 0 0 3px rgba(0,102,204,0.15); }
+
+    #output { height: 140px; margin-top: 10px; font-family: 'SF Mono', monospace; font-size: 12px; background:#f8f9fa; resize: none; width: 100%; border-radius: var(--border-radius-md); border: 1px solid #eee; padding: 12px; }
+
+    button { padding: 10px 20px; background: var(--primary-color); color: #fff; border: none; border-radius: var(--border-radius-md); cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; }
+    button:hover { background: var(--hover-color); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,102,204,0.2); }
+    button.outline { background: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); }
+    button.outline:hover { background: rgba(0,102,204,0.05); }
+
+    fieldset { border: 1px solid rgba(0,0,0,0.08); padding: 20px; margin-bottom: 25px; border-radius: var(--border-radius-lg); background: rgba(250,250,250,0.5); }
+    legend { font-weight: 600; padding: 0 12px; color: #333; font-size: 15px; }
+
+    #statusTip { display: none; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; padding: 10px 15px; border-radius: var(--border-radius-md); font-size: 13px; margin-bottom: 15px; }
+
+    .copy-area { display: flex; align-items: center; gap: 10px; position: relative; }
+    #copyTip { position: absolute; right: 0; top: -25px; color: var(--success-color); font-weight: 600; font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    #copyTip.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<div class="container">
+    <h1>TXT → VLESS 智能节点处理工作台</h1>
+
+    <div style="margin-bottom: 20px; text-align: center;">
+        <div style="display:inline-flex; gap:12px; align-items:center; background: #fff; padding: 10px 20px; border-radius: 50px; border: 1px solid #eee; flex-wrap: wrap;">
+            <!-- ⚡ 严格限制 accept=".txt" -->
+            <input type="file" id="txtFile" accept=".txt">
+            <span style="color:#ccc;">|</span>
+            <button class="outline" style="border-radius: 50px;" onclick="resetAll()">🔄 重置清空</button>
+        </div>
+    </div>
+
+    <div id="statusTip"></div>
+
+    <fieldset>
+        <legend>🔧 配置 VLESS 全局参数</legend>
+        <div class="config-grid">
+            <div class="form-item" style="grid-column: span 2;"><label>UUID</label><input type="text" id="uuid" value=""></div>
+            <div class="form-item"><label>加密方式 (encryption)</label><input type="text" id="encryption" value="none"></div>
+            <div class="form-item"><label>传输协议 (type)</label><select id="type"><option value="ws">ws</option><option value="grpc">grpc</option><option value="tcp">tcp</option><option value="http">http</option></select></div>
+            <div class="form-item"><label>安全层 (security)</label><select id="security"><option value="tls">tls</option><option value="reality">reality</option><option value="none">none</option></select></div>
+            <div class="form-item"><label>指纹 (fp)</label><select id="fp"><option value="chrome">chrome</option><option value="firefox">firefox</option><option value="safari">safari</option><option value="edge">edge</option><option value="ios">ios</option><option value="random">random</option></select></div>
+            <div class="form-item"><label>ALPN</label><input type="text" id="alpn" value="http/1.1"></div>
+            <div class="form-item"><label>跳过证书验证 (insecure)</label><select id="allowInsecure"><option value="0">否 (0)</option><option value="1">是 (1)</option></select></div>
+            <div class="form-item"><label>SNI</label><input type="text" id="sni" value=""></div>
+            <div class="form-item"><label>Host</label><input type="text" id="host" value=""></div>
+            <div class="form-item" style="grid-column: span 2;"><label>Path</label><input type="text" id="path" value=""></div>
+        </div>
+    </fieldset>
+
+    <button id="generateBtn" style="width: 100%;">🚀 一键生成 VLESS 链接库</button>
+
+    <div style="margin-top:30px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 10px;">
+            <h3 style="margin:0; font-size: 16px; color:#333;">🔗 生成结果</h3>
+            <div class="copy-area">
+                <span id="copyTip">✔ 已复制到剪贴板</span>
+                <button id="copyBtn" class="outline" style="padding: 6px 15px; font-size: 12px;">📋 复制全部内容</button>
+            </div>
+        </div>
+        <textarea id="output" readonly placeholder="生成结果将在此处显示... (请先在上方填写UUID等参数)"></textarea>
+    </div>
+</div>
+
+<script>
+/* ===========================================================
+   全局变量设置（在代码的开头即可设置 UUID、SNI、Host、Path）
+   =========================================================== */
+let CONFIG_UUID = '';  
+let CONFIG_SNI  = '';  
+let CONFIG_HOST = '';  
+let CONFIG_PATH = '%2Fproxyip%3DProxyIP.CMLiussss.net';  
+
+/* 背景动画 */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let width, height, particles = [];
+function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+window.addEventListener('resize', resize); resize();
+class Particle {
+    constructor() { this.x = Math.random() * width; this.y = Math.random() * height; this.vx = (Math.random() - 0.5) * 1.2; this.vy = (Math.random() - 0.5) * 1.2; this.radius = Math.random() * 2 + 1; }
+    update() { this.x += this.vx; this.y += this.vy; if (this.x < 0 || this.x > width) this.vx = -this.vx; if (this.y < 0 || this.y > height) this.vy = -this.vy; }
+    draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fillStyle = 'rgba(0, 102, 204, 0.3)'; ctx.fill(); }
+}
+for (let i = 0; i < 60; i++) particles.push(new Particle());
+function animate() {
+    ctx.clearRect(0, 0, width, height);
+    particles.forEach((p, i) => {
+        p.update(); p.draw();
+        for (let j = i + 1; j < particles.length; j++) {
+            const d = Math.sqrt((p.x - particles[j].x) ** 2 + (p.y - particles[j].y) ** 2);
+            if (d < 110) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(particles[j].x, particles[j].y); ctx.strokeStyle = `rgba(0, 102, 204, ${0.2 * (1 - d / 110)})`; ctx.stroke(); }
+        }
+    });
+    requestAnimationFrame(animate);
+}
+animate();
+
+/* 全局数据 */
+let globalData = [];
+
+/* 解析 CSV (支持引号内逗号) */
+function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i], next = text[i + 1];
+        if (char === '"') {
+            if (inQuotes && next === '"') { field += '"'; i++; } 
+            else { inQuotes = !inQuotes; }
+        } else if (char === ',' && !inQuotes) {
+            row.push(field); field = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (char === '\r' && next === '\n') i++;
+            row.push(field);
+            if (row.some(cell => String(cell).trim() !== '')) rows.push(row);
+            row = []; field = '';
+        } else { field += char; }
+    }
+    row.push(field);
+    if (row.some(cell => String(cell).trim() !== '')) rows.push(row);
+    return rows;
+}
+
+function cleanCSVValue(value) {
+    if (value == null) return '';
+    value = String(value).trim();
+    if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1).replace(/""/g, '"');
+    return value.trim();
+}
+
+function normalizeASN(val) {
+    val = String(val).trim();
+    if (!val) return '';
+    if (/^as\d+$/i.test(val)) return 'AS' + val.substring(2);
+    if (/^\d+$/.test(val)) return 'AS' + val;
+    return val;
+}
+
+/* ⚡⚡⚡ 核心算法：区间锚点拼接，完美解决企业名含逗号被截断问题 */
+function parseRowToObj(cols) {
+    let ip = '', port = '', asn = '', enterprise = '', airport = '', country = '';
+    
+    let ipIndex = -1, portIndex = -1, asnIndex = -1, airportIndex = -1;
+    
+    cols.forEach((rawV, i) => {
+        let v = cleanCSVValue(rawV);
+        if (!v) return;
+        
+        if (ipIndex === -1) {
+            if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(v) || (/^[0-9a-fA-F:]+$/.test(v) && v.includes(':')) || /^[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,}$/.test(v)) {
+                ipIndex = i; ip = v; return;
+            }
+        }
+        if (ipIndex !== -1 && portIndex === -1 && i > ipIndex && /^\d{2,5}$/.test(v)) {
+            portIndex = i; port = v; return;
+        }
+        if (asnIndex === -1 && /^(AS)?\d+$/i.test(v)) {
+            asnIndex = i; asn = normalizeASN(v); return;
+        }
+        let airportMatch = v.match(/^([a-zA-Z]{3})\s*\(/);
+        if (airportMatch && airportIndex === -1) {
+            airportIndex = i; airport = airportMatch[1].toUpperCase(); return;
+        }
+    });
+    
+    if (asnIndex !== -1 && airportIndex !== -1 && airportIndex > asnIndex) {
+        let entParts = [];
+        for (let i = asnIndex + 1; i < airportIndex; i++) {
+            let v = cleanCSVValue(cols[i]);
+            if (v) {
+                if (/^[A-Z]{2}$/.test(v) && entParts.length === 0) {
+                    country = v;
+                } else {
+                    entParts.push(v);
+                }
+            }
+        }
+        if (entParts.length > 0) enterprise = entParts.join(','); // 还原逗号
+    } else {
+        let possibleEnterprises = [];
+        cols.forEach((rawV, i) => {
+            let v = cleanCSVValue(rawV);
+            if (!v) return;
+            if (i === ipIndex || i === portIndex || i === asnIndex || i === airportIndex) return;
+            if (asnIndex !== -1 && i < asnIndex) return; 
+            if (v.length > 2 && !/^[\d\.:a-fA-F]+$/.test(v) && !/^[A-Z]{2}$/.test(v)) {
+                possibleEnterprises.push(v);
+            }
+        });
+        enterprise = possibleEnterprises.find(e => /LIMITED|LTD|INC|CLOUD|TECH|ENTERPRISE|Sdn|CORP|HOST|NETWORK|GROUP|HOLDINGS|SOLUTIONS/i.test(e)) 
+                    || possibleEnterprises.sort((a,b) => b.length - a.length)[0] 
+                    || '';
+    }
+    
+    if (!country && asnIndex !== -1) {
+        for(let i = asnIndex + 1; i < (airportIndex !== -1 ? airportIndex : cols.length); i++) {
+            let v = cleanCSVValue(cols[i]);
+            if (/^[A-Z]{2}$/.test(v)) { country = v; break; }
+        }
+    }
+    
+    return { ip, port, asn, enterprise, airport, country };
+}
+
+/* ⚡⚡⚡ 文件导入：强制仅 .txt，且强制 UTF-8 解码 */
+document.getElementById('txtFile').addEventListener('change', async (e) => {
+    if (!e.target.files.length) return;
+    const file = e.target.files[0];
+    
+    // 1. 强制后缀名校验
+    if (!file.name.toLowerCase().endsWith('.txt')) {
+        alert('❌ 仅支持导入 .txt 格式的文件！');
+        e.target.value = '';
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        try {
+            // 2. 强制以 UTF-8 文本读取，彻底摒弃编码猜测，绝无乱码可能
+            const text = ev.target.result; 
+            const rows = parseCSV(text);
+            
+            if (!rows.length) { alert('文件为空或无法解析。'); return; }
+            
+            // 直接智能提取，过滤掉没有 IP 的脏数据行
+            globalData = rows.map(cols => parseRowToObj(cols)).filter(r => r.ip);
+            
+            const tip = document.getElementById('statusTip');
+            tip.style.display = 'block';
+            tip.innerHTML = `✅ <b>已成功解析 ${globalData.length} 个节点</b> (强制 UTF-8 编码解析)，请配置参数后点击生成。`;
+            document.getElementById('output').value = '';
+        } catch (err) {
+            console.error(err);
+            alert('解析失败，请检查文件格式是否正确。');
+        }
+    };
+    // 关键：第二个参数直接锁死 'UTF-8'
+    reader.readAsText(file, 'UTF-8');
+});
+
+function resetAll() {
+    document.getElementById('txtFile').value = '';
+    document.getElementById('output').value = '';
+    document.getElementById('statusTip').style.display = 'none';
+    globalData = [];
+}
+
+/* 生成 VLESS 链接 */
+document.getElementById('generateBtn').onclick = () => {
+    const c = (id) => document.getElementById(id).value.trim();
+    if (!globalData.length) { alert('请先导入有效的 TXT 文件！'); return; }
+    
+    const links = globalData.map(row => {
+        if (!row.ip) return null;
+        let sec = c('security');
+        const ins = c('allowInsecure');
+        
+        let params = `encryption=${encodeURIComponent(c('encryption'))}&security=${encodeURIComponent(sec)}&sni=${encodeURIComponent(c('sni'))}&fp=${encodeURIComponent(c('fp'))}&alpn=${encodeURIComponent(c('alpn'))}&insecure=${encodeURIComponent(ins)}&allowInsecure=${encodeURIComponent(ins)}&type=${encodeURIComponent(c('type'))}`;
+        
+        if (c('host')) params += `&host=${encodeURIComponent(c('host'))}`;
+        if (c('path')) params += `&path=${encodeURIComponent(c('path'))}`;
+
+        // 节点名：三字机场码 - 企业 - ASN
+        const parts = [row.airport, row.enterprise, row.asn].filter(v => v);
+        const nodeName = parts.length ? parts.join('-') : 'Custom_Node';
+
+        return `vless://${c('uuid')}@${row.ip}:${row.port || 443}?${params}#${encodeURIComponent(nodeName)}`;
+    }).filter(Boolean);
+
+    document.getElementById('output').value = links.join('\n');
+};
+
+/* 复制结果 */
+document.getElementById('copyBtn').onclick = async () => {
+    const o = document.getElementById('output');
+    if (!o.value) return;
+    try {
+        await navigator.clipboard.writeText(o.value);
+        const tip = document.getElementById('copyTip');
+        tip.classList.add('show');
+        setTimeout(() => tip.classList.remove('show'), 2000);
+    } catch (err) {
+        o.select(); document.execCommand('copy');
+        const tip = document.getElementById('copyTip');
+        tip.classList.add('show');
+        setTimeout(() => tip.classList.remove('show'), 2000);
+    }
+};
+
+/* 初始化配置项 */
+window.onload = () => {
+    document.getElementById('uuid').value = CONFIG_UUID;
+    document.getElementById('sni').value = CONFIG_SNI;
+    document.getElementById('host').value = CONFIG_HOST;
+    document.getElementById('path').value = CONFIG_PATH;
+};
+</script>
+</body>
+</html>
