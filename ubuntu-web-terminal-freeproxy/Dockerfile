@@ -10,7 +10,7 @@ RUN apt-get update && \
     curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 -o /usr/bin/ttyd && \
     chmod +x /usr/bin/ttyd && \
     # free-proxy 二进制
-    curl -fL https://github.com/mastersir-lab/free-proxy/releases/latest/download/free-proxy-linux-amd64 -o /usr/local/bin/free-proxy && \
+    curl -fL https://github.com/MasterAlanLab/free-proxy/releases/latest/download/free-proxy-linux-amd64 -o /usr/local/bin/free-proxy && \
     chmod +x /usr/local/bin/free-proxy && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
