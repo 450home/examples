@@ -6,7 +6,7 @@ on:
       metro:
         description: Unikraft Cloud metro
         required: true
-        default: fra
+        default: dal
         type: choice
         options:
           - fra
