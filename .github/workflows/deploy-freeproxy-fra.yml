@@ -36,10 +36,13 @@ jobs:
         run: |
           unikraft build . --output iudd/ubuntu-web-terminal:freeproxy
 
-      - name: Create persistent data volume
+      - name: Ensure persistent data volume
         run: |
-          unikraft volumes get free-proxy-data-fra --metro fra >/dev/null 2>&1 || \
-            unikraft volumes create --metro fra --name free-proxy-data-fra --size 1GiB
+          if unikraft volumes get free-proxy-data-fra --metro fra >/dev/null 2>&1; then
+            echo "volume exists"
+          else
+            unikraft volumes create --metro fra --name free-proxy-data-fra --size 1GiB 2>&1 | grep -q 'already exists' && echo "volume exists (race)" || true
+          fi
 
       - name: Deploy to Frankfurt with multi-ports
         run: |
