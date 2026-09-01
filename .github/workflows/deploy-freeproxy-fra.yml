@@ -38,15 +38,15 @@ jobs:
 
       - name: Create persistent data volume
         run: |
-          unikraft volumes get ubuntu-web-terminal-data --metro fra >/dev/null 2>&1 || \
-            unikraft volumes create --metro fra --name ubuntu-web-terminal-data --size 1GiB
+          unikraft volumes get free-proxy-data-fra --metro fra >/dev/null 2>&1 || \
+            unikraft volumes create --metro fra --name free-proxy-data-fra --size 1GiB
 
       - name: Deploy to Frankfurt with multi-ports
         run: |
           unikraft run --metro fra \
             -n ubuntu-web-terminal \
             -m 1G \
-            -v ubuntu-web-terminal-data:/data \
+            -v free-proxy-data-fra:/data \
             -p 2222:2222/tls \
             -p 39527:39527/tls \
             -p 9527:9527/tls \
