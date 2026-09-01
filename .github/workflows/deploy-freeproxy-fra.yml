@@ -49,6 +49,10 @@ jobs:
           unikraft instances get ubuntu-web-terminal --metro fra >/dev/null 2>&1 && \
             unikraft instances delete ubuntu-web-terminal --metro fra || true
 
+      - name: Remove stale FRA index tag (force fresh pull)
+        run: |
+          unikraft images delete index.fra.unikraft.cloud/iudd/ubuntu-web-terminal:freeproxy >/dev/null 2>&1 || true
+
       - name: Deploy to Frankfurt with multi-ports
         run: |
           unikraft run --metro fra \
