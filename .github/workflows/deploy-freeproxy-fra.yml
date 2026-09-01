@@ -44,6 +44,11 @@ jobs:
             unikraft volumes create --metro fra --name free-proxy-data-fra --size 1GiB 2>&1 | grep -q 'already exists' && echo "volume exists (race)" || true
           fi
 
+      - name: Remove existing instance (if any)
+        run: |
+          unikraft instances get ubuntu-web-terminal --metro fra >/dev/null 2>&1 && \
+            unikraft instances delete ubuntu-web-terminal --metro fra || true
+
       - name: Deploy to Frankfurt with multi-ports
         run: |
           unikraft run --metro fra \
