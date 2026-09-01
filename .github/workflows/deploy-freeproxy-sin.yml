@@ -1,0 +1,63 @@
+name: deploy-freeproxy-sin
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      UKC_METRO: sin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Unikraft CLI
+        run: |
+          mkdir -p "$HOME/.local/bin" "$HOME/ukc-build"
+          curl -fsSL "https://github.com/unikraft-cloud/cli/releases/download/v0.4.2/unikraft-cli_0.4.2_linux_amd64.tar.gz" -o "$HOME/ukc-build/unikraft-cli.tar.gz"
+          tar -xzf "$HOME/ukc-build/unikraft-cli.tar.gz" -C "$HOME/ukc-build"
+          find "$HOME/ukc-build" -type f -name unikraft -exec cp {} "$HOME/.local/bin/unikraft" \;
+          chmod +x "$HOME/.local/bin/unikraft"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/unikraft" version
+
+      - name: Log in to Unikraft Cloud
+        env:
+          UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
+        run: |
+          printf '%s' "$UKC_TOKEN" | unikraft login --token - --organization iudd
+
+      - name: Build and publish image (restores central tag)
+        working-directory: ubuntu-web-terminal-freeproxy
+        run: |
+          unikraft build . --output iudd/ubuntu-web-terminal:freeproxy
+
+      - name: Ensure persistent data volume
+        run: |
+          if unikraft volumes get free-proxy-data-sin --metro sin >/dev/null 2>&1; then
+            echo "volume exists"
+          else
+            unikraft volumes create --metro sin --name free-proxy-data-sin --size 1GiB 2>&1 | grep -q 'already exists' && echo "volume exists (race)" || true
+          fi
+
+      - name: Remove existing instance (if any)
+        run: |
+          curl -sk -X DELETE -H "Authorization: Bearer $UKC_TOKEN" "https://api.sin.unikraft.cloud/v1/instances?name=free-proxy-sin" || true
+
+      - name: Deploy to Singapore with multi-ports
+        run: |
+          unikraft run --metro sin \
+            -n free-proxy-sin \
+            -m 1G \
+            -v free-proxy-data-sin:/data \
+            -p 2222:2222/tls \
+            -p 39527:39527/tls \
+            -p 9527:9527/tls \
+            -p 9528:9528/tls \
+            -p 9529:9529/tls \
+            -p 9530:9530/tls \
+            --image iudd/ubuntu-web-terminal:freeproxy
