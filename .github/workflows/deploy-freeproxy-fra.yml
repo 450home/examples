@@ -46,8 +46,7 @@ jobs:
 
       - name: Remove existing instance (if any)
         run: |
-          unikraft instances get ubuntu-web-terminal --metro fra >/dev/null 2>&1 && \
-            unikraft instances delete ubuntu-web-terminal --metro fra || true
+          unikraft instances delete ubuntu-web-terminal --metro fra || true
 
       - name: Remove stale FRA index tag (force fresh pull)
         run: |
