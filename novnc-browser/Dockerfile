@@ -6,7 +6,12 @@ ENV DEBIAN_PRIORITY=high
 RUN apt-get update && \
     apt-get -y install --no-install-recommends \
     ca-certificates \
+    xserver-xorg-core \
+    xauth \
+    x11-xserver-utils \
     xvfb \
+    xfonts-base \
+    fonts-liberation \
     xterm \
     xdotool \
     scrot \
