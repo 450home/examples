@@ -19,6 +19,9 @@ RUN apt-get update && \
     x11vnc \
     tint2 \
     wget \
+    openssh-server \
+    openssh-client \
+    procps \
     firefox-esr && \
     update-ca-certificates && \
     apt-get purge -y man-db 2>/dev/null || true; \
