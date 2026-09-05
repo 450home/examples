@@ -20,6 +20,7 @@ RUN apt-get update && \
     x11vnc \
     tint2 \
     wget \
+    python3 \
     openssh-server \
     openssh-client \
     procps \
