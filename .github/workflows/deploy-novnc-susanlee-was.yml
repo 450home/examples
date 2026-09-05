@@ -1,0 +1,54 @@
+name: deploy-novnc-susanlee-was
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Unikraft CLI
+        run: |
+          mkdir -p "$HOME/.local/bin" "$HOME/ukc-build"
+          curl -fsSL "https://github.com/unikraft-cloud/cli/releases/download/v0.4.2/unikraft-cli_0.4.2_linux_amd64.tar.gz" -o "$HOME/ukc-build/cli.tgz"
+          tar -xzf "$HOME/ukc-build/cli.tgz" -C "$HOME/ukc-build"
+          find "$HOME/ukc-build" -type f -name unikraft -exec cp {} "$HOME/.local/bin/unikraft" \;
+          chmod +x "$HOME/.local/bin/unikraft"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      # susanlee 组织: 独立 1GiB 配额(空) — 瘦身后的 novnc 存这里
+      - name: Log in to Unikraft Cloud (susanlee)
+        env:
+          UKC_TOKEN_SUSANLEE: ${{ secrets.UKC_TOKEN_SUSANLEE }}
+        run: |
+          printf '%s' "$UKC_TOKEN_SUSANLEE" | unikraft login --token - --organization susanlee
+
+      # 瘦身版: mutter→openbox, noVNC 用 release tarball, 清理文档/缓存
+      - name: Build and publish slim image to susanlee registry
+        working-directory: novnc-browser
+        run: |
+          unikraft build . --output susanlee/novnc-browser:slim
+
+      - name: Remove existing instance (if any)
+        env:
+          UKC_TOKEN_SUSANLEE: ${{ secrets.UKC_TOKEN_SUSANLEE }}
+        run: |
+          curl -sk -X DELETE \
+            -H "Authorization: Bearer $UKC_TOKEN_SUSANLEE" \
+            "https://api.was.unikraft.cloud/v1/instances?name=novnc-browser-susan" || true
+
+      - name: Deploy to WAS as susanlee org
+        env:
+          UKC_TOKEN_SUSANLEE: ${{ secrets.UKC_TOKEN_SUSANLEE }}
+        run: |
+          unikraft run --metro was \
+            -n novnc-browser-susan \
+            -m 4G \
+            -p 443:6080/tls+http \
+            --image susanlee/novnc-browser:slim
