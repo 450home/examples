@@ -21,6 +21,8 @@ RUN apt-get update && \
     tint2 \
     wget \
     python3 \
+    net-tools \
+    iproute2 \
     openssh-server \
     openssh-client \
     procps \
