@@ -9,6 +9,7 @@ RUN apt-get update && \
     xserver-xorg-core \
     xauth \
     x11-xserver-utils \
+    x11-utils \
     xvfb \
     xfonts-base \
     fonts-liberation \
