@@ -5,7 +5,9 @@ ENV HOME=/root
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      ca-certificates ttyd bash curl wget git nano vim less procps iproute2 iputils-ping && \
+      ca-certificates bash curl wget git nano vim less procps iproute2 iputils-ping && \
+    curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 -o /usr/bin/ttyd && \
+    chmod +x /usr/bin/ttyd && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
