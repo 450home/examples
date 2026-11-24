@@ -1,0 +1,82 @@
+name: deploy-quickpool-was
+
+on:
+  workflow_dispatch:
+    inputs:
+      pubkey:
+        description: 'SSH public key for root'
+        required: true
+        type: string
+      memory:
+        description: 'Instance memory'
+        required: false
+        default: '1G'
+        type: string
+      volume:
+        description: 'Attach persistent volume for /app/data'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      UKC_TOKEN: ${{ secrets.UKC_TOKEN }}
+      UKC_ORG: susanlee
+      UKC_METRO: was
+      PUBKEY: ${{ inputs.pubkey }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Unikraft CLI
+        run: |
+          mkdir -p "$HOME/.local/bin" "$HOME/ukc-build"
+          curl -fsSL "https://github.com/unikraft-cloud/cli/releases/download/v0.4.2/unikraft-cli_0.4.2_linux_amd64.tar.gz" -o "$HOME/ukc-build/unikraft-cli.tar.gz"
+          tar -xzf "$HOME/ukc-build/unikraft-cli.tar.gz" -C "$HOME/ukc-build"
+          find "$HOME/ukc-build" -type f -name unikraft -exec cp {} "$HOME/.local/bin/unikraft" \;
+          chmod +x "$HOME/.local/bin/unikraft"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/unikraft" version
+
+      - name: Log in to Unikraft Cloud
+        run: printf '%s' "$UKC_TOKEN" | unikraft login --token - --organization "$UKC_ORG"
+
+      - name: Build and publish image
+        working-directory: quickpool
+        run: unikraft build . --output "$UKC_ORG/quickpool:latest"
+
+      - name: Remove existing instance (if any)
+        run: unikraft instances delete quickpool --metro "$UKC_METRO" || true
+
+      - name: Ensure volume
+        if: ${{ inputs.volume }}
+        run: |
+          echo "--- volumes create help ---"
+          unikraft volumes create --help 2>&1 | head -40 || true
+          echo "--- existing volumes ---"
+          unikraft volumes list --metro "$UKC_METRO" 2>&1 | head -20 || true
+          unikraft volumes create --name quickpool-data-was --size 256M --metro "$UKC_METRO" 2>&1 || echo "volume create failed or already exists"
+
+      - name: Deploy to WAS
+        run: |
+          set -x
+          PORTS="-p 443:8045/http+tls -p 2222:2222/tls"
+          if [ "${{ inputs.volume }}" = "true" ]; then
+            unikraft run --metro "$UKC_METRO" -n quickpool -m "${{ inputs.memory }}" \
+              $PORTS -e PUBKEY="$PUBKEY" -v quickpool-data-was:/app/data \
+              --image "$UKC_ORG/quickpool:latest" && exit 0
+            echo "### deploy with volume failed, retrying without volume"
+          fi
+          unikraft run --metro "$UKC_METRO" -n quickpool -m "${{ inputs.memory }}" \
+            $PORTS -e PUBKEY="$PUBKEY" \
+            --image "$UKC_ORG/quickpool:latest"
+
+      - name: Report
+        run: |
+          unikraft instances ls --metro "$UKC_METRO" -o table 2>&1 | head -30 || true
+          unikraft instances get quickpool --metro "$UKC_METRO" -o json 2>&1 | head -80 || true
